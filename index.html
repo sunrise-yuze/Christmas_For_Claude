@@ -1,3 +1,11 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
 <title>Five Gold Rings</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -168,22 +176,22 @@ footer p { margin: 0; max-width: 64ch; }
 
   <footer>
     <p>On the fifth day of Christmas: five gold rings. Ring ticks read clockwise from twelve o'clock; a long tick is a 1 bit.</p>
-    <p>Every page opens in a new tab.</p>
+    <p>Use your browser's Back button to return here.</p>
   </footer>
 </main>
 
 <script>
 (() => {
   const PAGES = [
-    { n: 'I', seed: '219626542cc8593f42183be1137f30e8c9e9467e12bab5f4398162ea58fc22ff', title: 'Astrolabe of Midwinter', f: 'f1', url: 'https://claude.ai/artifact/RMhHepFrqTyxX8x2ktP6qd',
+    { n: 'I', seed: '219626542cc8593f42183be1137f30e8c9e9467e12bab5f4398162ea58fc22ff', title: 'Astrolabe of Midwinter', f: 'f1', url: 'astrolabe.html',
       desc: 'Turn a brass astrolabe through Christmas Eve until the Winter Hexagon stands in the south at midnight.', ground: '#0b1428', glyph: 'astro' },
-    { n: 'II', seed: '6368c03348cd0583a7cd63395517ca6df3e5bea15b7ffcdc65b0c62f6b982105', title: 'Overprint Noël', f: 'f2', url: 'https://claude.ai/artifact/DPvaA5sCBNhzb1ywzbm69p',
+    { n: 'II', seed: '6368c03348cd0583a7cd63395517ca6df3e5bea15b7ffcdc65b0c62f6b982105', title: 'Overprint Noël', f: 'f2', url: 'overprint.html',
       desc: 'Set a card from hand-cut stamps and pull two-ink prints that never come out the same twice.', ground: '#eeeee8', glyph: 'riso' },
-    { n: 'III', seed: '85975d06017536df0c3da4f60943959a82164ad5c7c0e7daef924496312ed7f8', title: 'The Frosted Pane', f: 'f3', url: 'https://claude.ai/artifact/4HbocH97u5Rp7Qvfyg8X2q',
+    { n: 'III', seed: '85975d06017536df0c3da4f60943959a82164ad5c7c0e7daef924496312ed7f8', title: 'The Frosted Pane', f: 'f3', url: 'frosted-pane.html',
       desc: 'Wipe the frost off a window to find a snowy village. Hold to breathe on the glass, then write.', ground: '#07090b', glyph: 'frost' },
-    { n: 'IV', seed: 'f342004c0ee0459d555b91360d075fe7b3bad234945c8ba5a46c42da7fc6847f', title: 'The Midnight Glasshouse', f: 'f4', url: 'https://claude.ai/artifact/UebYCbZqvZYCe6S1csGT4J',
+    { n: 'IV', seed: 'f342004c0ee0459d555b91360d075fe7b3bad234945c8ba5a46c42da7fc6847f', title: 'The Midnight Glasshouse', f: 'f4', url: 'glasshouse.html',
       desc: 'Blow, silver and paint a glass bauble in 3D, then hang it on the fir and ring it.', ground: '#1a0a10', glyph: 'glass' },
-    { n: 'V', seed: '2a34736f8713fd235f010f7d99ffa75c28eb0310a63d15f818b714eaeea8c9b9', title: 'Gingerbread Construction Set', f: 'f5', url: 'https://claude.ai/artifact/28hvjSG6sJjvfPZ1gYXZwT',
+    { n: 'V', seed: '2a34736f8713fd235f010f7d99ffa75c28eb0310a63d15f818b714eaeea8c9b9', title: 'Gingerbread Construction Set', f: 'f5', url: 'gingerbread-set.html',
       desc: 'Assemble a gingerbread house from a full drawing set: layers, cutting template and the recipe as a bill of materials.', ground: '#eef2ee', glyph: 'ginger' },
   ];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -199,10 +207,8 @@ footer p { margin: 0; max-width: 64ch; }
     const a = document.createElement('a');
     a.className = 'ring';
     a.href = p.url;
-    a.target = '_blank';
-    a.rel = 'noopener';
     a.style.setProperty('--drop', drops[i] + 'px');
-    a.setAttribute('aria-label', `${p.title}. ${p.desc} Opens in a new tab.`);
+    a.setAttribute('aria-label', `${p.title}. ${p.desc}`);
     a.innerHTML = `<span class="hang" aria-hidden="true"></span><canvas aria-hidden="true"></canvas>
       <span class="cap"><span class="num">Seed ${p.n}</span><span class="name ${p.f}"></span><span class="desc"></span><span class="hash"></span><span class="open">Open page ↗</span></span>`;
     a.querySelector('.name').textContent = p.title;
@@ -570,3 +576,6 @@ footer p { margin: 0; max-width: 64ch; }
   layout();
 })();
 </script>
+
+</body>
+</html>

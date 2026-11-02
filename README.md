@@ -2,9 +2,11 @@
 
 五个可交互的圣诞网页，每一个都从一个 SHA-256 哈希"种子"生长出来：配色、字体、版式、交互方式，以及页面里每一片雪、每一颗星的随机分布，都由各自的种子决定。另有一个大厅页 `index.html` 把它们串在一起。
 
+**网站：https://sunrise-yuze.github.io/Christmas_For_Claude/**
+
 ![Lobby](screenshots/00-lobby.png)
 
-## 在线版本（claude.ai Artifacts，默认私密，需在 Share 菜单中分享）
+## claude.ai Artifact 版本（默认私密，需在 Share 菜单中分享）
 
 | | 页面 | 文件 | 链接 |
 |---|---|---|---|
@@ -33,17 +35,21 @@
 
 ## 隐藏细节与预览
 
-每页都有一层"靠近才出现"的微交互和一层需要寻找的彩蛋（例如星盘上输入 `STELLA`、孔版印刷里趁滚筒还在转再按 PRINT、霜窗里在雾中画一颗心、玻璃工坊挂满六个后的圣诞腌黄瓜、姜饼屋长按盖章）。完整清单见 `docs/detail-plan.json`。
+每页都有一层"靠近才出现"的微交互和一层需要寻找的彩蛋（例如星盘上输入 `STELLA`、孔版印刷里趁滚筒还在转再按 PRINT、霜窗里在雾中画一颗心、玻璃工坊挂满六个后的圣诞腌黄瓜、姜饼屋长按盖章）。完整清单见 `notes/detail-plan.json`。
 
 页面会随访问者的本地日期变化（降临期、平安夜、圣诞节、圣诞十二日）。想提前看，在链接后加 `#advent`、`#christmas-eve` 或 `#christmas-day`。
 
-## 本地打开
+## 目录结构与构建
 
-直接用浏览器打开任意 `.html` 即可。这些文件是按 claude.ai Artifact 格式写的片段（没有 `<!doctype>`/`<head>`/`<body>`，发布时由平台包上外壳），浏览器也能正常渲染。外部资源只有 Google Fonts 和玻璃工坊用到的 `three@0.149.0`（jsDelivr）。
+- 仓库根目录的 `*.html` 是 GitHub Pages 网站本身（完整 HTML 文档）。
+- `src/` 是源文件，按 claude.ai Artifact 格式写成（没有 `<!doctype>`/`<head>`/`<body>`，由平台包外壳）。
+- 修改 `src/` 后运行 `python3 tools/build-pages.py`，它会生成根目录的网站文件，并把大厅里的链接改成站内相对链接。
+
+外部资源只有 Google Fonts 和玻璃工坊用到的 `three@0.149.0`（jsDelivr）。也可以在本地运行 `python3 -m http.server`，然后打开 http://localhost:8000 。
 
 ## 其他文件
 
-- `docs/brief-common.md`：给五个"设计工作室"子代理的统一设计与技术约束
-- `docs/detail-plan.json`：灵感调研后提炼的每页细节方案
+- `notes/brief-common.md`：给五个"设计工作室"子代理的统一设计与技术约束
+- `notes/detail-plan.json`：灵感调研后提炼的每页细节方案
 - `tools/shoot.js`：Playwright 截图/自测脚本（包装成发布外壳，桌面 1440×900 与手机 390×844）
 - `screenshots/`：最终版截图

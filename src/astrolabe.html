@@ -1,0 +1,3473 @@
+<title>Astrolabe of Midwinter</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;500&amp;family=Fragment+Mono:ital@0;1&amp;display=swap">
+<style>
+/* Layout: the brass instrument is the page, set right of centre on a sparse night; a narrow engraved column at left holds title, readouts and plates. Phones stack instrument, readouts, then text. */
+:root {
+  color-scheme: dark;
+  --night: #0b1428;
+  --night-2: #111d38;
+  --night-0: #060b18;
+  --plate: #0c162e;
+  --plate-hi: #16233f;
+  --floor: #2a2113;
+  --brass: #c8a25a;
+  --brass-hi: #ecd9a2;
+  --brass-lo: #7d6233;
+  --brass-deep: #3d3018;
+  --engrave: #1b160c;
+  --verdigris: #3f7f6c;
+  --star: #eef3ff;
+  --star-warm: #ffe2c2;
+  --ember: #b3543a;
+  --fg: #d6c8a0;
+  --fg-dim: #8e8a77;
+  --lede: #e2d5b0;
+  --hair: rgba(200, 162, 90, .22);
+  --hair-strong: rgba(200, 162, 90, .55);
+  --tag-bg: rgba(7, 12, 27, .94);
+  --shadow: #02040a;
+  --plate-active: rgba(200, 162, 90, .08);
+  --sheen-rgb: 236, 217, 162;
+  --sheen-dk-rgb: 27, 22, 12;
+  /* star colours by spectral class (B-V), and the warm cast of air near the horizon */
+  --bv-b: #d3dfff;
+  --bv-a: #eef3ff;
+  --bv-f: #fff4dc;
+  --bv-g: #ffe4b0;
+  --bv-k: #ffcf9c;
+  --bv-m: #ffb88a;
+  --air: #ffcf9a;
+  --f-display: "Cormorant Unicase", "Cormorant SC", "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --f-mono: "Fragment Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--fg);
+  font-family: var(--f-display);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(110vmax 80vmax at 64% 50%, var(--night-2) 0%, var(--night) 40%, var(--night-0) 100%);
+}
+.bg canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+@media (min-width: 761px) and (orientation: landscape), (min-width: 1101px) {
+  .bg canvas { -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,.18) 0, rgba(0,0,0,.18) 28%, #000 40%); mask-image: linear-gradient(90deg, rgba(0,0,0,.18) 0, rgba(0,0,0,.18) 28%, #000 40%); }
+}
+.bg::after {
+  content: ""; position: absolute; inset: 0;
+  background-image: var(--grain, none); background-size: 160px 160px;
+  opacity: .55;
+}
+
+.page {
+  position: relative; z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(250px, 360px) minmax(0, 1fr);
+  column-gap: clamp(24px, 4vw, 72px);
+  min-height: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding-left: clamp(0px, 3.4vw, 56px);
+  box-sizing: border-box;
+}
+
+.col {
+  display: flex; flex-direction: column; justify-content: space-between;
+  gap: 36px; min-width: 0;
+  padding-block: clamp(24px, 5.2vh, 64px);
+}
+
+.head { display: grid; gap: 22px; }
+.title {
+  margin: 0;
+  font-weight: 300;
+  font-size: clamp(40px, 4.15vw, 60px);
+  line-height: .94;
+  letter-spacing: .085em;
+  color: var(--brass-hi);
+  text-wrap: balance;
+}
+.title > span { display: block; }
+.title .sub { margin-top: .32em; font-size: .5em; font-weight: 500; letter-spacing: .27em; color: var(--brass); }
+.lede {
+  margin: 0;
+  max-width: 33ch;
+  font-weight: 500;
+  font-size: 19.5px;
+  line-height: 1.42;
+  letter-spacing: .012em;
+  word-spacing: .04em;
+  color: var(--lede);
+  text-wrap: pretty;
+}
+.hint {
+  margin: 0;
+  display: flex; align-items: flex-start; gap: 12px;
+  font: 11px/1.65 var(--f-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+.hint svg { flex: none; width: 26px; height: 26px; margin-top: -1px; color: var(--brass); }
+
+.panel { display: grid; gap: 20px; }
+.readouts {
+  margin: 0; padding-block: 12px;
+  display: grid;
+  border-top: 1px solid var(--hair-strong);
+  border-bottom: 1px solid var(--hair);
+  font-family: var(--f-mono);
+}
+.readouts > div {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  padding-block: 4px;
+}
+.readouts dt {
+  font-size: 10px; letter-spacing: .17em; text-transform: uppercase; color: var(--fg-dim);
+}
+.readouts dd {
+  margin: 0; font-size: 14px; letter-spacing: .03em; color: var(--brass-hi);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.readouts dd small { font-size: 10px; letter-spacing: .14em; color: var(--fg-dim); margin-left: .6em; }
+/* the live pip: the rete is following the viewer's own clock */
+.pip { display: inline-block; width: 4px; height: 4px; margin-right: 8px; border-radius: 50%; vertical-align: .22em; background: var(--brass-hi); box-shadow: 0 0 0 2px rgba(200, 162, 90, .16); }
+.readouts > .season { display: block; padding-block: 0 4px; margin-top: -3px; }
+.readouts > .season dd { font-size: 10px; letter-spacing: .04em; line-height: 1.5; color: var(--fg); opacity: .7; text-align: right; white-space: normal; text-wrap: balance; transition: opacity .2s; }
+.readouts > .season dd.swap { opacity: 0; }
+.readouts > .season.travel dd { color: var(--brass-hi); }
+
+.ctl-label {
+  display: block;
+  font: 10px/1.4 var(--f-mono); letter-spacing: .17em; text-transform: uppercase; color: var(--fg-dim);
+}
+.hourbox { display: grid; gap: 6px; }
+#hour {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 22px; margin: 0; background: transparent; cursor: pointer;
+}
+#hour::-webkit-slider-runnable-track { height: 1px; background: var(--hair-strong); }
+#hour::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 9px; height: 9px; margin-top: -4px; border: 0;
+  background: var(--brass); transform: rotate(45deg);
+  box-shadow: 0 0 0 3px var(--night);
+}
+#hour::-moz-range-track { height: 1px; background: var(--hair-strong); border: 0; }
+#hour::-moz-range-thumb {
+  width: 8px; height: 8px; border: 0; border-radius: 0;
+  background: var(--brass); transform: rotate(45deg);
+}
+#hour:focus-visible { outline: 1px solid var(--brass-hi); outline-offset: 5px; }
+.scale {
+  position: relative; height: 14px;
+  font: 10px/1 var(--f-mono); letter-spacing: .06em; color: var(--fg-dim);
+  font-variant-numeric: tabular-nums;
+}
+.scale span { position: absolute; top: 0; transform: translateX(-50%); }
+.scale span:first-child { transform: none; }
+.scale span:last-child { transform: translateX(-100%); }
+.scale span.mid { color: var(--fg); }
+
+.plates { display: grid; gap: 6px; }
+.plates-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; min-width: 0; }
+.plate-note { font: italic 10px/1.4 var(--f-mono); letter-spacing: .03em; color: var(--fg); opacity: 0; transition: opacity .25s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.plate-note.show { opacity: .7; }
+.plate-row {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--hair);
+}
+.plate-row button {
+  appearance: none; -webkit-appearance: none;
+  display: grid; gap: 3px; justify-items: start;
+  padding: 9px 9px 10px; margin: 0;
+  background: transparent; border: 0; border-left: 1px solid var(--hair); border-radius: 0;
+  color: var(--fg-dim); cursor: pointer; text-align: left;
+  font: 10px/1.2 var(--f-mono); letter-spacing: .12em; text-transform: uppercase;
+  transition: color .3s, background-color .3s;
+}
+.plate-row button:first-child { border-left: 0; }
+.plate-row button small { font-size: 11px; letter-spacing: .03em; font-variant-numeric: tabular-nums; }
+.plate-row button:hover { color: var(--fg); }
+.plate-row button[aria-pressed="true"] { color: var(--brass-hi); background: var(--plate-active); box-shadow: inset 0 -1px 0 var(--brass); }
+.plate-row button:focus-visible, .colophon button:focus-visible { outline: 1px solid var(--brass-hi); outline-offset: 2px; position: relative; z-index: 1; }
+
+.colophon {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 18px;
+  font: 10px/1.6 var(--f-mono); letter-spacing: .1em; color: var(--fg-dim);
+}
+.colophon .serial { color: var(--brass); letter-spacing: .08em; }
+.colophon button {
+  appearance: none; -webkit-appearance: none;
+  background: transparent; border: 0; border-bottom: 1px solid var(--hair-strong); border-radius: 0;
+  padding: 2px 0; margin: 0; cursor: pointer;
+  font: 10px/1.6 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--fg);
+}
+.colophon button[aria-pressed="true"] { color: var(--brass-hi); border-bottom-color: var(--brass-hi); }
+.colophon button .state { color: var(--fg-dim); }
+.colophon button[aria-pressed="true"] .state { color: var(--brass-hi); }
+
+.stage {
+  position: sticky; top: 0; align-self: start;
+  height: 100vh; height: 100dvh;
+  box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  min-width: 0;
+  padding-block: 2vh;
+}
+.instrument {
+  position: relative;
+  width: min(83vh, 100%);
+  width: min(83dvh, 100%);
+  aspect-ratio: 1 / 1.1;
+  max-width: 100%;
+}
+.instrument canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.instrument canvas.scint { inset: auto; left: 0; top: 0; width: auto; height: auto; pointer-events: none; }
+.sheen {
+  position: absolute; inset: 0; pointer-events: none;
+  /* the light is turned by rotating this layer about the pin (compositor only); its ring mask is centred there, so it stays put */
+  transform-origin: var(--sx) var(--sy); will-change: transform;
+  --sx: 50%; --sy: 50%; --ri: 40%; --ro: 48%;
+  /* lathe-turned brass: two opposed narrow streaks (a bow-tie) over a broad soft wash */
+  --hi: rgba(var(--sheen-rgb), .52); --hi1: rgba(var(--sheen-rgb), .33); --hi2: rgba(var(--sheen-rgb), .18); --hi5: rgba(var(--sheen-rgb), .1); --hi3: rgba(var(--sheen-rgb), .3); --hi6: rgba(var(--sheen-rgb), .17); --hi4: rgba(var(--sheen-rgb), .07); --hi0: rgba(var(--sheen-rgb), 0); --dk: rgba(var(--sheen-dk-rgb), .26);
+  background: conic-gradient(at var(--sx) var(--sy), var(--hi) 0turn, var(--hi1) .007turn, var(--hi2) .02turn, var(--hi5) .055turn, var(--hi0) .12turn, var(--dk) .25turn, var(--hi0) .38turn, var(--hi4) .45turn, var(--hi6) .485turn, var(--hi3) .5turn, var(--hi6) .515turn, var(--hi4) .55turn, var(--hi0) .62turn, var(--dk) .75turn, var(--hi0) .88turn, var(--hi5) .945turn, var(--hi2) .98turn, var(--hi1) .993turn, var(--hi) 1turn);
+  -webkit-mask-image: radial-gradient(circle at var(--sx) var(--sy), transparent calc(var(--ri) - .5px), #000 calc(var(--ri) + .5px), #000 calc(var(--ro) - 1px), transparent var(--ro));
+  mask-image: radial-gradient(circle at var(--sx) var(--sy), transparent calc(var(--ri) - .5px), #000 calc(var(--ri) + .5px), #000 calc(var(--ro) - 1px), transparent var(--ro));
+}
+.dial {
+  position: absolute; border-radius: 50%; clip-path: circle(50%);
+  touch-action: none; cursor: grab;
+}
+.dial.dragging { cursor: grabbing; }
+.dial.on-star { cursor: pointer; }
+.dial:focus { outline: none; }
+.dial-ring { position: absolute; border-radius: 50%; pointer-events: none; }
+.dial:focus-visible + .dial-ring { outline: 1px solid var(--brass-hi); outline-offset: 5px; }
+
+.tag {
+  position: absolute; left: 0; top: 0; z-index: 3;
+  pointer-events: none;
+  min-width: 170px; max-width: 230px;
+  padding: 10px 12px 11px;
+  background: var(--tag-bg);
+  border: 1px solid var(--hair-strong);
+  color: var(--fg);
+  font: 10.5px/1.55 var(--f-mono); letter-spacing: .04em;
+  font-variant-numeric: tabular-nums;
+  opacity: 0; transition: opacity .25s;
+}
+.tag.show { opacity: 1; }
+.tag.kb { outline: 1px solid var(--brass-hi); outline-offset: 3px; }
+.tag b {
+  display: block; margin-bottom: 5px;
+  font: 500 18px/1.05 var(--f-display); letter-spacing: .07em; color: var(--brass-hi);
+}
+.tag span { display: block; white-space: nowrap; }
+.tag .dim { color: var(--fg-dim); }
+.tag .dry { color: var(--fg); opacity: .7; font-size: 10px; }
+.tag .spark { display: flex; align-items: center; gap: 9px; margin-block: 5px 3px; }
+.tag .spark svg { flex: none; width: 120px; height: 24px; overflow: visible; }
+.tag .spark .hz { stroke: var(--hair-strong); stroke-width: .6; stroke-dasharray: 1.5 2.5; }
+.tag .spark .up { fill: none; stroke: var(--brass-hi); stroke-width: 1; }
+.tag .spark .dn { fill: none; stroke: var(--fg-dim); stroke-width: 1; opacity: .55; }
+.tag .spark .mk { stroke: var(--hair-strong); stroke-width: .6; }
+.tag .spark circle { fill: var(--star); }
+.tag .rs { display: inline; white-space: nowrap; border-bottom: 1px dotted var(--hair-strong); color: var(--brass-hi); }
+.tag.pinned { pointer-events: none; }
+.tag.pinned .rs { pointer-events: auto; cursor: ew-resize; touch-action: none; }
+.tag.pinned .rs:hover { border-bottom-color: var(--brass-hi); }
+/* the horse: the wedge through the pin */
+.wtag {
+  position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none;
+  padding: 3px 7px 4px; background: var(--tag-bg); border: 1px solid var(--hair);
+  font: italic 10px/1.3 var(--f-mono); letter-spacing: .03em; color: var(--fg); white-space: nowrap;
+  opacity: 0; transition: opacity .15s;
+}
+.wtag.show { opacity: 1; }
+/* hints engraved in the world, outside the limb */
+.lore { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; opacity: 0; transition: opacity .6s; }
+.lore.show { opacity: 1; }
+.lore text { font: italic 9.5px var(--f-mono); letter-spacing: .08em; }
+.lore .sh { fill: var(--shadow); opacity: .8; }
+.lore .tx { fill: var(--brass); }
+.lore .key { fill: var(--brass-hi); font-style: normal; }
+/* the instrument's face turns over to show its back */
+.face { position: absolute; inset: 0; transform-origin: 50% 50%; overflow: hidden; }
+.face #c-back { opacity: 0; visibility: hidden; }
+.face.back #c-back { opacity: 1; visibility: visible; }
+.face.back > :not(#c-back) { visibility: hidden; }
+.face.fade #c-back { transition: opacity .3s, visibility .3s; }
+.face.fade > :not(#c-back) { transition: visibility .3s; }
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+@media (max-width: 760px), (max-width: 1100px) and (orientation: portrait) {
+  .page { grid-template-columns: minmax(0, 1fr); padding-left: 0; row-gap: 26px; padding-bottom: 36px; }
+  .col, .head { display: contents; }
+  /* title names the page above the instrument; the turning hint sits right under it */
+  .title { order: 0; padding-top: 22px; font-size: 34px; text-align: center; }
+  .title .sub { margin-top: .28em; }
+  .stage { order: 1; position: relative; height: auto; padding-block: 0; margin-top: -12px; }
+  .instrument { width: 100%; max-width: 560px; }
+  .hint { order: 2; align-items: center; justify-self: center; max-width: 330px; margin-top: -16px; font-size: 10.5px; letter-spacing: .1em; }
+  .hint #hint-turn, .hint #hint-star { display: block; }
+  .hint svg { width: 22px; height: 22px; margin-top: 0; }
+  .panel { order: 3; }
+  .lede { order: 4; max-width: 34ch; }
+  .colophon { order: 5; }
+  .readouts { grid-template-columns: 1fr 1fr; column-gap: 18px; row-gap: 8px; padding-block: 12px; }
+  .readouts > div { display: grid; gap: 2px; justify-content: start; padding-block: 0; }
+  .readouts > div:last-child, .readouts > .season { grid-column: span 2; }
+  .readouts > .season { margin-top: -4px; padding-block: 0; }
+  .readouts > .season dd { text-align: left; }
+  .lede { font-size: 19px; line-height: 1.45; }
+  .tag { min-width: 150px; }
+  /* the starfield stays with the instrument; the text below sits on plain night */
+  .bg {
+    position: absolute; inset: 0 0 auto 0; height: var(--sky-h, 100vh); overflow: hidden;
+    background: radial-gradient(130% 85% at 50% 42%, var(--night-2) 0%, var(--night) 72%);
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 90px), transparent);
+    mask-image: linear-gradient(180deg, #000 calc(100% - 90px), transparent);
+  }
+  .bg canvas { height: 100vh; bottom: auto; }
+}
+
+/* laptop heights: the column tightens so the plates and the sound control stay on the first screen */
+@media (min-width: 761px) and (orientation: landscape) and (max-height: 940px) {
+  .col { gap: 20px; padding-block: clamp(18px, 4vh, 40px); }
+  .head { gap: 18px; }
+  .readouts > .season { margin-top: -4px; padding-block: 0 2px; }
+  .readouts > .season dd { line-height: 1.35; }
+}
+@media (min-width: 761px) and (orientation: landscape) and (max-height: 820px) {
+  .col { gap: 18px; }
+  .head { gap: 14px; }
+  .title { font-size: clamp(38px, 3.5vw, 48px); }
+  .lede { font-size: 17.5px; line-height: 1.38; }
+  .panel { gap: 13px; }
+  .readouts { padding-block: 7px; }
+  .readouts > div { padding-block: 2px; }
+  .plate-row button { padding-block: 7px 8px; }
+  .col { padding-block: clamp(14px, 3vh, 32px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag, .plate-row button, .wtag { transition: none; }
+}
+</style>
+
+<div class="bg" aria-hidden="true"><canvas class="sky s0"></canvas><canvas class="sky s1"></canvas><canvas class="sky s2"></canvas></div>
+
+<main class="page">
+  <div class="col">
+    <header class="head">
+      <h1 class="title"><span>Astrolabe</span><span class="sub">of Midwinter</span></h1>
+      <p class="lede">A brass astrolabe set for <span id="place">Bethlehem, 31°42′ north</span>, showing the real sky of Christmas Eve. Its pierced star map, the rete, turns from six in the evening to six in the morning. At midnight the Winter Hexagon crosses the meridian in the south.</p>
+      <p class="hint"><svg viewBox="0 0 26 26" aria-hidden="true" focusable="false"><path d="M21.2 9.6A9 9 0 1 0 22 13" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M18.2 9.9l3.2.1.6-3.3" fill="none" stroke="currentColor" stroke-width="1.1"/><circle cx="13" cy="13" r="1.6" fill="currentColor"/></svg><span id="hint-text"><span id="hint-turn">Drag the rete around its pin to turn the hours.</span> <span id="hint-star">Click a star to read it.</span></span></p>
+    </header>
+
+    <div class="panel">
+      <dl class="readouts" aria-live="off">
+        <div><dt>Date</dt><dd id="r-date">24 DEC 2026</dd></div>
+        <div><dt>Local time</dt><dd><span class="pip" id="r-pip" aria-hidden="true" hidden></span><span id="r-time">19:00</span><small id="r-tz">LMT</small></dd></div>
+        <div class="season"><dt class="sr-only">Season</dt><dd id="r-season"></dd></div>
+        <div class="season travel" id="r-travel-row" hidden><dt class="sr-only">Midnight</dt><dd id="r-travel"></dd></div>
+        <div><dt>Sidereal time</dt><dd id="r-lst">01:12:53</dd></div>
+        <div><dt>Sirius alt</dt><dd id="r-sirius">−3.0°</dd></div>
+        <div><dt>Plate</dt><dd id="r-plate">31°42′ N · Bethlehem</dd></div>
+      </dl>
+
+      <div class="hourbox">
+        <label class="ctl-label" for="hour">Hour of Christmas Eve</label>
+        <input type="range" id="hour" min="0" max="720" step="4" value="60" aria-valuetext="19:00, 24 December">
+        <div class="scale" aria-hidden="true"><span style="left:0%">18h</span><span style="left:25%">21h</span><span class="mid" style="left:50%">0h</span><span style="left:75%">3h</span><span style="left:100%">6h</span></div>
+      </div>
+
+      <div class="plates" role="group" aria-labelledby="plates-label">
+        <div class="plates-head"><span class="ctl-label" id="plates-label">Latitude plate</span><span class="plate-note" id="plate-note" aria-hidden="true"></span></div>
+        <div class="plate-row">
+          <button type="button" id="plate-0" data-plate="0" aria-pressed="true">Bethlehem<small>31°42′ N</small></button>
+          <button type="button" id="plate-1" data-plate="1" aria-pressed="false">Nuremberg<small>49°27′ N</small></button>
+          <button type="button" id="plate-2" data-plate="2" aria-pressed="false">Rovaniemi<small>66°30′ N</small></button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="colophon">
+      <span class="serial">No. 219626…22ff</span>
+      <span>Star places J2000 · local mean time</span>
+      <button type="button" id="sound" aria-pressed="false">Sound <span class="state" aria-hidden="true">off</span></button>
+    </footer>
+  </div>
+
+  <section class="stage" aria-label="The astrolabe">
+    <div class="instrument" id="instrument">
+      <div class="face" id="face">
+        <canvas id="c-under" aria-hidden="true"></canvas>
+        <div class="sheen" id="sheen" aria-hidden="true"></div>
+        <canvas id="c-shade" aria-hidden="true"></canvas>
+        <canvas id="c-brass" aria-hidden="true"></canvas>
+        <canvas id="c-light" role="img" aria-label="Brass astrolabe showing the sky over Bethlehem at 19:00 on 24 December."></canvas>
+        <canvas id="c-back" aria-hidden="true"></canvas>
+      </div>
+      <svg class="lore" id="lore" aria-hidden="true" focusable="false"><defs><path id="lore-arc" d="M0 0"/></defs><text class="sh" dx=".6" dy=".7"><textPath href="#lore-arc" startOffset="50%" text-anchor="middle"></textPath></text><text class="tx"><textPath href="#lore-arc" startOffset="50%" text-anchor="middle"></textPath></text></svg>
+      <div class="dial" id="dial" tabindex="0" role="slider" aria-label="Rete, hour of Christmas Eve" aria-valuemin="0" aria-valuemax="720" aria-valuenow="60" aria-valuetext="19:00, 24 December"></div>
+      <div class="dial-ring" id="dial-ring" aria-hidden="true"></div>
+      <div class="tag" id="tag" aria-hidden="true"></div>
+      <div class="wtag" id="wtag" aria-hidden="true">equus · the horse</div>
+    </div>
+    <div class="sr-only">
+      <p>Stars on the rete. Focus a star to show its data; press it to turn the rete to its rising or setting. The wedge through the pin is the horse.</p>
+      <ul id="star-list"></ul>
+    </div>
+    <p class="sr-only" id="live" aria-live="polite"></p>
+  </section>
+</main>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------------- constants ---------------- */
+const SEED = '219626542cc8593f42183be1137f30e8c9e9467e12bab5f4398162ea58fc22ff';
+const TAU = Math.PI * 2, DEG = Math.PI / 180;
+const EPS_DEG = 23.44;
+const RCAP_U = Math.tan((90 + EPS_DEG) / 2 * DEG);   // Tropic of Capricorn radius, in equator radii
+const RCAN_U = Math.tan((90 - EPS_DEG) / 2 * DEG);   // Tropic of Cancer
+const ECL_C = (RCAP_U - RCAN_U) / 2, ECL_R = (RCAP_U + RCAN_U) / 2;
+const SIDEREAL = 1.00273790935;
+const MIN_PER_DEG = 4 / SIDEREAL;
+const MID = 360, SPAN = 720;
+// the instrument opens at 19:00, Sirius on the eastern horizon; a short turn from 18:00 shows that the rete moves
+const REST = 60;
+
+/* ---------------- detail flags (each detail can be cut here) ---------------- */
+const FX = { tonight: 1, air: 1, bells: 1, ritual: 1, brass: 1, polish: 1, candle: 1, purr: 1, twilight: 1, signature: 1, travel: 1, hints: 1, tags: 1, drift: 1, back: 1, stella: 1, sled: 1 };
+
+/* small conveniences kept in localStorage; the page works the same without it */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('astro-' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('astro-' + k, JSON.stringify(v)); } catch (e) { /* storage is optional */ } }
+};
+
+/* ---------------- season clock ---------------- */
+// preview names for the artifact viewer: each pretends the local clock reads that moment
+const PREVIEWS = { 'advent': [11, 6, 19, 0], 'christmas-eve': [11, 24, 21, 30], 'christmas-day': [11, 25, 10, 0] };
+let clockShift = 0, seasonLive = false, seasonReady = false, liveOffered = false;
+function readHash() {
+  let name = '';
+  try { name = decodeURIComponent((location.hash || '').slice(1)).toLowerCase(); } catch (e) { name = ''; }
+  const p = PREVIEWS[name];
+  if (!p) { clockShift = 0; return; }
+  const real = new Date(), y = real.getMonth() === 0 ? real.getFullYear() - 1 : real.getFullYear();
+  clockShift = new Date(y, p[0], p[1], p[2], p[3]).getTime() - real.getTime();
+}
+const clockNow = () => new Date(Date.now() + clockShift);
+const RN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+const dayNo = (y, m, d) => Date.UTC(y, m, d) / 864e5;
+function season(now) {
+  const y = now.getFullYear(), mo = now.getMonth(), d = now.getDate(), h = now.getHours(), mi = now.getMinutes();
+  const night = h >= 18 || h < 6;
+  const today = dayNo(y, mo, d);
+  const eveY = (mo === 11 && d > 24) ? y + 1 : y;
+  // Advent IV is the Sunday before Christmas Day; Advent I three weeks earlier
+  const xd = new Date(y, 11, 25).getDay(), adv1 = dayNo(y, 11, 25 - (xd === 0 ? 7 : xd)) - 21;
+  const z = { night, liveT: night ? (h >= 18 ? h - 18 : h + 6) * 60 + mi : -1, nights: dayNo(eveY, 11, 24) - today, state: 'out', n: 0, year: eveY };
+  if (mo === 11 && (d === 24 || (d === 25 && h < 6))) { z.state = 'eve'; z.year = y; }
+  else if (mo === 11 && d === 25) { z.state = 'day'; z.n = 1; z.year = y; }
+  else if ((mo === 11 && d > 25) || (mo === 0 && d <= 5)) { z.state = 'twelve'; z.n = mo === 11 ? d - 24 : d + 7; z.year = mo === 0 ? y - 1 : y; }
+  else if (mo === 0 && d === 6) { z.state = 'epiphany'; z.year = y - 1; }
+  else if (mo === 11 || (mo === 10 && today >= adv1)) { if (today >= adv1) { z.state = 'advent'; z.n = 1 + Math.floor((today - adv1) / 7); } else z.state = 'pre'; }
+  else if (mo === 10) z.state = 'pre';
+  z.dec = mo === 11 ? d : 0;
+  return z;
+}
+function seasonLine(z) {
+  const nn = z.nights === 1 ? '1 night' : z.nights + ' nights';
+  switch (z.state) {
+    case 'eve': return z.night ? (clockNow().getDate() === 25 ? "Christmas night · this is tonight's sky" : "Christmas Eve · this is tonight's sky") : 'Christmas Eve is tonight';
+    case 'day': return 'Christmas Day · first of the Twelve Nights';
+    case 'twelve': return 'the Twelve Nights · ' + RN[z.n - 1];
+    case 'epiphany': return 'Epiphany · the Magi arrive';
+    case 'advent': return `Advent ${RN[z.n - 1]} · ${nn} to Christmas Eve`;
+    // 'its sky at this hour' only while the rete is following the viewer's clock (the brass pip shows)
+    default: return z.night ? (seasonLive ? `${nn} to Christmas Eve · its sky at this hour` : `${nn} to Christmas Eve`) : `${nn} to Christmas Eve · live after dusk`;
+  }
+}
+readHash();
+let SZ = season(clockNow());
+let YEAR = SZ.year;
+
+const hms = (h, m, s) => h + m / 60 + s / 3600;
+const dms = (sg, d, m, s) => sg * (d + m / 60 + s / 3600);
+
+const STARS = [
+  { id: 'sirius', name: 'Sirius', bayer: 'α CMa', ra: hms(6, 45, 9), dec: dms(-1, 16, 42, 58), mag: -1.46, dist: '8.6 ly', sp: 'A1 V', col: 'blue-white', old: 'Alhabor', hex: 1 },
+  { id: 'procyon', name: 'Procyon', bayer: 'α CMi', ra: hms(7, 39, 18), dec: dms(1, 5, 13, 30), mag: 0.34, dist: '11.5 ly', sp: 'F5 IV–V', col: 'yellow-white', old: 'Algomeisa', hex: 1 },
+  { id: 'pollux', name: 'Pollux', bayer: 'β Gem', ra: hms(7, 45, 19), dec: dms(1, 28, 1, 34), mag: 1.14, dist: '34 ly', sp: 'K0 III', col: 'orange', hex: 1 },
+  { id: 'capella', name: 'Capella', bayer: 'α Aur', ra: hms(5, 16, 41), dec: dms(1, 45, 59, 53), mag: 0.08, dist: '43 ly', sp: 'K0 III + G1 III', col: 'yellow', old: 'Alhaioth', hex: 1 },
+  { id: 'aldebaran', name: 'Aldebaran', bayer: 'α Tau', ra: hms(4, 35, 55), dec: dms(1, 16, 30, 33), mag: 0.86, dist: '65 ly', sp: 'K5 III', col: 'orange', old: 'Oculus Tauri', hex: 1 },
+  { id: 'rigel', name: 'Rigel', bayer: 'β Ori', ra: hms(5, 14, 32), dec: dms(-1, 8, 12, 6), mag: 0.13, dist: 'c. 860 ly', sp: 'B8 Ia', col: 'blue-white', hex: 1 },
+  { id: 'betelgeuse', name: 'Betelgeuse', bayer: 'α Ori', ra: hms(5, 55, 10), dec: dms(1, 7, 24, 25), mag: 0.5, magTxt: '0.5, variable', dist: 'c. 550 ly', sp: 'M1–2 Ia', col: 'red', hex: 2 },
+  { id: 'polaris', name: 'Polaris', bayer: 'α UMi', ra: hms(2, 31, 49), dec: dms(1, 89, 15, 51), mag: 1.98, dist: 'c. 430 ly', sp: 'F7 Ib', col: 'yellow-white' },
+  { id: 'algol', name: 'Algol', bayer: 'β Per', ra: hms(3, 8, 10), dec: dms(1, 40, 57, 20), mag: 2.1, magTxt: '2.1 to 3.4, every 2.87 d', dist: '90 ly', sp: 'B8 V', col: 'blue-white', old: 'Caput Algol' },
+  { id: 'alphard', name: 'Alphard', bayer: 'α Hya', ra: hms(9, 27, 35), dec: dms(-1, 8, 39, 31), mag: 1.98, dist: '177 ly', sp: 'K3 II–III', col: 'orange', old: 'Cor Hydrae' },
+  { id: 'dubhe', name: 'Dubhe', bayer: 'α UMa', ra: hms(11, 3, 44), dec: dms(1, 61, 45, 4), mag: 1.79, dist: '123 ly', sp: 'K0 III', col: 'orange' },
+  { id: 'arcturus', name: 'Arcturus', bayer: 'α Boo', ra: hms(14, 15, 40), dec: dms(1, 19, 10, 57), mag: -0.05, dist: '37 ly', sp: 'K1.5 III', col: 'orange', old: 'Alramech' },
+  { id: 'vega', name: 'Vega', bayer: 'α Lyr', ra: hms(18, 36, 56), dec: dms(1, 38, 47, 1), mag: 0.03, dist: '25 ly', sp: 'A0 V', col: 'blue-white', old: 'Wega' },
+  { id: 'altair', name: 'Altair', bayer: 'α Aql', ra: hms(19, 50, 47), dec: dms(1, 8, 52, 6), mag: 0.76, dist: '16.7 ly', sp: 'A7 V', col: 'white' },
+  { id: 'deneb', name: 'Deneb', bayer: 'α Cyg', ra: hms(20, 41, 26), dec: dms(1, 45, 16, 49), mag: 1.25, dist: 'c. 2,600 ly', sp: 'A2 Ia', col: 'white', old: 'Denebadigege' },
+  { id: 'markab', name: 'Markab', bayer: 'α Peg', ra: hms(23, 4, 46), dec: dms(1, 15, 12, 19), mag: 2.48, dist: '133 ly', sp: 'B9 III', col: 'blue-white' }
+];
+const IDX = Object.fromEntries(STARS.map((s, i) => [s.id, i]));
+const HEX = ['sirius', 'procyon', 'pollux', 'capella', 'aldebaran', 'rigel'].map(id => IDX[id]);
+const POLARIS = IDX.polaris, BETEL = IDX.betelgeuse, SIRIUS = IDX.sirius;
+
+const PLATES = [
+  { name: 'Bethlehem', lat: 31.70, lon: 35.20, latTxt: '31°42′', place: 'Bethlehem, 31°42′ north' },
+  { name: 'Nuremberg', lat: 49.45, lon: 11.08, latTxt: '49°27′', place: 'Nuremberg, 49°27′ north' },
+  { name: 'Rovaniemi', lat: 66.50, lon: 25.73, latTxt: '66°30′', place: 'Rovaniemi, 66°30′ north' }
+];
+
+/* ---------------- seeded randomness ---------------- */
+function sfc32(a, b, c, d) {
+  return function () {
+    a |= 0; b |= 0; c |= 0; d |= 0;
+    const t = (((a + b) | 0) + d) | 0;
+    d = (d + 1) | 0;
+    a = b ^ (b >>> 9);
+    b = (c + (c << 3)) | 0;
+    c = (c << 21) | (c >>> 11);
+    c = (c + t) | 0;
+    return (t >>> 0) / 4294967296;
+  };
+}
+const W32 = [0, 8, 16, 24].map(i => parseInt(SEED.slice(i, i + 8), 16));
+function rngFor(salt) {
+  const r = sfc32(W32[0] ^ Math.imul(salt, 0x9e3779b9), W32[1], W32[2] ^ salt, W32[3]);
+  for (let i = 0; i < 16; i++) r();
+  return r;
+}
+
+/* ---------------- tokens ---------------- */
+const rootStyle = getComputedStyle(document.documentElement);
+const C = {}, RGB = {};
+['night', 'night-2', 'night-0', 'plate', 'plate-hi', 'floor', 'brass', 'brass-hi', 'brass-lo', 'brass-deep', 'engrave', 'verdigris', 'star', 'star-warm', 'ember', 'shadow', 'bv-b', 'bv-a', 'bv-f', 'bv-g', 'bv-k', 'bv-m', 'air'].forEach(k => {
+  C[k] = rootStyle.getPropertyValue('--' + k).trim() || '#888888';
+  const h = C[k].replace('#', '');
+  const n = parseInt(h.length === 3 ? h.split('').map(x => x + x).join('') : h, 16);
+  RGB[k] = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+});
+const rgba = (k, a) => `rgba(${RGB[k][0]},${RGB[k][1]},${RGB[k][2]},${a})`;
+const mix = (k1, k2, t) => { const a = RGB[k1], b = RGB[k2]; return `rgb(${Math.round(a[0] + (b[0] - a[0]) * t)},${Math.round(a[1] + (b[1] - a[1]) * t)},${Math.round(a[2] + (b[2] - a[2]) * t)})`; };
+const FD = (w, px) => `${w} ${px}px "Cormorant Unicase", "Cormorant SC", Georgia, serif`;
+const FM = px => `400 ${px}px "Fragment Mono", ui-monospace, Menlo, Consolas, monospace`;
+
+/* ---------------- helpers ---------------- */
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const clamp01 = v => clamp(v, 0, 1);
+const easeOut = k => 1 - Math.pow(1 - k, 3);
+const easeInOut = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const wrapPI = a => { while (a > Math.PI) a -= TAU; while (a < -Math.PI) a += TAU; return a; };
+const pad = n => String(n).padStart(2, '0');
+const minus = s => s.replace('-', '−');
+
+/* ---------------- astronomy ---------------- */
+function jdUT(y, m, d, h) {
+  if (m <= 2) { y -= 1; m += 12; }
+  const A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5 + h / 24;
+}
+function daysJ2000(tMin, lon) { return jdUT(YEAR, 12, 24, 18 + tMin / 60 - lon / 15) - 2451545.0; }
+function lstAt(tMin, lon) {
+  const g = 18.697374558 + 24.06570982441908 * daysJ2000(tMin, lon) + lon / 15;
+  return ((g % 24) + 24) % 24;
+}
+function altitude(raH, decD, lstH, latD) {
+  const H = (lstH - raH) * 15 * DEG, d = decD * DEG, p = latD * DEG;
+  return Math.asin(Math.sin(p) * Math.sin(d) + Math.cos(p) * Math.cos(d) * Math.cos(H)) / DEG;
+}
+function sunLambda(D) {
+  const L = 280.460 + 0.9856474 * D, g = (357.528 + 0.9856003 * D) * DEG;
+  return (((L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) % 360) + 360) % 360;
+}
+function eclToEq(lamD) {
+  const l = lamD * DEG, e = EPS_DEG * DEG;
+  return { ra: Math.atan2(Math.cos(e) * Math.sin(l), Math.cos(l)) / DEG / 15, dec: Math.asin(Math.sin(e) * Math.sin(l)) / DEG };
+}
+// rete-local coordinates (units of equator radius, canvas y down, RA 0h at top, RA increasing anticlockwise)
+function localOf(raH, decD) {
+  const d = decD * DEG, r = Math.cos(d) / (1 + Math.sin(d)), f = raH * 15 * DEG;
+  return { x: -r * Math.sin(f), y: -r * Math.cos(f), r };
+}
+
+/* ---------------- DOM ---------------- */
+const $ = s => document.querySelector(s);
+const inst = $('#instrument');
+// Without a real GPU (software GL), canvases are rasterised on the CPU; with one, the visible layers stay on the GPU.
+const SOFT = (() => {
+  try {
+    const t = document.createElement('canvas');
+    const gl = t.getContext('webgl', { failIfMajorPerformanceCaveat: true });
+    if (!gl) return true;
+    const x = gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext();
+    return false;
+  } catch (e) { return true; }
+})();
+// a software rasteriser behind WebGL (SwiftShader, llvmpipe) is as slow as no GPU for continuous ambient redraws
+const SLOWGL = SOFT || (() => {
+  try {
+    const gl = document.createElement('canvas').getContext('webgl');
+    const x = gl && gl.getExtension('WEBGL_debug_renderer_info');
+    const r = x ? String(gl.getParameter(x.UNMASKED_RENDERER_WEBGL)) : '';
+    const lc = gl && gl.getExtension('WEBGL_lose_context'); if (lc) lc.loseContext();
+    return /swiftshader|llvmpipe|software|softpipe/i.test(r);
+  } catch (e) { return false; }
+})();
+const CPU = { willReadFrequently: true };
+const VIS = SOFT ? CPU : {};
+const cvU = $('#c-under'), cU = cvU.getContext('2d', VIS);
+const cvS = $('#c-shade'), cS = cvS.getContext('2d', VIS);
+const cvB = $('#c-brass'), cB = cvB.getContext('2d', VIS);
+const cvL = $('#c-light'), cL = cvL.getContext('2d', VIS);
+const cvK = $('#c-back'), face = $('#face');
+const ctx = cL, cv = cvL;
+const sheenEl = $('#sheen');
+const dial = $('#dial'), dialRing = $('#dial-ring'), tagEl = $('#tag'), skies = [...document.querySelectorAll('.sky')];
+const hour = $('#hour'), live = $('#live'), soundBtn = $('#sound'), placeEl = $('#place');
+const RO = { date: $('#r-date'), time: $('#r-time'), lst: $('#r-lst'), sirius: $('#r-sirius'), plate: $('#r-plate'), pip: $('#r-pip'), tz: $('#r-tz'), season: $('#r-season'), travel: $('#r-travel'), travelRow: $('#r-travel-row') };
+const plateNote = $('#plate-note'), lore = $('#lore'), wtag = $('#wtag');
+const plateBtns = [...document.querySelectorAll('[data-plate]')];
+// static and baked art is rasterised once on the CPU and then only composited
+const cpuCanvas = () => { const c = document.createElement('canvas'); c.getContext('2d', CPU); return c; };
+const materCv = cpuCanvas(), baseCv = cpuCanvas();
+const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
+if (!FINE) { $('#hint-turn').textContent = 'Turn the star map with a finger.'; $('#hint-star').textContent = 'Tap a star to read it.'; }
+const rmq = matchMedia('(prefers-reduced-motion: reduce)');
+let reduced = rmq.matches;
+if (rmq.addEventListener) rmq.addEventListener('change', e => { reduced = e.matches; kick(); });
+
+/* ---------------- state ---------------- */
+let W = 0, H = 0, D = 0, dpr = 1, cx = 0, cy = 0, Ro = 0, Ri = 0, Rcap = 0, Req = 0;
+let retePath = null, reteEng = null, reteHair = null, flames = [], tipsU = [], sunPt = null, labSize = 10;
+let plateCache = [];
+let dirty = true, underDirty = true, layersDirty = true, raf = 0, lastFrame = 0;
+let shadeKey = '', brassKey = '', insWas = false, plateDim = 0;
+// one more screen point than there are stars: the conjunction of 7 BC, shown only when asked for
+const scr = STARS.map(() => ({ x: 0, y: 0 })).concat([{ x: 0, y: 0 }]);
+const STELLA_I = STARS.length;
+
+const S = {
+  t: 0, mode: 'intro', introFrom: 0, introStart: 0,
+  vel: 0, target: REST, tau: 120, finger: 0, src: 'other',
+  lst: 0, plate: 0, prevPlate: -1, swapStart: 0,
+  hover: -1, sel: -1, kb: false, glint: { i: -1, start: 0 },
+  sheen: -2.25, sheenTarget: -2.25,
+  moment: { on: false, start: 0, off: 0, offFrom: 0, level: 0, hold: null, lastChime: -1e9, armed: true, resume: 0, res: 0 },
+  egg: [null, null, null],
+  rest: REST, following: false, spd: 0, sheenMid: -2.25, sheenBase: -2.25,
+  nightLvl: 0, night: 0, sig: 0, sigTarget: 0, driftTo: 0, candle: 0,
+  seen: [true, false, false], swapEngrave: false, swapCue: 0, swarf: [],
+  flip: { on: false, start: 0, to: 0, shown: 0 }, stella: null, airK: 0, focusK: 1
+};
+let lastInput = performance.now(), lastPointer = performance.now();
+
+/* ---------------- rete geometry ---------------- */
+const RIM_I = RCAP_U - 0.046, RIM_O = RCAP_U - 0.004, BAR_HW = 0.013;
+const MEMBERS = [
+  { kind: 'ring', x: 0, y: 0, ri: RIM_I, ro: RIM_O },
+  { kind: 'ring', x: 0, y: 0, ri: 0.986, ro: 1.014 },
+  { kind: 'ring', x: 0, y: 0, ri: 0.300, ro: 0.328 },
+  { kind: 'ring', x: ECL_C, y: 0, ri: ECL_R - 0.076, ro: ECL_R },
+  { kind: 'bar', hw: 0.013, y0: -1, y1: 1 }
+];
+function memberDist(m, p) {
+  if (m.kind === 'ring') {
+    const rho = Math.hypot(p.x - m.x, p.y - m.y);
+    if (rho > m.ro) return { d: rho - m.ro, R: m.ro };
+    if (rho < m.ri) return { d: m.ri - rho, R: m.ri };
+    return null;
+  }
+  const ax = Math.abs(p.x);
+  if (ax <= m.hw || p.y < m.y0 || p.y > m.y1) return null;
+  return { d: ax - m.hw, X: Math.sign(p.x) * m.hw };
+}
+function circleIntersect(c, R, p, L) {
+  const dx = p.x - c.x, dy = p.y - c.y, d = Math.hypot(dx, dy);
+  if (d === 0 || d > R + L || d < Math.abs(R - L)) return null;
+  const a = (R * R - L * L + d * d) / (2 * d), h = Math.sqrt(Math.max(0, R * R - a * a));
+  const xm = c.x + a * dx / d, ym = c.y + a * dy / d;
+  return [{ x: xm + h * dy / d, y: ym - h * dx / d }, { x: xm - h * dy / d, y: ym + h * dx / d }];
+}
+function cubic(p0, p1, p2, p3, t) {
+  const m = 1 - t;
+  return {
+    x: m * m * m * p0.x + 3 * m * m * t * p1.x + 3 * m * t * t * p2.x + t * t * t * p3.x,
+    y: m * m * m * p0.y + 3 * m * m * t * p1.y + 3 * m * t * t * p2.y + t * t * t * p3.y,
+    dx: 3 * m * m * (p1.x - p0.x) + 6 * m * t * (p2.x - p1.x) + 3 * t * t * (p3.x - p2.x),
+    dy: 3 * m * m * (p1.y - p0.y) + 6 * m * t * (p2.y - p1.y) + 3 * t * t * (p3.y - p2.y)
+  };
+}
+function wprof(t) {
+  if (t < 0.12) return 1.55 - 0.8 * (t / 0.12) * (t / 0.12) * (3 - 2 * t / 0.12);
+  if (t < 0.38) { const k = (t - 0.12) / 0.26; return 0.75 + 0.37 * k * k * (3 - 2 * k); }
+  const k = (t - 0.38) / 0.62; return 1.12 * Math.pow(1 - k, 1.3);
+}
+function computeFlames() {
+  const rnd = rngFor(4);
+  tipsU = STARS.map(s => localOf(s.ra, s.dec));
+  flames = STARS.map((s, i) => {
+    if (i === POLARIS) return null;
+    const T = tipsU[i];
+    let best = null;
+    for (const m of MEMBERS) { const q = memberDist(m, T); if (q && (!best || q.d < best.q.d)) best = { m, q }; }
+    const d = best.q.d;
+    let L = Math.max(0.09, Math.min(d * 1.5, d + 0.13));
+    if (L < d + 0.016) L = d + 0.016;
+    let cands = null;
+    if (best.m.kind === 'ring') cands = circleIntersect({ x: best.m.x, y: best.m.y }, best.q.R, T, L);
+    else { const X = best.q.X, dy = Math.sqrt(Math.max(0, L * L - (T.x - X) * (T.x - X))); cands = [{ x: X, y: T.y - dy }, { x: X, y: T.y + dy }]; }
+    if (!cands) {
+      const m = best.m, vx = T.x - m.x, vy = T.y - m.y, vl = Math.hypot(vx, vy);
+      cands = [{ x: m.x + vx / vl * best.q.R, y: m.y + vy / vl * best.q.R }];
+    }
+    let B = cands[0], bestScore = -1;
+    for (const c of cands) {
+      const mid = { x: (c.x + T.x) / 2, y: (c.y + T.y) / 2 };
+      let sc = Infinity;
+      tipsU.forEach((o, j) => { if (j !== i) sc = Math.min(sc, Math.hypot(o.x - mid.x, o.y - mid.y), Math.hypot(o.x - c.x, o.y - c.y) * 1.2); });
+      if (sc > bestScore) { bestScore = sc; B = c; }
+    }
+    const bend = (rnd() < 0.5 ? -1 : 1) * (0.09 + rnd() * 0.08);
+    const dx = T.x - B.x, dy = T.y - B.y, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len, nx = -uy, ny = ux;
+    const emb = 0.03;
+    const B0 = { x: B.x - ux * emb, y: B.y - uy * emb }, L0 = len + emb;
+    const P1 = { x: B0.x + ux * L0 * 0.36 + nx * L0 * bend, y: B0.y + uy * L0 * 0.36 + ny * L0 * bend };
+    const P2 = { x: B0.x + ux * L0 * 0.70 - nx * L0 * bend * 0.6, y: B0.y + uy * L0 * 0.70 - ny * L0 * bend * 0.6 };
+    const w0 = 0.026;
+    const left = [], right = [];
+    const N = 24;
+    for (let k = 0; k <= N; k++) {
+      const t = k / N, p = cubic(B0, P1, P2, T, t);
+      const dl = Math.hypot(p.dx, p.dy) || 1, qx = -p.dy / dl, qy = p.dx / dl, w = w0 * wprof(t);
+      left.push({ x: p.x + qx * w, y: p.y + qy * w });
+      right.push({ x: p.x - qx * w, y: p.y - qy * w });
+    }
+    let poly = left.concat(right.reverse());
+    let area = 0;
+    for (let k = 0; k < poly.length; k++) { const a = poly[k], b = poly[(k + 1) % poly.length]; area += a.x * b.y - b.x * a.y; }
+    if (area < 0) poly.reverse();
+    const end = cubic(B0, P1, P2, T, 1), el = Math.hypot(end.dx, end.dy) || 1;
+    return { poly, B0, P1, P2, T, dir: { x: end.dx / el, y: end.dy / el }, path: null };
+  });
+}
+
+function buildRete() {
+  const u = Req;
+  const p = new Path2D();
+  const ring = (x, y, ri, ro) => {
+    p.moveTo((x + ro) * u, y * u); p.arc(x * u, y * u, ro * u, 0, TAU, false);
+    p.moveTo((x + ri) * u, y * u); p.arc(x * u, y * u, ri * u, TAU, 0, true);
+  };
+  const rimO = (Rcap - 0.8) / u;
+  ring(0, 0, RIM_I, rimO);
+  ring(0, 0, 0.986, 1.014);
+  ring(0, 0, 0.300, 0.328);
+  ring(ECL_C, 0, ECL_R - 0.076, ECL_R);
+  // equinoctial bar from rim to rim, with lozenge bosses where it crosses the rings
+  const bw = BAR_HW, by = 1.0;
+  p.moveTo(-bw * u, -by * u); p.lineTo(bw * u, -by * u); p.lineTo(bw * u, by * u); p.lineTo(-bw * u, by * u); p.closePath();
+  const boss = (y, s) => { p.moveTo(0, (y - s) * u); p.lineTo(s * 0.62 * u, y * u); p.lineTo(0, (y + s) * u); p.lineTo(-s * 0.62 * u, y * u); p.closePath(); };
+  boss(-1, 0.05); boss(1, 0.05); boss(-0.314, 0.04); boss(0.314, 0.04);
+  // central hub of the rete
+  p.moveTo(0.1 * u, 0); p.arc(0, 0, 0.1 * u, 0, TAU, false);
+  for (const f of flames) {
+    if (!f) continue;
+    const fp = new Path2D();
+    f.poly.forEach((q, k) => { const x = q.x * u, y = q.y * u; if (k) { p.lineTo(x, y); fp.lineTo(x, y); } else { p.moveTo(x, y); fp.moveTo(x, y); } });
+    p.closePath(); fp.closePath();
+    f.path = fp;
+  }
+  retePath = p;
+
+  // engraved detail
+  const e = new Path2D();
+  for (let lam = 0; lam < 360; lam += 2) {
+    const q = eclToEq(lam), P = localOf(q.ra, q.dec);
+    const nx = ECL_C - P.x, ny = -P.y, nl = Math.hypot(nx, ny);
+    const len = lam % 30 === 0 ? 0.074 : lam % 10 === 0 ? 0.036 : 0.019;
+    e.moveTo((P.x + nx / nl * 0.004) * u, (P.y + ny / nl * 0.004) * u);
+    e.lineTo((P.x + nx / nl * len) * u, (P.y + ny / nl * len) * u);
+  }
+  const circ = (x, y, r) => { e.moveTo((x + r) * u, y * u); e.arc(x * u, y * u, r * u, 0, TAU); };
+  circ(ECL_C, 0, ECL_R - 0.038);
+  circ(0, 0, (RIM_I + RIM_O) / 2);
+  reteEng = e;
+
+  // hairlines incised along the rings
+  const h = new Path2D();
+  const hc = (x, y, r) => { h.moveTo((x + r) * u, y * u); h.arc(x * u, y * u, r * u, 0, TAU); };
+  hc(0, 0, 1); hc(0, 0, 0.314); hc(0, 0, 0.072);
+  h.moveTo(0, -0.986 * u); h.lineTo(0, -0.1 * u); h.moveTo(0, 0.1 * u); h.lineTo(0, 0.986 * u);
+  reteHair = h;
+
+  // sun's place on the ecliptic for Christmas night
+  labSize = clamp(D * 0.0138, D < 430 ? 9 : 8, 12);
+  const lam = sunLambda(daysJ2000(MID, 35.2));
+  const sq = eclToEq(lam), SP = localOf(sq.ra, sq.dec);
+  const nx = ECL_C - SP.x, ny = -SP.y, nl = Math.hypot(nx, ny);
+  sunPt = { x: (SP.x + nx / nl * 0.056) * u, y: (SP.y + ny / nl * 0.056) * u, lam };
+
+  placeLabels();
+}
+
+// choose, for each star name, a direction from its tip that keeps clear of brass, other stars and other names
+function placeLabels() {
+  ctx.save(); ctx.font = FD(500, labSize);
+  const hU = labSize / Req, gapU = (labSize * 0.55 + 3) / Req;
+  const small = D < 430;
+  const spine = [];
+  flames.forEach((f, i) => { if (!f) return; for (let k = 0; k <= 12; k++) { const p = cubic(f.B0, f.P1, f.P2, f.T, k / 12); spine.push({ x: p.x, y: p.y, i, k }); } });
+  // the edges of the Winter Hexagon, so that no name sits on the light line at midnight
+  const edges = HEX.map((a, k) => [tipsU[a], tipsU[HEX[(k + 1) % HEX.length]]]);
+  const segDist = (p, a, b) => {
+    const vx = b.x - a.x, vy = b.y - a.y, t = clamp01(((p.x - a.x) * vx + (p.y - a.y) * vy) / (vx * vx + vy * vy));
+    return Math.hypot(p.x - a.x - vx * t, p.y - a.y - vy * t);
+  };
+  const order = STARS.map((s, i) => i).filter(i => i !== POLARIS && (!small || STARS[i].hex))
+    .sort((a, b) => ((STARS[b].hex ? 1 : 0) - (STARS[a].hex ? 1 : 0)) || (STARS[a].mag - STARS[b].mag));
+  const placed = [];
+  for (const i of order) {
+    const f = flames[i], T = f.T;
+    const wU = ctx.measureText(STARS[i].name).width / Req;
+    const base = Math.atan2(f.dir.y, f.dir.x);
+    let best = null;
+    for (let c = 0; c < 48; c++) {
+      const k = (c % 24) - 11, far = c >= 24;
+      const th = base + k * Math.PI / 12, dx = Math.cos(th), dy = Math.sin(th);
+      const g0 = gapU * (far ? 1.9 : 1);
+      const pts = [];
+      for (let s = 0; s <= wU + 1e-6; s += hU * 0.33) pts.push({ x: T.x + dx * (g0 + s), y: T.y + dy * (g0 + s) });
+      let pen = Math.abs(k) * 0.45 + (far ? 2.5 : 0);
+      for (const p of pts) {
+        const rho = Math.hypot(p.x, p.y);
+        for (const m of MEMBERS) {
+          if (m.kind === 'ring') {
+            const rr = Math.hypot(p.x - m.x, p.y - m.y);
+            if (Math.abs(rr - (m.ri + m.ro) / 2) < (m.ro - m.ri) / 2 + hU * 0.6) pen += 7;
+          } else if (Math.abs(p.x) < m.hw + hU * 0.6 && Math.abs(p.y) < 1.02) pen += 7;
+        }
+        if (rho > RIM_I - hU * 0.6) pen += 12;
+        if (rho < 0.13) pen += 12;
+        for (let j = 0; j < tipsU.length; j++) if (j !== i && Math.hypot(p.x - tipsU[j].x, p.y - tipsU[j].y) < hU * 1.25) pen += 9;
+        for (const q of spine) {
+          if (q.i === i && q.k > 9) continue;
+          if (Math.hypot(p.x - q.x, p.y - q.y) < hU * 0.95) pen += 5;
+        }
+        for (const q of placed) if (Math.hypot(p.x - q.x, p.y - q.y) < hU * 1.7) pen += 9;
+        for (const [a, b] of edges) if (segDist(p, a, b) < hU * 0.8) pen += 11;
+      }
+      if (!best || pen < best.pen) best = { pen, th, pts, g0 };
+    }
+    f.labAng = best.th; f.labGap = best.g0; f.labShow = true;
+    placed.push(...best.pts);
+  }
+  flames.forEach((f, i) => { if (f && !order.includes(i)) f.labShow = false; });
+  ctx.restore();
+}
+
+/* ---------------- layout ---------------- */
+function layout() {
+  const r = inst.getBoundingClientRect();
+  if (r.width < 20) return;
+  W = r.width; H = r.height; D = W;
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+  for (const c of [cvU, cvS, cvB, cvL, materCv, baseCv]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+  cx = W / 2; cy = H - D * 0.5;
+  Ro = 0.48 * D; Ri = 0.40 * D; Rcap = Ri; Req = Rcap / RCAP_U;
+  document.documentElement.style.setProperty('--sky-h', Math.round(r.bottom + scrollY + 10) + 'px');
+  const box = { left: (cx - Ro) + 'px', top: (cy - Ro) + 'px', width: (2 * Ro) + 'px', height: (2 * Ro) + 'px' };
+  Object.assign(dial.style, box); Object.assign(dialRing.style, box);
+  sheenEl.style.setProperty('--sx', cx + 'px'); sheenEl.style.setProperty('--sy', cy + 'px');
+  sheenEl.style.setProperty('--ri', Ri + 'px'); sheenEl.style.setProperty('--ro', Ro + 'px');
+  buildRete();
+  bake.valid = false;
+  renderBase();
+  renderMater();
+  plateCache = []; blankCache.length = 0; backCache.length = 0; SLED = null;
+  buildSignature();
+  setLoreArc();
+  backDrawn = 0;
+  if (S.flip.shown) renderBack();
+  dirty = true; underDirty = true; layersDirty = true;
+  kick();
+}
+
+/* ---------------- static layers ---------------- */
+const THRONE_K = 0.056;
+function throneShape(g) {
+  const y0 = cy - Ro, K = { x: cx, y: y0 - THRONE_K * D }, rk = 0.030 * D;
+  const a = 16 * DEG;
+  const BL = { x: cx - Ro * Math.sin(a), y: cy - Ro * Math.cos(a) }, BR = { x: cx + Ro * Math.sin(a), y: BL.y };
+  const TL = { x: K.x + rk * Math.cos(150 * DEG), y: K.y + rk * Math.sin(150 * DEG) };
+  const TR = { x: K.x + rk * Math.cos(30 * DEG), y: TL.y };
+  g.moveTo(BL.x, BL.y + 0.02 * D);
+  g.lineTo(BL.x, BL.y);
+  g.bezierCurveTo(BL.x + 0.034 * D, BL.y - 0.012 * D, TL.x - 0.05 * D, TL.y + 0.014 * D, TL.x, TL.y);
+  g.arc(K.x, K.y, rk, 150 * DEG, 390 * DEG, false);
+  g.bezierCurveTo(TR.x + 0.05 * D, TR.y + 0.014 * D, BR.x - 0.034 * D, BR.y - 0.012 * D, BR.x, BR.y);
+  g.lineTo(BR.x, BR.y + 0.02 * D);
+  g.closePath();
+  return { K, rk };
+}
+function renderBase() {
+  const g = baseCv.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, W, H);
+  // soft drop shadow (shadow-only trick)
+  g.save();
+  g.shadowColor = rgba('shadow', 0.62); g.shadowBlur = 0.035 * D * dpr; g.shadowOffsetX = 10000 * dpr; g.shadowOffsetY = 0.012 * D * dpr;
+  g.translate(-10000, 0);
+  g.beginPath(); g.arc(cx, cy, Ro, 0, TAU); throneShape(g); g.fillStyle = C.shadow; g.fill();
+  g.restore();
+  // floor of the mater, seen when a plate is lifted out
+  const fl = g.createRadialGradient(cx, cy - Rcap * 0.3, 0, cx, cy, Rcap);
+  fl.addColorStop(0, mix('floor', 'brass-lo', 0.35)); fl.addColorStop(1, C.floor);
+  g.beginPath(); g.arc(cx, cy, Rcap, 0, TAU); g.fillStyle = fl; g.fill();
+}
+
+const ROMAN = ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
+function engraveText(g, text, x, y, rot, font, align) {
+  g.save(); g.translate(x, y); g.rotate(rot);
+  g.font = font; g.textAlign = align || 'center'; g.textBaseline = 'middle';
+  const ox = 0.6 * (Math.cos(rot) + Math.sin(rot)), oy = 0.6 * (Math.cos(rot) - Math.sin(rot));
+  g.fillStyle = rgba('brass-hi', 0.42); g.fillText(text, ox, oy);
+  g.fillStyle = C.engrave; g.fillText(text, 0, 0);
+  g.fillStyle = rgba('verdigris', 0.32); g.fillText(text, 0, 0);
+  g.restore();
+}
+function engraveStroke(g, path, w) {
+  g.save(); g.lineWidth = w; g.translate(0.55, 0.6); g.strokeStyle = rgba('brass-hi', 0.4); g.stroke(path);
+  g.translate(-0.55, -0.6); g.strokeStyle = rgba('engrave', 0.92); g.stroke(path); g.restore();
+}
+// an eight-pointed star whose rays are cut in two facets, one catching the light
+function gildedStar(g, x, y, R, glory) {
+  const rays = [[-90, 1.08], [0, 0.94], [90, 1.62], [180, 0.94], [-45, 0.52], [45, 0.52], [135, 0.52], [-135, 0.52]];
+  const w = R * 0.25;
+  g.save(); g.translate(x, y);
+  if (glory) {
+    // fine engraved rays of glory behind the star
+    g.beginPath();
+    for (let k = 0; k < 24; k++) {
+      const a = (k + 0.5) * TAU / 24, r0 = R * 0.62, r1 = R * (k % 2 ? 1.0 : 1.22);
+      g.moveTo(Math.cos(a) * r0, Math.sin(a) * r0); g.lineTo(Math.cos(a) * r1, Math.sin(a) * r1);
+    }
+    g.lineWidth = 0.55; g.strokeStyle = rgba('engrave', 0.55); g.stroke();
+  }
+  g.lineJoin = 'miter';
+  for (const [deg, len] of rays.slice(4).concat(rays.slice(0, 4))) {
+    const a = deg * DEG, ux = Math.cos(a), uy = Math.sin(a), nx = -uy, ny = ux, L = R * len, ww = len < 0.6 ? w * 0.75 : w;
+    for (const s of [-1, 1]) {
+      g.beginPath(); g.moveTo(0, 0); g.lineTo(ux * L, uy * L); g.lineTo(nx * ww * s, ny * ww * s); g.closePath();
+      // the facet facing the light (top left) is bright
+      const lit = (nx * s) * -0.7 + (ny * s) * -0.7 > 0;
+      g.fillStyle = lit ? mix('brass-hi', 'star-warm', 0.45) : mix('brass', 'brass-lo', 0.35);
+      g.fill();
+    }
+  }
+  g.beginPath();
+  for (const [deg, len] of rays.slice(0, 4).concat(rays.slice(4)).sort((p, q) => p[0] - q[0])) {
+    const a = deg * DEG, ux = Math.cos(a), uy = Math.sin(a), nx = -uy, ny = ux, L = R * len, ww = len < 0.6 ? w * 0.75 : w;
+    g.moveTo(nx * ww, ny * ww); g.lineTo(ux * L, uy * L); g.lineTo(-nx * ww, -ny * ww);
+  }
+  g.lineWidth = 0.6; g.strokeStyle = rgba('engrave', 0.85); g.stroke();
+  g.beginPath(); g.arc(0, 0, Math.max(1.2, R * 0.13), 0, TAU); g.fillStyle = C['star-warm']; g.fill();
+  g.restore();
+}
+function hollyLeaf(g, x, y, ang, L, W) {
+  // a holly leaf along its midrib, with three spines a side
+  const pts = [];
+  const N = 3;
+  for (let k = 0; k <= 2 * N; k++) {
+    const t = k / (2 * N), wv = Math.sin(Math.PI * t) * W * (k % 2 ? 0.62 : 1.0);
+    pts.push([t * L, wv]);
+  }
+  g.save(); g.translate(x, y); g.rotate(ang);
+  g.beginPath(); g.moveTo(0, 0);
+  for (let k = 1; k <= 2 * N; k++) g.lineTo(pts[k][0], -pts[k][1]);
+  for (let k = 2 * N - 1; k >= 1; k--) g.lineTo(pts[k][0], pts[k][1]);
+  g.closePath();
+  g.fillStyle = mix('verdigris', 'engrave', 0.18); g.fill();
+  g.lineWidth = 0.6; g.strokeStyle = rgba('engrave', 0.9); g.stroke();
+  g.beginPath(); g.moveTo(L * 0.06, 0); g.lineTo(L * 0.9, 0); g.strokeStyle = rgba('brass-hi', 0.4); g.lineWidth = 0.5; g.stroke();
+  g.restore();
+}
+function hollySprig(g, x, y, side) {
+  const L = 0.026 * D, W = 0.0088 * D;
+  hollyLeaf(g, x, y, side > 0 ? -0.02 : Math.PI + 0.02, L, W);
+  hollyLeaf(g, x, y, side > 0 ? 0.62 : Math.PI - 0.62, L * 0.84, W * 0.9);
+  const br = Math.max(1.3, 0.0042 * D);
+  for (const [dx, dy] of [[-0.6, -0.5], [0.55, -0.55], [0, 0.45]]) {
+    const bx = x + side * (dx * br * 1.5 - br * 0.6), by = y + dy * br * 1.5;
+    g.beginPath(); g.arc(bx, by, br, 0, TAU); g.fillStyle = C.ember; g.fill();
+    g.lineWidth = 0.5; g.strokeStyle = rgba('engrave', 0.85); g.stroke();
+    g.beginPath(); g.arc(bx - br * 0.32, by - br * 0.32, br * 0.32, 0, TAU); g.fillStyle = rgba('star-warm', 0.75); g.fill();
+  }
+}
+function renderMater() {
+  const g = materCv.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, W, H);
+  const rnd = rngFor(3);
+
+  // the suspension ring, drawn first so the throne overlaps it
+  const tmp = new Path2D(); const { K, rk } = throneShape(tmp);
+  const rr = 0.024 * D, rc = { x: cx, y: K.y - rr + 0.003 * D };
+  g.lineWidth = 0.0062 * D;
+  const rg = g.createLinearGradient(rc.x - rr, rc.y - rr, rc.x + rr, rc.y + rr);
+  rg.addColorStop(0, C['brass-hi']); rg.addColorStop(0.5, C.brass); rg.addColorStop(1, C['brass-lo']);
+  g.strokeStyle = rg; g.beginPath(); g.arc(rc.x, rc.y, rr, 0, TAU); g.stroke();
+  g.lineWidth = 0.7; g.strokeStyle = rgba('engrave', 0.6); g.beginPath(); g.arc(rc.x, rc.y, rr + 0.0031 * D, 0, TAU); g.stroke();
+  g.beginPath(); g.arc(rc.x, rc.y, rr - 0.0031 * D, 0, TAU); g.stroke();
+
+  // body: limb annulus plus throne, pierced throne eye
+  const body = new Path2D();
+  body.arc(cx, cy, Ro, 0, TAU);
+  throneShape(body);
+  const bodyHole = new Path2D();
+  bodyHole.arc(cx, cy, Ro, 0, TAU); throneShape(bodyHole);
+  g.save();
+  const lin = g.createLinearGradient(cx - Ro, cy - Ro, cx + Ro * 0.8, cy + Ro);
+  lin.addColorStop(0, mix('brass', 'brass-hi', 0.12)); lin.addColorStop(0.5, mix('brass', 'brass-lo', 0.42)); lin.addColorStop(1, mix('brass-lo', 'brass-deep', 0.25));
+  g.fillStyle = lin; g.fill(body, 'nonzero');
+  // cut plate well and throne eye
+  g.globalCompositeOperation = 'destination-out';
+  g.beginPath(); g.arc(cx, cy, Ri, 0, TAU); g.fill();
+  g.beginPath(); g.arc(K.x, K.y, 0.0105 * D, 0, TAU); g.fill();
+  g.globalCompositeOperation = 'source-over';
+
+  // turned (lathe) texture
+  g.save(); g.beginPath(); g.arc(cx, cy, Ro, 0, TAU); g.arc(cx, cy, Ri, 0, TAU, true); g.clip();
+  for (let i = 0; i < 170; i++) {
+    const r = Ri + rnd() * (Ro - Ri);
+    g.lineWidth = 0.4 + rnd() * 1.1;
+    g.strokeStyle = rnd() < 0.5 ? rgba('brass-hi', 0.02 + rnd() * 0.05) : rgba('brass-deep', 0.03 + rnd() * 0.06);
+    g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.stroke();
+  }
+  // fine turning marks half a pixel apart; on a small dial they would only read as noise
+  if (FX.brass && D >= 600) {
+    const rr = rngFor(12);
+    g.globalCompositeOperation = 'overlay'; g.lineWidth = 0.5;
+    for (let r = Ri + 0.25, k = 0; r < Ro; r += 0.5, k++) {
+      const a = 0.015 + 0.02 * rr();
+      g.strokeStyle = k % 2 ? rgba('brass-hi', a) : rgba('brass-deep', a);
+      g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.stroke();
+    }
+    g.globalCompositeOperation = 'source-over';
+  }
+  g.restore();
+
+  // bevels: outer edge catches light top-left, inner wall of the well
+  const edge = g.createLinearGradient(cx - Ro, cy - Ro, cx + Ro, cy + Ro);
+  edge.addColorStop(0, rgba('brass-hi', 0.85)); edge.addColorStop(0.5, rgba('brass-hi', 0.12)); edge.addColorStop(1, rgba('engrave', 0.5));
+  g.lineWidth = 1.2; g.strokeStyle = edge; g.beginPath(); g.arc(cx, cy, Ro - 0.7, 0, TAU); g.stroke();
+  const wall = g.createLinearGradient(cx - Ri, cy - Ri, cx + Ri, cy + Ri);
+  wall.addColorStop(0, rgba('engrave', 0.75)); wall.addColorStop(0.55, rgba('brass-lo', 0.3)); wall.addColorStop(1, rgba('brass-hi', 0.75));
+  g.lineWidth = 0.0035 * D; g.strokeStyle = wall; g.beginPath(); g.arc(cx, cy, Ri + 0.00175 * D, 0, TAU); g.stroke();
+
+  // band boundaries
+  const rings = new Path2D();
+  const rcirc = r => { rings.moveTo(cx + r, cy); rings.arc(cx, cy, r, 0, TAU); };
+  rcirc(Ro - 0.008 * D); rcirc(Ro - 0.0115 * D); rcirc(Ro - 0.055 * D); rcirc(Ro - 0.047 * D);
+  engraveStroke(g, rings, 0.75);
+
+  // hour scale: 24 hours, XII at noon (top) and midnight (bottom)
+  const ticks = new Path2D();
+  const tickAt = (psiDeg, r0, r1) => { const s = Math.sin(psiDeg * DEG), c = -Math.cos(psiDeg * DEG); ticks.moveTo(cx + s * r0, cy + c * r0); ticks.lineTo(cx + s * r1, cy + c * r1); };
+  for (let q = 0; q < 96; q++) {
+    const psi = q * 3.75;
+    if (q % 4 === 0) continue;
+    tickAt(psi, Ro - 0.055 * D, Ro - 0.055 * D + (q % 2 === 0 ? 0.0065 : 0.0038) * D);
+  }
+  for (let k = 0; k < 24; k++) {
+    if (k === 0 || k === 12) continue;
+    tickAt(k * 15, Ro - 0.055 * D, Ro - 0.047 * D);
+  }
+  // degree scale 0-360
+  for (let dg = 0; dg < 360; dg++) {
+    const len = dg % 10 === 0 ? 0.0135 : dg % 5 === 0 ? 0.0092 : 0.0052;
+    tickAt(dg, Ri + 0.0018 * D, Ri + 0.0018 * D + len * D);
+  }
+  engraveStroke(g, ticks, D > 560 ? 0.8 : 0.6);
+
+  const fh = Math.max(8.5, 0.026 * D);
+  for (let k = 0; k < 24; k++) {
+    const psi = k * 15 * DEG, rr2 = Ro - 0.0305 * D;
+    const x = cx + Math.sin(psi) * rr2, y = cy - Math.cos(psi) * rr2;
+    const lower = k > 6 && k < 18;
+    engraveText(g, ROMAN[k % 12], x, y, lower ? psi + Math.PI : psi, FD(500, fh));
+  }
+  if (D > 520) {
+    const fd = 0.0098 * D;
+    for (let dg = 0; dg < 360; dg += 10) {
+      const psi = dg * DEG, r3 = Ri + 0.0196 * D;
+      const lower = dg > 90 && dg < 270;
+      engraveText(g, String(dg), cx + Math.sin(psi) * r3, cy - Math.cos(psi) * r3, lower ? psi + Math.PI : psi, FM(fd));
+    }
+  }
+  // noon lozenge (engraved) and the midnight lozenge (ember inlay)
+  const lozenge = (psiDeg, fill) => {
+    const psi = psiDeg * DEG, r0 = Ro - 0.055 * D, r1 = Ro - 0.044 * D, wq = 0.0042 * D;
+    const s = Math.sin(psi), c = -Math.cos(psi), tx = Math.cos(psi), ty = Math.sin(psi);
+    const rm = (r0 + r1) / 2;
+    g.beginPath();
+    g.moveTo(cx + s * r0, cy + c * r0);
+    g.lineTo(cx + s * rm + tx * wq, cy + c * rm + ty * wq);
+    g.lineTo(cx + s * r1, cy + c * r1);
+    g.lineTo(cx + s * rm - tx * wq, cy + c * rm - ty * wq);
+    g.closePath();
+    g.fillStyle = fill; g.fill();
+    g.lineWidth = 0.7; g.strokeStyle = rgba('engrave', 0.9); g.stroke();
+  };
+  lozenge(0, rgba('engrave', 0.85));
+  lozenge(180, C.ember);
+
+  // throne: inset engraved outline and a Bethlehem star
+  g.save();
+  const inset = new Path2D(); throneShape(inset);
+  g.clip(inset);
+  g.beginPath(); g.arc(cx, cy, Ro + 0.004 * D, 0, TAU); g.lineWidth = 0.8; g.strokeStyle = rgba('engrave', 0.6); g.stroke();
+  g.restore();
+  g.beginPath(); g.arc(K.x, K.y, rk - 0.0045 * D, 0, TAU); g.lineWidth = 0.75; g.strokeStyle = rgba('engrave', 0.7); g.stroke();
+  g.beginPath(); g.arc(K.x, K.y, 0.0105 * D + 0.6, 0, TAU); g.lineWidth = 1; g.strokeStyle = rgba('brass-hi', 0.55); g.stroke();
+  // holly sprigs in green enamel with ember berries on the shoulders of the throne
+  for (const side of [-1, 1]) hollySprig(g, cx + side * 0.05 * D, cy - Ro - 0.0132 * D, side);
+  // the Star of Bethlehem, gilded and faceted, its long ray pointing down to the noon line
+  gildedStar(g, cx, cy - Ro - 0.0225 * D, 0.0175 * D, true);
+
+  // patina in the recesses: a few seeded specks near the inner wall and the throne joint
+  for (let i = 0; i < 46; i++) {
+    const near = rnd() < 0.7;
+    const a3 = near ? rnd() * TAU : (-90 + (rnd() - 0.5) * 34) * DEG;
+    const r4 = near ? Ri + 0.002 * D + rnd() * 0.01 * D : Ro - rnd() * 0.012 * D;
+    const x = cx + Math.cos(a3) * r4, y = cy + Math.sin(a3) * r4, s2 = 0.6 + rnd() * 2.6;
+    const sp = g.createRadialGradient(x, y, 0, x, y, s2);
+    sp.addColorStop(0, rgba('verdigris', 0.08 + rnd() * 0.16)); sp.addColorStop(1, rgba('verdigris', 0));
+    g.fillStyle = sp; g.fillRect(x - s2, y - s2, s2 * 2, s2 * 2);
+  }
+  g.restore();
+}
+
+/* ---------------- plates ---------------- */
+let SLED = null;
+function renderPlate(idx, blank) {
+  const P = PLATES[idx], phi = P.lat * DEG, sp = Math.sin(phi), cpp = Math.cos(phi), tp = Math.tan(phi);
+  const c = cpuCanvas(); c.width = cvU.width; c.height = cvU.height;
+  const g = c.getContext('2d', CPU); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.save(); g.beginPath(); g.arc(cx, cy, Rcap, 0, TAU); g.clip();
+  const gr = g.createRadialGradient(cx - Rcap * 0.15, cy - Rcap * 0.35, Rcap * 0.05, cx, cy, Rcap * 1.02);
+  gr.addColorStop(0, C['plate-hi']); gr.addColorStop(1, C.plate);
+  g.fillStyle = gr; g.fillRect(cx - Rcap, cy - Rcap, 2 * Rcap, 2 * Rcap);
+
+  const hz = (aD, AD) => {
+    const a = aD * DEG, A = AD * DEG, sa = Math.sin(a), ca = Math.cos(a);
+    const sd = sp * sa + cpp * ca * Math.cos(A);
+    const X = -ca * Math.sin(A), Y = cpp * sa - sp * ca * Math.cos(A);
+    const k = Req / (1 + sd);
+    return [cx + X * k, cy - Y * k, k];
+  };
+  const poly = (fn, t0, t1, n) => {
+    g.beginPath(); let pen = false;
+    for (let i = 0; i <= n; i++) {
+      const [x, y, k] = fn(t0 + (t1 - t0) * i / n);
+      if (!isFinite(x) || !isFinite(y) || k > Req * 60) { pen = false; continue; }
+      if (!pen) { g.moveTo(x, y); pen = true; } else g.lineTo(x, y);
+    }
+  };
+  const ink = (w, a) => { g.lineWidth = w; g.strokeStyle = rgba('brass', a); };
+  const hairW = D > 560 ? 0.7 : 0.6;
+
+  if (!blank) {
+  // the visible sky inside the horizon is a shade lighter
+  poly(A => hz(0, A), 0, 360, 360); g.closePath(); g.fillStyle = rgba('brass', 0.035); g.fill();
+
+  ink(hairW, 0.36); g.beginPath(); g.arc(cx, cy, RCAN_U * Req, 0, TAU); g.stroke();
+  ink(hairW + 0.1, 0.5); g.beginPath(); g.arc(cx, cy, Req, 0, TAU); g.stroke();
+  ink(hairW, 0.3); g.beginPath(); g.moveTo(cx, cy - Rcap); g.lineTo(cx, cy + Rcap); g.moveTo(cx - Rcap, cy); g.lineTo(cx + Rcap, cy); g.stroke();
+
+  // unequal (planetary) hours below the horizon
+  ink(hairW * 0.85, 0.24);
+  for (let k = 1; k < 12; k++) {
+    g.beginPath();
+    for (let j = 0; j <= 48; j++) {
+      const dec = (-EPS_DEG + 2 * EPS_DEG * j / 48) * DEG;
+      const H0 = Math.acos(clamp(-tp * Math.tan(dec), -1, 1));
+      const Ha = H0 + k * (TAU - 2 * H0) / 12;
+      const r = Math.cos(dec) / (1 + Math.sin(dec)) * Req;
+      const x = cx + r * Math.sin(Ha), y = cy - r * Math.cos(Ha);
+      j ? g.lineTo(x, y) : g.moveTo(x, y);
+    }
+    g.stroke();
+  }
+
+  // almucantars
+  for (let a = 5; a < 90; a += 5) {
+    const major = a % 10 === 0;
+    ink(major ? hairW : hairW * 0.75, major ? 0.56 : 0.2);
+    poly(A => hz(a, A), 0, 360, 300); g.closePath(); g.stroke();
+  }
+  // twilight line, 18 degrees below the horizon
+  g.setLineDash([2.4, 3.2]); ink(hairW, 0.36);
+  poly(A => hz(-18, A), 0, 360, 400); g.stroke(); g.setLineDash([]);
+  // azimuths every 30 degrees
+  ink(hairW * 0.9, 0.34);
+  for (let A = 0; A < 360; A += 30) { poly(a => hz(a, A), 0, 90, 120); g.stroke(); }
+  // horizon
+  ink(1.15, 0.92); poly(A => hz(0, A), 0, 360, 420); g.closePath(); g.stroke();
+  // zenith
+  const [zx, zy] = hz(90, 0), zs = Math.max(4, D * 0.007);
+  if (idx === 0) {
+    // over Bethlehem the zenith is marked with the star that stood over the town
+    gildedStar(g, zx, zy, zs * 1.45);
+  } else {
+    ink(0.8, 0.9); g.beginPath(); g.arc(zx, zy, zs * 0.42, 0, TAU); g.stroke();
+    g.beginPath(); g.moveTo(zx - zs, zy); g.lineTo(zx + zs, zy); g.moveTo(zx, zy - zs); g.lineTo(zx, zy + zs); g.stroke();
+  }
+
+  // labels on the plate
+  const fsz = Math.max(7.5, D * 0.0145);
+  const labelAlong = (text, A, side) => {
+    const [x1, y1] = hz(0, A - 1), [x2, y2] = hz(0, A + 1), [x, y] = hz(0, A);
+    let ang = Math.atan2(y2 - y1, x2 - x1); if (Math.cos(ang) < 0) ang += Math.PI;
+    let nx = -Math.sin(ang), ny = Math.cos(ang);
+    if ((zx - x) * nx + (zy - y) * ny < 0) { nx = -nx; ny = -ny; }
+    const off = fsz * 0.85 * side;
+    g.save(); g.translate(x + nx * off, y + ny * off); g.rotate(ang);
+    g.font = FD(500, fsz); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = rgba('verdigris', 0.5); g.fillText(text, 0.6, 0.6);
+    g.fillStyle = rgba('brass', 0.82); g.fillText(text, 0, 0);
+    g.restore();
+  };
+  // set the names where the horizon runs between the equator and the rim of the rete; on a small dial there is no room for them
+  if (D >= 430) {
+    let Aw = 100;
+    for (let A = 91; A < 179; A += 0.5) { const [x, y] = hz(0, A); if (Math.hypot(x - cx, y - cy) > 1.22 * Req) { Aw = A; break; } }
+    labelAlong('ORIENS', Aw, 1);
+    labelAlong('OCCIDENS', 360 - Aw, 1);
+  }
+  if (D > 520) {
+    g.font = FM(Math.max(6.5, D * 0.0095)); g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillStyle = rgba('brass', 0.6);
+    for (let a = 10; a < 90; a += 10) {
+      const [x, y] = hz(a, 180);
+      if (Math.hypot(x - cx, y - cy) < Rcap - 0.06 * Rcap && Math.abs(y - zy) > 8) g.fillText(String(a), x + 3, y - 5);
+    }
+  }
+  // Rovaniemi: a small engraved sled waits on the horizon, just east of north
+  if (idx === 2 && FX.sled) {
+    const [sx, sy] = hz(0, 7), [ax, ay] = hz(0, 6), [bx, by] = hz(0, 8);
+    // the sled stands on the horizon with its seat toward the zenith
+    let ang = Math.atan2(by - ay, bx - ax);
+    if (Math.sin(ang) * (zx - sx) - Math.cos(ang) * (zy - sy) < 0) ang += Math.PI;
+    const k = Math.max(5.5, 0.0095 * D), sl = new Path2D();
+    sl.moveTo(-0.62 * k, -0.06 * k); sl.lineTo(0.42 * k, -0.06 * k); sl.quadraticCurveTo(0.66 * k, -0.06 * k, 0.6 * k, -0.3 * k);
+    sl.moveTo(-0.38 * k, -0.06 * k); sl.lineTo(-0.38 * k, -0.36 * k); sl.moveTo(0.22 * k, -0.06 * k); sl.lineTo(0.22 * k, -0.36 * k);
+    sl.moveTo(-0.56 * k, -0.36 * k); sl.lineTo(0.36 * k, -0.36 * k); sl.moveTo(-0.56 * k, -0.36 * k); sl.lineTo(-0.62 * k, -0.6 * k);
+    g.save(); g.translate(sx, sy); g.rotate(ang);
+    engraveStroke(g, sl, 0.75);
+    g.restore();
+    SLED = { x: sx + Math.sin(ang) * 0.3 * k, y: sy - Math.cos(ang) * 0.3 * k, k };
+  }
+  }
+  // inner shadow from the raised limb
+  const sh = g.createRadialGradient(cx, cy, Rcap * 0.93, cx, cy, Rcap);
+  sh.addColorStop(0, rgba('shadow', 0)); sh.addColorStop(1, rgba('shadow', 0.55));
+  g.fillStyle = sh; g.fillRect(cx - Rcap, cy - Rcap, 2 * Rcap, 2 * Rcap);
+  g.restore();
+  return c;
+}
+function plateImg(i) { return plateCache[i] || (plateCache[i] = renderPlate(i)); }
+const blankCache = [], backCache = [];
+function plateBlank(i) { return blankCache[i] || (blankCache[i] = renderPlate(i, true)); }
+// the reverse of each plate: plain turned brass with its latitude engraved, seen for a moment as it comes out
+const PLATE_BACK = ['LAT · XXXI · XLII · BETHLEHEM', 'LAT · XLIX · XXVII · NORIMBERGA', 'LAT · LXVI · XXX · ROVANIEMI'];
+function plateBack(idx) {
+  if (backCache[idx]) return backCache[idx];
+  const c = cpuCanvas(); c.width = cvU.width; c.height = cvU.height;
+  const g = c.getContext('2d', CPU); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.save(); g.beginPath(); g.arc(cx, cy, Rcap, 0, TAU); g.clip();
+  const gr = g.createLinearGradient(cx + Rcap, cy + Rcap, cx - Rcap, cy - Rcap);
+  gr.addColorStop(0, mix('brass', 'brass-lo', 0.2)); gr.addColorStop(0.55, mix('brass-lo', 'brass-deep', 0.25)); gr.addColorStop(1, mix('brass-lo', 'brass-deep', 0.7));
+  g.fillStyle = gr; g.fillRect(cx - Rcap, cy - Rcap, 2 * Rcap, 2 * Rcap);
+  const rnd = rngFor(13);
+  for (let i = 0; i < 70; i++) {
+    g.lineWidth = 0.4 + rnd() * 0.9; g.strokeStyle = rnd() < 0.5 ? rgba('brass-hi', 0.03 + rnd() * 0.05) : rgba('brass-deep', 0.04 + rnd() * 0.06);
+    g.beginPath(); g.arc(cx, cy, rnd() * Rcap, 0, TAU); g.stroke();
+  }
+  g.beginPath(); g.arc(cx, cy, Math.max(3, 0.0095 * D), 0, TAU); g.fillStyle = C.shadow; g.fill();
+  const fs = Math.max(8, 0.06 * Req), font = FD(500, fs);
+  const arc = placeArc(layoutArc(PLATE_BACK[idx], font, fs, 0.16), Rcap * 0.6, 0, false);
+  for (const o of arc.glyphs) engraveText(g, o.ch, o.x, o.y, o.rot, font);
+  const sh = g.createRadialGradient(cx, cy, Rcap * 0.9, cx, cy, Rcap);
+  sh.addColorStop(0, rgba('shadow', 0)); sh.addColorStop(1, rgba('shadow', 0.5));
+  g.fillStyle = sh; g.fillRect(cx - Rcap, cy - Rcap, 2 * Rcap, 2 * Rcap);
+  g.restore();
+  return (backCache[idx] = c);
+}
+
+/* ---------------- arc inscriptions ---------------- */
+const glyphCache = new Map();
+function layoutArc(text, font, size, track) {
+  const key = text + '|' + font;
+  if (glyphCache.has(key)) return glyphCache.get(key);
+  ctx.save(); ctx.font = font;
+  const chars = [...text].map(ch => ({ ch, w: ctx.measureText(ch).width }));
+  ctx.restore();
+  let x = 0; chars.forEach((c, i) => { c.x = x + c.w / 2; x += c.w + (i < chars.length - 1 ? track * size : 0); });
+  const res = { chars, width: x };
+  glyphCache.set(key, res);
+  return res;
+}
+// psi measured clockwise from the top; bottom text reads with tops toward the centre
+function placeArc(lay, r, psiCenter, bottom) {
+  const glyphs = lay.chars.map(c => {
+    const off = (c.x - lay.width / 2) / r;
+    const psi = bottom ? psiCenter - off : psiCenter + off;
+    return { ch: c.ch, psi, x: cx + r * Math.sin(psi), y: cy - r * Math.cos(psi), rot: bottom ? psi - Math.PI : psi };
+  });
+  return { glyphs, span: lay.width / r };
+}
+function cartouche(g, r, psi0, psi1, hh, alpha) {
+  const a0 = Math.min(psi0, psi1) - Math.PI / 2, a1 = Math.max(psi0, psi1) - Math.PI / 2;
+  g.save(); g.globalAlpha = alpha;
+  g.beginPath(); g.arc(cx, cy, r + hh, a0, a1); g.arc(cx, cy, r - hh, a1, a0, true); g.closePath();
+  g.fillStyle = C.plate; g.fill();
+  if (plateDim > 0) { g.fillStyle = rgba('night-0', plateDim); g.fill(); }
+  g.lineWidth = 0.7; g.strokeStyle = rgba('brass', 0.6);
+  g.beginPath(); g.arc(cx, cy, r + hh, a0, a1); g.stroke();
+  g.beginPath(); g.arc(cx, cy, r - hh, a0, a1); g.stroke();
+  for (const a of [a0, a1]) {
+    const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r, s = hh * 0.36;
+    const tx = -Math.sin(a), ty = Math.cos(a);
+    g.beginPath(); g.moveTo(x + Math.cos(a) * s, y + Math.sin(a) * s); g.lineTo(x + tx * s * 0.7, y + ty * s * 0.7);
+    g.lineTo(x - Math.cos(a) * s, y - Math.sin(a) * s); g.lineTo(x - tx * s * 0.7, y - ty * s * 0.7); g.closePath();
+    g.fillStyle = rgba('brass', 0.7); g.fill();
+  }
+  g.restore();
+}
+function engraveGlyphs(g, glyphs, font, start, now, step, alpha) {
+  g.save(); g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle';
+  glyphs.forEach((o, i) => {
+    const t0 = start + i * step;
+    if (now < t0 || o.ch === ' ') return;
+    const k = reduced ? 1 : clamp01((now - t0) / 520);
+    g.save(); g.translate(o.x, o.y); g.rotate(o.rot);
+    g.globalAlpha = alpha * clamp01(k * 3);
+    g.fillStyle = rgba('verdigris', 0.55); g.fillText(o.ch, 0.6, 0.7);
+    g.fillStyle = rgba('brass', 0.95); g.fillText(o.ch, 0, 0);
+    if (k < 1) { g.globalAlpha = alpha * (1 - k); g.fillStyle = C['brass-hi']; g.fillText(o.ch, 0, 0); }
+    g.restore();
+  });
+  g.restore();
+}
+// the midnight cartouches sit inside the rete's ecliptic ring as it stands at 00:00, and outside its equator ring
+let insGeo = null;
+function midnightGeom() {
+  if (insGeo && insGeo.D === D && insGeo.plate === S.plate && insGeo.cache === glyphCache.size) return insGeo;
+  const fs = Math.max(8.5, 0.07 * Req), font = FD(500, fs), track = D < 430 ? 0.1 : 0.16;
+  const L = layoutArc('XXV · XII', font, fs, track), Rr = layoutArc('MEDIA NOCTE', font, fs, track);
+  const rot = lstAt(MID, PLATES[S.plate].lon) * 15 * DEG;
+  const ex = ECL_C * Math.cos(rot) * Req, ey = ECL_C * Math.sin(rot) * Req, rin = (ECL_R - 0.076) * Req;
+  const hh = fs * 0.8, margin = Math.max(3, 0.012 * Req), rMin = 1.014 * Req + hh + margin;
+  const fits = r => {
+    const gap = fs * 2.4 / r, pad = fs * 1.05 / r;
+    const spans = [[Math.PI + gap / 2 - pad * 0.55, Math.PI + gap / 2 + L.width / r + pad], [Math.PI - gap / 2 - Rr.width / r - pad, Math.PI - gap / 2 + pad * 0.55]];
+    for (const [a0, a1] of spans) for (let k = 0; k <= 16; k++) {
+      const psi = a0 + (a1 - a0) * k / 16;
+      for (const rr of [r - hh, r + hh]) {
+        const x = rr * Math.sin(psi), y = -rr * Math.cos(psi);
+        if (Math.hypot(x - ex, y - ey) > rin - margin) return false;
+      }
+    }
+    return true;
+  };
+  let r = 1.30 * Req;
+  while (r > rMin && !fits(r)) r -= 0.004 * Req;
+  insGeo = { D, plate: S.plate, cache: glyphCache.size, fs, font, L, Rr, r: Math.max(r, rMin) };
+  return insGeo;
+}
+function drawMidnightInscription(g, now) {
+  const m = S.moment;
+  if (!m.on && m.level <= 0) return;
+  const alpha = m.on ? 1 : m.level;
+  const { fs, font, L, Rr, r } = midnightGeom();
+  const gap = (fs * 2.4) / r;
+  const left = placeArc(L, r, Math.PI + gap / 2 + L.width / r / 2, true);
+  const right = placeArc(Rr, r, Math.PI - gap / 2 - Rr.width / r / 2, true);
+  // the cartouches open as the figure closes, and the words are cut quickly after
+  const t0 = m.start + (reduced ? 0 : HEX_CLOSE - 250);
+  const band = reduced ? 1 : clamp01((now - t0) / 450);
+  const pad = fs * 1.05 / r, hh = fs * 0.8;
+  const ak = alpha * band * (m.on ? resumeK(now) : 1);
+  cartouche(g, r, Math.PI + gap / 2 - pad * 0.55, Math.PI + gap / 2 + left.span + pad, hh, ak);
+  cartouche(g, r, Math.PI - gap / 2 + pad * 0.55, Math.PI - gap / 2 - right.span - pad, hh, ak);
+  const step = reduced ? 0 : 48, lead = reduced ? 0 : 200;
+  engraveGlyphs(g, left.glyphs, font, t0 + lead, now, step, alpha * (m.on ? resumeK(now) : 1));
+  engraveGlyphs(g, right.glyphs, font, t0 + lead + left.glyphs.length * step + (reduced ? 0 : 60), now, step, alpha * (m.on ? resumeK(now) : 1));
+}
+function poleVisibility(now) {
+  const e = S.egg[S.plate], m = S.moment;
+  if (!e) return 0;
+  if (!m.on) return 1 - m.level;
+  // asked for while the hexagon stands: show the engraving for a moment, then give the sky back
+  const shown = Math.max(e.start, e.peek), hold = shown === e.start ? 4200 : 2400;
+  if (shown > m.start) return 1 - (reduced ? (now - shown > hold ? 1 : 0) : clamp01((now - shown - hold) / 800));
+  return 1 - (reduced ? 1 : clamp01((now - m.start) / 700));
+}
+const eggBusy = (e, now) => !!e && (now - e.start < 5200 || now - e.peek < 3400);
+function engraveEgg() {
+  const e = S.egg[S.plate], now = performance.now();
+  if (e) { e.peek = now; return; }
+  S.egg[S.plate] = { start: now, peek: -1e9 };
+  live.textContent = `Engraved on the plate: elevation of the pole ${PLATES[S.plate].latTxt}, maker's mark No. 219626…22ff.`;
+}
+function drawPoleInscription(g, now) {
+  const e = S.egg[S.plate];
+  if (!e) return;
+  const vis = poleVisibility(now);
+  if (vis <= 0) return;
+  const P = PLATES[S.plate];
+  const fs1 = Math.max(8.5, 0.064 * Req), fs2 = Math.max(7.5, 0.05 * Req);
+  const f1 = FD(500, fs1), f2 = FD(500, fs2);
+  const r1 = 1.33 * Req, r2 = 1.205 * Req;
+  const l1 = layoutArc('ELEVATIO POLI ' + P.latTxt, f1, fs1, 0.14);
+  const l2 = layoutArc('No. 219626…22ff · fecit', f2, fs2, 0.12);
+  const a1 = placeArc(l1, r1, 0, false), a2 = placeArc(l2, r2, 0, false);
+  const band = reduced ? 1 : clamp01((now - e.start) / 450);
+  cartouche(g, r1, -a1.span / 2 - fs1 * 1.1 / r1, a1.span / 2 + fs1 * 1.1 / r1, fs1 * 0.8, band * vis);
+  cartouche(g, r2, -a2.span / 2 - fs2 * 1.1 / r2, a2.span / 2 + fs2 * 1.1 / r2, fs2 * 0.82, band * vis);
+  const step = reduced ? 0 : 75, lead = reduced ? 0 : 300;
+  engraveGlyphs(g, a1.glyphs, f1, e.start + lead, now, step, vis);
+  engraveGlyphs(g, a2.glyphs, f2, e.start + lead + a1.glyphs.length * step + (reduced ? 0 : 150), now, step, vis);
+}
+
+/* ---------------- the polish of use ---------------- */
+// a 64 x 64 map, in the rete's own frame, of where hands have turned it; it never brightens the brass by more than 10 per cent
+const POL_N = 64, polish = new Float32Array(POL_N * POL_N);
+let polishCv = null, polishDirty = true, polishAny = false, polishSaved = 0;
+(function loadPolish() {
+  if (!FX.polish) return;
+  const b = store.get('polish', null);
+  if (typeof b !== 'string') return;
+  try {
+    const bin = atob(b);
+    if (bin.length !== POL_N * POL_N) return;
+    for (let i = 0; i < bin.length; i++) { polish[i] = bin.charCodeAt(i) / 255; if (polish[i] > 0) polishAny = true; }
+  } catch (e) { polish.fill(0); polishAny = false; }
+})();
+function polishAdd(p, rot) {
+  const dx = p.x - cx, dy = p.y - cy, c = Math.cos(-rot), sn = Math.sin(-rot);
+  const ux = (dx * c - dy * sn) / Req, uy = (dx * sn + dy * c) / Req;
+  const gx = (ux / RCAP_U * 0.5 + 0.5) * POL_N, gy = (uy / RCAP_U * 0.5 + 0.5) * POL_N, R = 2.6;
+  for (let j = Math.floor(gy - R); j <= Math.ceil(gy + R); j++) for (let i = Math.floor(gx - R); i <= Math.ceil(gx + R); i++) {
+    if (i < 0 || j < 0 || i >= POL_N || j >= POL_N) continue;
+    const d = Math.hypot(i + 0.5 - gx, j + 0.5 - gy) / R; if (d >= 1) continue;
+    const k = j * POL_N + i; polish[k] = Math.min(1, polish[k] + 0.0006 * (1 - d * d));
+  }
+  polishAny = true; polishDirty = true;
+}
+function polishCanvas() {
+  if (!FX.polish || !polishAny) return null;
+  if (!polishCv) { polishCv = cpuCanvas(); polishCv.width = polishCv.height = POL_N; }
+  if (polishDirty) {
+    const g = polishCv.getContext('2d', CPU), id = g.createImageData(POL_N, POL_N), c = RGB['brass-hi'];
+    for (let i = 0; i < polish.length; i++) { id.data[i * 4] = c[0]; id.data[i * 4 + 1] = c[1]; id.data[i * 4 + 2] = c[2]; id.data[i * 4 + 3] = Math.round(polish[i] * 0.1 * 255); }
+    g.putImageData(id, 0, 0); polishDirty = false;
+  }
+  return polishCv;
+}
+function polishSave() {
+  if (!FX.polish || !polishAny) return;
+  const now = performance.now(); if (now - polishSaved < 2000) return; polishSaved = now;
+  let bin = ''; for (let i = 0; i < polish.length; i++) bin += String.fromCharCode(Math.round(polish[i] * 255));
+  store.set('polish', btoa(bin));
+}
+
+/* ---------------- dynamic drawing ---------------- */
+function ruleGeom() {
+  const th = (6 + S.t / 60) * 15 * DEG;
+  const d = { x: Math.sin(th), y: -Math.cos(th) }, n = { x: Math.cos(th), y: Math.sin(th) };
+  const hw = Math.max(1.6, 0.0036 * D), tip = Ro - 0.0505 * D, sh = tip - 0.13 * D, tail = Rcap * 0.2;
+  const p = new Path2D();
+  p.moveTo(cx + d.x * tip, cy + d.y * tip);
+  p.lineTo(cx + d.x * sh + n.x * hw, cy + d.y * sh + n.y * hw);
+  p.lineTo(cx - d.x * tail + n.x * hw * 0.85, cy - d.y * tail + n.y * hw * 0.85);
+  p.arc(cx - d.x * tail, cy - d.y * tail, hw * 0.85, th, th + Math.PI, false);
+  p.lineTo(cx + d.x * sh - n.x * hw, cy + d.y * sh - n.y * hw);
+  p.closePath();
+  return { p, d, n, tip, hw, th };
+}
+let reteBmp = null, reteShBmp = null;
+const bake = { rot: 0, light: 0, valid: false };
+// render the rete once at the current rotation; frames in motion only rotate this bitmap
+function bakeRete(rot) {
+  const half = Rcap + 6, side = Math.ceil(2 * half * dpr);
+  if (!reteBmp || reteBmp.width !== side) {
+    reteBmp = cpuCanvas(); reteShBmp = cpuCanvas();
+    reteBmp.width = reteBmp.height = reteShBmp.width = reteShBmp.height = side;
+  }
+  const ocx = cx, ocy = cy;
+  cx = cy = side / dpr / 2;
+  const g = reteBmp.getContext('2d');
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, side, side);
+  drawRete(g, rot, 1);
+  const h = reteShBmp.getContext('2d');
+  h.setTransform(1, 0, 0, 1, 0, 0); h.clearRect(0, 0, side, side);
+  h.save();
+  h.shadowColor = rgba('shadow', 0.6); h.shadowBlur = 2.4 * dpr; h.shadowOffsetX = 10000 * dpr;
+  reteXform(h, rot, 1, -10000, 0); h.fillStyle = C.shadow; h.fill(retePath);
+  h.restore();
+  cx = ocx; cy = ocy;
+  bake.rot = rot; bake.light = S.sheen; bake.valid = true;
+}
+function drawBaked(g, bmp, rot, lift, ox, oy) {
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.translate(cx + ox, cy + oy); g.scale(lift, lift); g.rotate(rot - bake.rot);
+  const half = bmp.width / dpr / 2;
+  g.drawImage(bmp, -half, -half, half * 2, half * 2);
+}
+function reteXform(g, rot, lift, ox, oy) {
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.translate(cx + (ox || 0), cy + (oy || 0)); g.scale(lift, lift); g.rotate(rot);
+}
+function drawRete(g, rot, lift) {
+  g.save();
+  const Lx = Math.cos(S.sheen), Ly = Math.sin(S.sheen);
+  reteXform(g, rot, lift, -Lx * 0.8, -Ly * 0.8); g.fillStyle = mix('brass-lo', 'brass-deep', 0.3); g.fill(retePath);
+  reteXform(g, rot, lift, Lx * 0.8, Ly * 0.8); g.fillStyle = mix('brass', 'brass-hi', 0.55); g.fill(retePath);
+  reteXform(g, rot, lift); g.fillStyle = mix('brass', 'brass-lo', 0.3); g.fill(retePath);
+  if (FX.brass) {
+    // straight filed grain along the equinoctial bar, and the bright places worn by thumbs
+    g.save(); g.clip(retePath);
+    const bx = BAR_HW * Req;
+    g.lineWidth = 0.5;
+    for (let k = 0; k < 6; k++) {
+      const x = -bx + (k + 0.5) * bx / 3;
+      g.strokeStyle = k % 2 ? rgba('brass-hi', 0.13) : rgba('brass-deep', 0.16);
+      g.beginPath(); g.moveTo(x, -Req); g.lineTo(x, Req); g.stroke();
+    }
+    const pc = polishCanvas();
+    if (pc) { g.globalCompositeOperation = 'lighter'; const e = RCAP_U * Req; g.drawImage(pc, -e, -e, 2 * e, 2 * e); }
+    g.restore();
+  }
+  const lx = Math.cos(S.sheen - rot), ly = Math.sin(S.sheen - rot);
+  g.lineWidth = D > 560 ? 0.75 : 0.6;
+  g.save(); g.translate(lx * 0.55, ly * 0.55); g.strokeStyle = rgba('brass-hi', 0.35); g.stroke(reteEng); g.stroke(reteHair); g.restore();
+  g.strokeStyle = rgba('engrave', 0.85); g.stroke(reteEng);
+  g.strokeStyle = rgba('engrave', 0.55); g.stroke(reteHair);
+  // sun's place
+  const sr = Math.max(1.8, 0.017 * Req);
+  g.beginPath(); g.arc(sunPt.x, sunPt.y, sr, 0, TAU); g.strokeStyle = rgba('engrave', 0.9); g.lineWidth = 0.8; g.stroke();
+  g.beginPath(); g.arc(sunPt.x, sunPt.y, 0.7, 0, TAU); g.fillStyle = C.engrave; g.fill();
+
+  // star names
+  g.font = FD(500, labSize); g.textBaseline = 'middle';
+  for (let i = 0; i < STARS.length; i++) {
+    const f = flames[i]; if (!f || !f.labShow) continue;
+    const ang = f.labAng;
+    const gap = f.labGap * Req;
+    const ax = f.T.x * Req + Math.cos(ang) * gap, ay = f.T.y * Req + Math.sin(ang) * gap;
+    const flip = Math.cos(rot + ang) < 0;
+    g.save(); g.translate(ax, ay); g.rotate(flip ? ang + Math.PI : ang);
+    g.textAlign = flip ? 'right' : 'left';
+    g.fillStyle = rgba('night-0', 0.8); g.fillText(STARS[i].name, 0.7, 0.8);
+    g.fillStyle = rgba('brass-hi', 0.9);
+    g.fillText(STARS[i].name, 0, 0);
+    g.restore();
+  }
+  g.restore();
+}
+function drawPin(g) {
+  g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const r0 = Math.max(6, 0.024 * D), hole = Math.max(3, 0.0095 * D);
+  const gr = g.createRadialGradient(cx - r0 * 0.4, cy - r0 * 0.4, 0, cx, cy, r0);
+  gr.addColorStop(0, C['brass-hi']); gr.addColorStop(0.55, C.brass); gr.addColorStop(1, C['brass-lo']);
+  g.beginPath(); g.arc(cx, cy, r0, 0, TAU); g.fillStyle = gr; g.fill();
+  g.lineWidth = 0.75; g.strokeStyle = rgba('engrave', 0.7); g.beginPath(); g.arc(cx, cy, r0 * 0.72, 0, TAU); g.stroke();
+  g.strokeStyle = rgba('engrave', 0.8); g.beginPath(); g.arc(cx, cy, r0 - 0.4, 0, TAU); g.stroke();
+  g.globalCompositeOperation = 'destination-out';
+  g.beginPath(); g.arc(cx, cy, hole, 0, TAU); g.fill();
+  g.globalCompositeOperation = 'source-over';
+  g.lineWidth = 1; g.strokeStyle = rgba('engrave', 0.9); g.beginPath(); g.arc(cx, cy, hole + 0.5, 0, TAU); g.stroke();
+  g.restore();
+  if (FX.ritual) drawWedge(g, wedgeOut, r0, hole);
+}
+// the horse: the wedge through the slot of the pin that holds rete and plates, its end cut as a horse's head
+let wedgeOut = 0, WEDGE = null;
+function drawWedge(g, out, r0, hole) {
+  const wd = Math.max(2.4, 0.0072 * D), y = cy + hole + wd * 0.5 + 0.8;
+  const slide = out * r0 * 1.1;
+  const x0 = cx - r0 * 1.32 + slide, x1 = cx + r0 * 1.42 + slide, s = wd * 1.55;
+  const p = new Path2D();
+  p.moveTo(x0, y - wd * 0.28); p.lineTo(x1, y - wd * 0.5);
+  // neck, poll and ear, forehead, muzzle, jaw
+  p.quadraticCurveTo(x1 + s * 0.12, y - s * 0.9, x1 + s * 0.42, y - s * 1.02);
+  p.lineTo(x1 + s * 0.5, y - s * 1.34); p.lineTo(x1 + s * 0.64, y - s * 1.0);
+  p.quadraticCurveTo(x1 + s * 0.98, y - s * 0.84, x1 + s * 1.24, y - s * 0.36);
+  p.quadraticCurveTo(x1 + s * 1.34, y - s * 0.1, x1 + s * 1.1, y - s * 0.02);
+  p.quadraticCurveTo(x1 + s * 0.74, y + s * 0.02, x1 + s * 0.6, y + wd * 0.5);
+  p.lineTo(x0, y + wd * 0.28); p.closePath();
+  g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.save(); g.translate(0.9, 1.1); g.fillStyle = rgba('shadow', 0.45); g.fill(p); g.restore();
+  const gr = g.createLinearGradient(0, y - s, 0, y + wd);
+  gr.addColorStop(0, C['brass-hi']); gr.addColorStop(0.45, C.brass); gr.addColorStop(1, C['brass-lo']);
+  g.fillStyle = gr; g.fill(p);
+  g.lineWidth = 0.6; g.strokeStyle = rgba('engrave', 0.85); g.stroke(p);
+  g.beginPath(); g.moveTo(x0 + wd, y); g.lineTo(x1 - wd * 0.2, y); g.strokeStyle = rgba('engrave', 0.45); g.lineWidth = 0.5; g.stroke();
+  g.beginPath(); g.arc(x1 + s * 0.8, y - s * 0.62, Math.max(0.5, s * 0.07), 0, TAU); g.fillStyle = C.engrave; g.fill();
+  g.restore();
+  WEDGE = { x0: x0, x1: x1 + s * 1.34, y0: y - s * 1.34, y1: y + wd * 0.6, hx: x1 + s * 0.7, hy: y - s * 1.1 };
+}
+function applySheen(g) {
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
+  g.globalCompositeOperation = 'source-atop';
+  const x = cx * dpr, y = cy * dpr;
+  let gr;
+  if (typeof g.createConicGradient === 'function') {
+    gr = g.createConicGradient(S.sheen, x, y);
+    const hi = a => rgba('brass-hi', a), dk = a => rgba('engrave', a);
+    [[0, hi(0.5)], [0.05, hi(0.22)], [0.12, hi(0)], [0.25, dk(0.26)], [0.38, hi(0)], [0.45, hi(0.12)], [0.5, hi(0.26)], [0.55, hi(0.12)], [0.62, hi(0)], [0.75, dk(0.26)], [0.88, hi(0)], [0.95, hi(0.22)], [1, hi(0.5)]]
+      .forEach(([o, c]) => gr.addColorStop(o, c));
+  } else {
+    gr = g.createRadialGradient(x + Math.cos(S.sheen) * Ro * dpr * 0.6, y + Math.sin(S.sheen) * Ro * dpr * 0.6, 0, x, y, Ro * dpr * 1.4);
+    gr.addColorStop(0, rgba('brass-hi', 0.3)); gr.addColorStop(1, rgba('engrave', 0.18));
+  }
+  g.fillStyle = gr; g.fillRect((cx - Ro) * dpr, (cy - Ro) * dpr, 2 * Ro * dpr, 2 * Ro * dpr);
+  g.restore();
+}
+
+/* glow sprites */
+function makeSprite(k) {
+  const c = cpuCanvas(); c.width = c.height = 64;
+  const g = c.getContext('2d', CPU), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, rgba(k, 1)); gr.addColorStop(0.18, rgba(k, 0.45)); gr.addColorStop(0.45, rgba(k, 0.1)); gr.addColorStop(1, rgba(k, 0));
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return c;
+}
+const SPR = { cool: makeSprite('star'), warm: makeSprite('star-warm'), ember: makeSprite('ember'), air: makeSprite('air') };
+['bv-b', 'bv-a', 'bv-f', 'bv-g', 'bv-k', 'bv-m'].forEach(k => { SPR[k] = makeSprite(k); });
+const isWarm = s => /orange|red/.test(s.col);
+// spectral colour of each star (B-V), from blue-white Rigel to deep orange Betelgeuse
+const BV_OF = { sirius: 'a', procyon: 'f', pollux: 'g', capella: 'g', aldebaran: 'k', rigel: 'b', betelgeuse: 'm', polaris: 'f', algol: 'b', alphard: 'k', dubhe: 'g', arcturus: 'k', vega: 'a', altair: 'a', deneb: 'a', markab: 'b' };
+STARS.forEach(s => { s.bv = 'bv-' + (BV_OF[s.id] || 'a'); });
+
+/* ---------------- a sky with air in it ---------------- */
+// each star's light depends on its altitude for the plate and hour: below the horizon only the brass point remains;
+// low down it dims with airmass (Kasten and Young), warms and scintillates
+const sstep = (e0, e1, x) => { const t = clamp01((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
+const AIR = STARS.map(() => ({ alt: 90, up: 1, dim: 1, warm: 0, amp: 0, low: 0 }));
+function airmass(h) { return 1 / (Math.sin(h * DEG) + 0.50572 * Math.pow(h + 6.07995, -1.6364)); }
+function airOf(a, alt) {
+  a.alt = alt;
+  if (!FX.air) { a.up = 1; a.dim = 1; a.warm = 0; a.amp = 0; a.low = 0; return; }
+  const X = airmass(Math.max(alt, 0));
+  a.up = sstep(-1.2, 0.8, alt);
+  a.dim = 0.42 + 0.58 * Math.pow(10, -0.08 * (X - 1));
+  a.warm = sstep(1.5, 6, X);
+  a.low = sstep(22, 15, alt);
+  a.amp = SLOWGL ? 0 : Math.min(0.1, 0.015 * Math.pow(X, 1.75)) * a.low;
+}
+function computeAir() {
+  const lat = PLATES[S.plate].lat;
+  for (let i = 0; i < STARS.length; i++) airOf(AIR[i], altitude(STARS[i].ra, STARS[i].dec, S.lst, lat));
+}
+function hash1(i, s) { let h = Math.imul(i ^ Math.imul(s, 374761393), 668265263); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; }
+function vnoise(x, s) { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return (hash1(i, s) * (1 - u) + hash1(i + 1, s) * u) * 2 - 1; }
+// scintillation between 2 and 6 Hz
+const scint = (i, ts) => 0.65 * vnoise(ts * 3.1, i * 7 + 1) + 0.35 * vnoise(ts * 5.7, i * 7 + 2);
+function airActive() {
+  if (!FX.air || reduced) return false;
+  for (let i = 0; i < STARS.length; i++) if (AIR[i].amp > 0.004 && AIR[i].up > 0.02) return true;
+  return false;
+}
+function coreColour(i, a, ts) {
+  const s = STARS[i], b = FX.air ? RGB[s.bv] : RGB[isWarm(s) ? 'star-warm' : 'star'], w = RGB.air, k = a.warm;
+  let r = b[0] + (w[0] - b[0]) * k, gg = b[1] + (w[1] - b[1]) * k, bb = b[2] + (w[2] - b[2]) * k;
+  // Sirius low in winter flickers through blue, white and red
+  if (i === SIRIUS && a.amp > 0 && !reduced && FX.air && S.airK > 0) {
+    const q = 0.1 * a.low * S.airK;
+    r *= 1 + q * vnoise(ts * 4.3, 91); gg *= 1 + q * vnoise(ts * 3.7, 92); bb *= 1 + q * vnoise(ts * 5.1, 93);
+  }
+  return `rgb(${Math.min(255, r) | 0},${Math.min(255, gg) | 0},${Math.min(255, bb) | 0})`;
+}
+
+function starCore(s) { return clamp(1.85 - 0.4 * s.mag, 0.8, 2.6) * clamp(D / 760, 0.72, 1.2); }
+
+/* the midnight figure resolves in order: each corner star flares 170 ms after the last, the line follows them,
+   closes back on Sirius, and Betelgeuse lights last inside it */
+const HEX_T0 = 150, HEX_STEP = 170, HEX_CLOSE = HEX_T0 + 5 * HEX_STEP + 210, BETEL_T = HEX_CLOSE + 170;
+const HEX_ORDER = new Map(HEX.map((id, k) => [id, k]));
+const resumeK = now => S.moment.resume ? (reduced ? 1 : clamp01((now - S.moment.resume) / 400)) : 1;
+function flareCurve(k) { return k < 0.3 ? 1 + 1.2 * easeOut(k / 0.3) : 2.2 - 0.8 * easeInOut((k - 0.3) / 0.7); }
+function flare(i, now) {
+  const m = S.moment, out = { boost: 1, glint: 0 };
+  const hk = HEX_ORDER.get(i);
+  if (hk === undefined && i !== BETEL) return out;
+  if (!m.on) { out.boost = 1 + 0.4 * m.level; return out; }
+  if (reduced || m.resume) { out.boost = 1 + 0.4 * resumeK(now); return out; }
+  const el = now - m.start, t = hk === undefined ? BETEL_T : HEX_T0 + hk * HEX_STEP;
+  const k = (el - t) / 500;
+  if (k < 0) return out;
+  if (k <= 1) { out.boost = flareCurve(k); out.glint = Math.sin(Math.PI * k); }
+  else out.boost = 1.4;
+  if (i === SIRIUS) {
+    const k2 = (el - HEX_CLOSE) / 500;
+    if (k2 >= 0 && k2 <= 1) { out.boost = 1.4 + 1.56 * (k2 < 0.3 ? easeOut(k2 / 0.3) : 1 - easeInOut((k2 - 0.3) / 0.7)); out.glint = 1.3 * Math.sin(Math.PI * k2); }
+  }
+  return out;
+}
+const twinkler = i => AIR[i].amp > 0.004 && AIR[i].up > 0.02;
+function drawGlints(g, now, skipLow) {
+  for (let i = 0; i < STARS.length; i++) if (!(skipLow && twinkler(i))) drawStar(g, i, now, scr[i]);
+}
+function drawStar(g, i, now, p) {
+  const ts = now / 1000;
+  {
+    const s = STARS[i], a = AIR[i];
+    let core = starCore(s);
+    if (i === POLARIS) core *= 0.85;
+    const fl = flare(i, now), boost = fl.boost;
+    const focus = i === S.hover || i === S.sel;
+    let tw = 1;
+    if (focus && !reduced) tw = 1 + S.focusK * (0.32 * Math.sin(now * 0.0085) + 0.12 * Math.sin(now * 0.021));
+    const sc = (a.amp > 0 && !reduced && S.airK > 0) ? a.amp * S.airK * scint(i, ts) : 0;
+    const vis = a.up;
+    if (vis > 0.004) {
+      const lum = a.dim * (1 + sc);
+      const sz = core * 7.5 * boost * tw * (0.72 + 0.28 * lum);
+      const al = (focus ? 1 : 0.85) * vis * Math.min(1, lum);
+      g.globalAlpha = al;
+      g.drawImage(FX.air ? SPR[s.bv] : (isWarm(s) ? SPR.warm : SPR.cool), p.x - sz / 2, p.y - sz / 2, sz, sz);
+      if (a.warm > 0.02) { g.globalAlpha = al * a.warm * 0.8; g.drawImage(SPR.air, p.x - sz / 2, p.y - sz / 2, sz, sz); }
+      g.globalAlpha = vis * Math.min(1, 0.5 + 0.5 * lum);
+      g.beginPath(); g.arc(p.x, p.y, core * 0.62 * Math.min(1.4, boost) * (0.82 + 0.18 * lum), 0, TAU); g.fillStyle = coreColour(i, a, ts); g.fill();
+      if (fl.glint > 0) {
+        // a four-pointed glint as the star takes its place in the figure
+        const L = core * 9 * Math.min(1.3, fl.glint);
+        g.globalAlpha = vis * 0.6 * Math.min(1, fl.glint);
+        g.strokeStyle = rgba('star', 0.9); g.lineWidth = 0.7;
+        g.beginPath(); g.moveTo(p.x - L, p.y); g.lineTo(p.x + L, p.y); g.moveTo(p.x, p.y - L); g.lineTo(p.x, p.y + L); g.stroke();
+      }
+    }
+    if (vis < 0.996) {
+      // below the horizon: only the punched brass point at the tip of the pointer
+      const pr = Math.max(1, core * 0.42);
+      g.globalAlpha = 1 - vis;
+      g.beginPath(); g.arc(p.x, p.y, pr + 0.5, 0, TAU); g.fillStyle = rgba('engrave', 0.55); g.fill();
+      g.beginPath(); g.arc(p.x - 0.25, p.y - 0.25, pr, 0, TAU); g.fillStyle = mix('brass', 'brass-hi', 0.35); g.fill();
+    }
+    g.globalAlpha = 1;
+    if (focus) {
+      const L = core * 6 * tw, an = reduced ? 0.3 : now * 0.00035;
+      g.save(); g.translate(p.x, p.y); g.rotate(an); g.strokeStyle = rgba('star', 0.55); g.lineWidth = 0.6;
+      g.beginPath(); g.moveTo(-L, 0); g.lineTo(L, 0); g.moveTo(0, -L); g.lineTo(0, L); g.stroke(); g.restore();
+    }
+  }
+}
+function drawPointerGlint(g, now, rot, lift) {
+  const gl = S.glint;
+  if (gl.i < 0 || gl.i >= STARS.length || reduced || AIR[gl.i].up < 0.5) return;
+  const k = (now - gl.start) / 700;
+  if (k < 0 || k > 1) return;
+  const f = flames[gl.i]; if (!f) return;
+  const p = cubic(f.B0, f.P1, f.P2, f.T, easeInOut(k));
+  g.save(); reteXform(g, rot, lift); g.clip(f.path);
+  g.globalCompositeOperation = 'lighter';
+  const r = 0.07 * Req, x = p.x * Req, y = p.y * Req;
+  const gr = g.createRadialGradient(x, y, 0, x, y, r);
+  gr.addColorStop(0, rgba('brass-hi', 0.9 * Math.sin(Math.PI * k))); gr.addColorStop(1, rgba('brass-hi', 0));
+  g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r);
+  g.restore();
+}
+function hexPoints() { return HEX.concat([HEX[0]]).map(i => scr[i]); }
+function drawHexagon(g, now) {
+  const m = S.moment;
+  const lvl = m.on ? resumeK(now) : m.level;
+  if (lvl <= 0 && m.res <= 0) return;
+  const pts = hexPoints(), el = now - m.start;
+  const staged = m.on && !m.resume && !reduced;
+  const path = new Path2D(); path.moveTo(pts[0].x, pts[0].y);
+  let head = null, done = true;
+  for (let j = 0; j < 6; j++) {
+    const t0 = HEX_T0 + j * HEX_STEP, t1 = j < 5 ? t0 + HEX_STEP : HEX_CLOSE;
+    const f = staged ? clamp01((el - t0) / (t1 - t0)) : 1;
+    if (f <= 0) { done = false; break; }
+    head = { x: pts[j].x + (pts[j + 1].x - pts[j].x) * f, y: pts[j].y + (pts[j + 1].y - pts[j].y) * f };
+    path.lineTo(head.x, head.y);
+    if (f < 1) { done = false; break; }
+  }
+  g.save();
+  g.globalCompositeOperation = 'lighter';
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  const lw = clamp(D / 480, 1.1, 1.6);
+  // a hairline of the figure stays while the rete is within twenty minutes of midnight
+  if (m.res > 0 && !m.on) {
+    g.globalAlpha = m.res * (1 - lvl);
+    g.strokeStyle = rgba('star', 0.3); g.lineWidth = 0.6; g.stroke(path);
+  }
+  if (lvl > 0) {
+    g.globalAlpha = lvl;
+    g.strokeStyle = rgba('star', 0.07); g.lineWidth = lw * 6.5; g.stroke(path);
+    g.strokeStyle = rgba('star', 0.14); g.lineWidth = lw * 3; g.stroke(path);
+    g.strokeStyle = rgba('star', 0.85); g.lineWidth = lw; g.stroke(path);
+    if (!done && head) {
+      const sz = 18 * clamp(D / 760, 0.7, 1.2);
+      g.drawImage(SPR.cool, head.x - sz / 2, head.y - sz / 2, sz, sz);
+    }
+    // on the Bethlehem plate the zenith star inside the hexagon warms once the figure has closed
+    if (S.plate === 0 && S.prevPlate < 0) {
+      const P = PLATES[0], zr = Math.cos(P.lat * DEG) / (1 + Math.sin(P.lat * DEG)) * Req;
+      const k = staged ? clamp01((el - HEX_CLOSE) / 1100) : 1;
+      const zsz = 0.06 * D;
+      g.globalAlpha = lvl * k * 0.55;
+      g.drawImage(SPR.warm, cx - zsz / 2, cy - zr - zsz / 2, zsz, zsz);
+      g.globalAlpha = lvl;
+    }
+    // the ember lozenge at midnight on the limb warms while the moment lasts
+    const ex = cx, ey = cy + Ro - 0.0495 * D, es = 0.05 * D;
+    g.globalAlpha = lvl * (reduced ? 0.7 : 0.45 + 0.25 * clamp01(el / 900));
+    g.drawImage(SPR.ember, ex - es / 2, ey - es / 2, es, es);
+    // Betelgeuse lights last, inside the figure
+    if (staged) {
+      const k = (el - BETEL_T) / 1500;
+      if (k > 0 && k < 1) {
+        const b = scr[BETEL];
+        g.globalAlpha = (1 - k) * 0.6;
+        g.strokeStyle = rgba('star-warm', 1); g.lineWidth = 0.9;
+        g.beginPath(); g.arc(b.x, b.y, 3 + easeOut(k) * 26 * clamp(D / 760, 0.7, 1.2), 0, TAU); g.stroke();
+      }
+    }
+  }
+  g.restore();
+}
+function drawLeader(g) {
+  const i = S.sel >= 0 ? S.sel : S.hover;
+  if (i < 0 || !tagBox.w) return;
+  const p = scr[i];
+  const ax = tagBox.x + (tagBox.x > p.x ? 0 : tagBox.w), ay = tagBox.y + (tagBox.y > p.y ? 0 : tagBox.h);
+  const dx = ax - p.x, dy = ay - p.y, l = Math.hypot(dx, dy); if (l < 8) return;
+  const s = (i === STELLA_I ? 2.5 * clamp(D / 760, 0.72, 1.2) : starCore(STARS[i])) + 4;
+  g.save(); g.strokeStyle = rgba('brass-hi', 0.6); g.lineWidth = 0.7;
+  g.beginPath(); g.moveTo(p.x + dx / l * s, p.y + dy / l * s); g.lineTo(ax, ay); g.stroke(); g.restore();
+}
+
+const STELLA_POS = localOf(hms(0, 20, 0), 1);
+function computeScreens(rot, lift) {
+  const c = Math.cos(rot), s = Math.sin(rot);
+  for (let i = 0; i <= STARS.length; i++) {
+    const t = i < STARS.length ? tipsU[i] : STELLA_POS, x = t.x * Req, y = t.y * Req;
+    scr[i].x = cx + lift * (x * c - y * s);
+    scr[i].y = cy + lift * (x * s + y * c);
+  }
+}
+
+/* ---------------- small things on the light layer ---------------- */
+// Kepler's guess for the star: the triple conjunction of Jupiter and Saturn in Pisces, 7 BC
+function stellaLevel(now) {
+  const st = S.stella; if (!st) return 0;
+  const el = now - st.start;
+  if (el < 0) return 0;
+  if (reduced) return el < 60000 ? 1 : 0;
+  return el < 1400 ? easeOut(el / 1400) : el < 60000 ? 1 : clamp01(1 - (el - 60000) / 2400);
+}
+function drawStella(g, now) {
+  const k = stellaLevel(now); if (k <= 0) return;
+  const p = scr[STELLA_I], core = 2.8 * clamp(D / 760, 0.72, 1.2), sz = core * 12;
+  g.globalAlpha = k * 0.95; g.drawImage(SPR.warm, p.x - sz / 2, p.y - sz / 2, sz, sz);
+  g.globalAlpha = k * 0.5; g.drawImage(SPR.air, p.x - sz * 0.35, p.y - sz * 0.35, sz * 0.7, sz * 0.7);
+  g.globalAlpha = k; g.beginPath(); g.arc(p.x, p.y, core * 0.75, 0, TAU); g.fillStyle = C['star-warm']; g.fill();
+  const L = core * 7;
+  g.globalAlpha = k * 0.45; g.strokeStyle = rgba('star-warm', 1); g.lineWidth = 0.6;
+  g.beginPath(); g.moveTo(p.x - L, p.y); g.lineTo(p.x + L, p.y); g.moveTo(p.x, p.y - L * 1.3); g.lineTo(p.x, p.y + L * 1.3); g.stroke();
+  g.globalAlpha = 1;
+}
+// Rovaniemi: the engraved sled catches the light once as the rete comes within ten minutes of midnight
+function drawSledGlint(g, now) {
+  if (!FX.sled || S.plate !== 2 || !SLED || S.prevPlate >= 0 || !S.sledOn) return;
+  const k = reduced ? 0.5 : (now - S.sledAt) / 900;
+  if (k < 0 || k > 1) return;
+  const a = reduced ? 0.4 : Math.sin(Math.PI * k), r = SLED.k * 2.4;
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const gr = g.createRadialGradient(SLED.x, SLED.y, 0, SLED.x, SLED.y, r);
+  gr.addColorStop(0, rgba('brass-hi', 0.75 * a)); gr.addColorStop(1, rgba('brass-hi', 0));
+  g.fillStyle = gr; g.fillRect(SLED.x - r, SLED.y - r, 2 * r, 2 * r);
+  g.strokeStyle = rgba('brass-hi', 0.5 * a); g.lineWidth = 0.5;
+  g.beginPath(); g.moveTo(SLED.x - r * 0.9, SLED.y); g.lineTo(SLED.x + r * 0.9, SLED.y); g.moveTo(SLED.x, SLED.y - r * 0.6); g.lineTo(SLED.x, SLED.y + r * 0.6); g.stroke();
+  g.restore();
+}
+// 20 to 26 December: an ember index on the hour ring shows the mean time in Bethlehem now, travelling toward its midnight
+let TRAVEL = null;
+function drawIndex(g) {
+  if (!TRAVEL) return;
+  const ps = TRAVEL.psi, r0 = Ro - 0.0118 * D, r1 = Ro - 0.0032 * D, w = Math.max(1.3, 0.0026 * D);
+  const sx = Math.sin(ps), sy = -Math.cos(ps), tx = Math.cos(ps), ty = Math.sin(ps);
+  g.beginPath(); g.moveTo(cx + sx * r0, cy + sy * r0); g.lineTo(cx + sx * r1 + tx * w, cy + sy * r1 + ty * w); g.lineTo(cx + sx * r1 - tx * w, cy + sy * r1 - ty * w); g.closePath();
+  g.fillStyle = C.ember; g.fill(); g.lineWidth = 0.5; g.strokeStyle = rgba('engrave', 0.8); g.stroke();
+}
+// a signature cut into the rim, seen only when the light rakes along it
+let SIG = null;
+const SIG_PSI = 142 * DEG;
+function buildSignature() {
+  SIG = null;
+  if (!FX.signature || D < 300) return;
+  const r = Ro - 0.0041 * D, fs = Math.max(3.6, 0.0056 * D), font = FD(500, fs);
+  const arc = placeArc(layoutArc('FECIT · IN · NOCTE · NATIVITATIS', font, fs, 0.12), r, SIG_PSI, true);
+  const pS = SIG_PSI - arc.span / 2 - fs * 1.3 / r, star = { x: cx + r * Math.sin(pS), y: cy - r * Math.cos(pS) };
+  let x0 = star.x, y0 = star.y, x1 = star.x, y1 = star.y;
+  arc.glyphs.forEach(o => { x0 = Math.min(x0, o.x); y0 = Math.min(y0, o.y); x1 = Math.max(x1, o.x); y1 = Math.max(y1, o.y); });
+  const pad = fs * 1.5; x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
+  const c = cpuCanvas(); c.width = Math.ceil((x1 - x0) * dpr); c.height = Math.ceil((y1 - y0) * dpr);
+  const g = c.getContext('2d', CPU);
+  g.setTransform(dpr, 0, 0, dpr, -x0 * dpr, -y0 * dpr);
+  g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.shadowColor = rgba('star-warm', 0.9); g.shadowBlur = 2.5 * dpr; g.fillStyle = C['star-warm'];
+  for (const o of arc.glyphs) { g.save(); g.translate(o.x, o.y); g.rotate(o.rot); g.fillText(o.ch, 0, 0); g.fillText(o.ch, 0.3, 0); g.restore(); }
+  g.shadowBlur = 0;
+  // a small six-pointed star closes the line
+  const sr = fs * 0.5;
+  g.strokeStyle = C['star-warm']; g.lineWidth = 0.6; g.beginPath();
+  for (const off of [0, Math.PI]) for (let k = 0; k < 3; k++) {
+    const a = pS + off + k * TAU / 3, x = star.x + Math.sin(a) * sr, y = star.y - Math.cos(a) * sr;
+    k ? g.lineTo(x, y) : g.moveTo(x, y);
+    if (k === 2) g.closePath();
+  }
+  g.stroke();
+  SIG = { cv: c, x: x0, y: y0, w: x1 - x0, h: y1 - y0, Q: { x: cx + r * Math.sin(SIG_PSI), y: cy - r * Math.cos(SIG_PSI) }, T: { x: Math.cos(SIG_PSI), y: Math.sin(SIG_PSI) } };
+}
+function sigAim(p) {
+  if (!SIG || S.flip.shown) return;
+  const dx = p.x - SIG.Q.x, dy = p.y - SIG.Q.y, dist = Math.hypot(dx, dy), pr = Math.hypot(p.x - cx, p.y - cy);
+  let v = 0;
+  if (dist > 0.03 * D) {
+    const al = Math.abs((dx * SIG.T.x + dy * SIG.T.y) / dist);
+    v = sstep(0.82, 0.97, al) * sstep(0.7 * Ro, 0.9 * Ro, pr) * sstep(1.3 * Ro, 1.08 * Ro, pr) * sstep(0.55 * D, 0.2 * D, dist);
+  }
+  if (Math.abs(v - S.sigTarget) > 0.01 || (v === 0 && S.sigTarget !== 0)) { S.sigTarget = v; kick(); }
+}
+function drawSignature(g) {
+  if (!SIG || S.sig < 0.01) return;
+  g.globalAlpha = 0.75 * S.sig; g.drawImage(SIG.cv, SIG.x, SIG.y, SIG.w, SIG.h); g.globalAlpha = 1;
+}
+// brass swarf curling off the graver as a new plate is engraved
+function drawSwarf(g, now) {
+  if (!S.swarf.length) return;
+  for (const c of S.swarf) {
+    const t = (now - c.t0) / 1000; if (t < 0 || t > 0.8) continue;
+    const x = c.x + c.vx * t, y = c.y + c.vy * t + 0.5 * 900 * t * t, rot = c.rot + c.spin * t, a = 1 - t / 0.8;
+    g.save(); g.translate(x, y); g.rotate(rot); g.beginPath();
+    for (let k = 0; k <= 16; k++) {
+      const u = k / 16, an = u * 2.7 * Math.PI, r = c.s * (1 - u * 0.72);
+      const px = Math.cos(an) * r + u * c.s * 0.9, py = Math.sin(an) * r;
+      k ? g.lineTo(px, py) : g.moveTo(px, py);
+    }
+    g.strokeStyle = rgba('brass-hi', 0.8 * a); g.lineWidth = 0.75; g.stroke(); g.restore();
+  }
+}
+
+/* ---------------- changing plates ---------------- */
+// the horse slides out of the pin, the rete lifts, the old plate turns 4 degrees to free its tab from the throne
+// and slides away showing its reverse, the new plate drops in and seats, and the horse goes back with a tick
+const SWAP_CUES = [[0, 'wedge'], [280, 'slide'], [905, 'seat'], [1150, 'tick']];
+function swapState(now) {
+  if (S.prevPlate < 0) return null;
+  const el = now - S.swapStart;
+  if (reduced || !FX.ritual) {
+    const k = el / (reduced ? 400 : 1300);
+    if (k >= 1) { S.prevPlate = -1; return null; }
+    if (reduced) return { simple: true, out: k, inn: k, lift: 1, liftK: 0, wedge: 0 };
+    const seg = (a, b) => clamp01((k - a) / (b - a));
+    return { simple: true, out: seg(0.12, 0.55), inn: seg(0.42, 0.9), lift: 1 + 0.016 * Math.sin(Math.PI * k), liftK: 0, wedge: 0 };
+  }
+  const T = S.swapEngrave ? 1560 : 1180;
+  if (el >= T) { S.prevPlate = -1; return null; }
+  const seg = (a, b) => clamp01((el - a) / (b - a));
+  const liftK = easeOut(seg(80, 260)) * (1 - easeInOut(seg(880, 1040)));
+  return {
+    el, liftK, lift: 1 + 0.006 * liftK,
+    wedge: easeInOut(seg(0, 150)) * (1 - easeInOut(seg(1000, 1150))),
+    tilt: easeInOut(seg(150, 300)), slide: seg(280, 740), flip: easeInOut(seg(290, 500)),
+    drop: seg(590, 900), seat: seg(880, 960),
+    engrave: S.swapEngrave ? seg(640, 1540) : 1
+  };
+}
+
+function drawUnder(now, sw) {
+  const g = cU;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.clearRect(0, 0, cvU.width, cvU.height);
+  g.drawImage(baseCv, 0, 0);
+  g.save();
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.beginPath(); g.arc(cx, cy, Rcap, 0, TAU); g.clip();
+  if (sw && sw.simple) {
+    if (sw.out < 1) {
+      const e = sw.out * sw.out;
+      g.save(); g.globalAlpha = reduced ? 1 - sw.out : 1 - e * 0.6;
+      if (!reduced) g.translate(0, e * Rcap * 1.05);
+      g.drawImage(plateImg(S.prevPlate), 0, 0, W, H); g.restore();
+    }
+    if (sw.inn > 0) {
+      const e = easeOut(sw.inn), sc = reduced ? 1 : 1.06 - 0.06 * e;
+      g.save(); g.globalAlpha = e;
+      g.translate(cx, cy); g.scale(sc, sc); g.translate(-cx, -cy);
+      g.drawImage(plateImg(S.plate), 0, 0, W, H); g.restore();
+    }
+  } else if (sw) {
+    if (sw.slide < 1) {
+      // the old plate pivots about the throne notch, slides down out of the mater and turns over as it goes
+      const e = sw.slide * sw.slide, fx = Math.cos(Math.PI * sw.flip);
+      g.save();
+      g.globalAlpha = 1 - clamp01((sw.slide - 0.5) / 0.5);
+      g.translate(cx, cy - Rcap); g.rotate(-4 * DEG * sw.tilt); g.translate(-cx, -(cy - Rcap));
+      g.translate(0, e * Rcap * 1.1);
+      g.translate(cx, cy); g.scale(Math.max(0.03, Math.abs(fx)), 1); g.translate(-cx, -cy);
+      g.drawImage(fx >= 0 ? plateImg(S.prevPlate) : plateBack(S.prevPlate), 0, 0, W, H);
+      g.restore();
+    }
+    if (sw.drop > 0) {
+      const e = easeOut(sw.drop), sc = 1.035 - 0.035 * e, dy = Math.sin(Math.PI * sw.seat);
+      g.save(); g.globalAlpha = clamp01(sw.drop * 2.5);
+      g.translate(cx, cy + dy); g.scale(sc, sc); g.translate(-cx, -cy);
+      if (sw.engrave < 1) {
+        // a plate seen for the first time is engraved as it seats, the graver going round from the noon line
+        g.drawImage(plateBlank(S.plate), 0, 0, W, H);
+        const a0 = -Math.PI / 2, a1 = a0 + TAU * easeInOut(sw.engrave);
+        if (sw.engrave > 0) {
+          g.save(); g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, Rcap + 2, a0, a1); g.closePath(); g.clip();
+          g.drawImage(plateImg(S.plate), 0, 0, W, H); g.restore();
+          g.beginPath(); g.moveTo(cx + Math.cos(a1) * Rcap * 0.08, cy + Math.sin(a1) * Rcap * 0.08); g.lineTo(cx + Math.cos(a1) * Rcap, cy + Math.sin(a1) * Rcap);
+          g.strokeStyle = rgba('brass-hi', 0.32); g.lineWidth = 0.7; g.stroke();
+        }
+      } else g.drawImage(plateImg(S.plate), 0, 0, W, H);
+      g.restore();
+    }
+  } else {
+    g.drawImage(plateImg(S.plate), 0, 0, W, H);
+  }
+  // after astronomical dusk the plate darkens a little; it lives on this layer, which is only repainted when it changes
+  const nd = 0.035 * S.nightLvl;
+  if (nd > 0.001) { g.fillStyle = rgba('night-0', nd); g.fillRect(cx - Rcap, cy - Rcap, 2 * Rcap, 2 * Rcap); }
+  g.restore();
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.drawImage(materCv, 0, 0);
+}
+
+// the light layer. When only low stars scintillate, they move to a few small canvases over the still layer,
+// so the large canvas is not repainted for a ten per cent flicker
+const scintPool = [];
+let scintOn = false;
+function scintSize(i) { return Math.ceil(starCore(STARS[i]) * 7.5 * 1.25 + 8); }
+function drawScint(now) {
+  let k = 0;
+  for (let i = 0; i < STARS.length; i++) {
+    if (!twinkler(i)) continue;
+    let e = scintPool[k];
+    if (!e) {
+      const c = document.createElement('canvas'); c.className = 'scint'; c.setAttribute('aria-hidden', 'true'); c.hidden = true;
+      inst.insertBefore(c, lore);
+      e = scintPool[k] = { c, g: c.getContext('2d', VIS), key: '' };
+    }
+    const sz = scintSize(i), x0 = Math.round(scr[i].x - sz / 2), y0 = Math.round(scr[i].y - sz / 2), key = i + '|' + x0 + '|' + y0 + '|' + sz + '|' + dpr;
+    if (e.key !== key) {
+      e.key = key;
+      e.c.width = Math.ceil(sz * dpr); e.c.height = Math.ceil(sz * dpr);
+      e.c.style.width = sz + 'px'; e.c.style.height = sz + 'px';
+      e.c.style.transform = `translate(${x0}px, ${y0}px)`;
+    }
+    const g = e.g;
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, e.c.width, e.c.height);
+    g.setTransform(dpr, 0, 0, dpr, -x0 * dpr, -y0 * dpr);
+    drawStar(g, i, now, scr[i]);
+    g.globalAlpha = 1;
+    if (e.c.hidden) e.c.hidden = false;
+    k++;
+  }
+  for (; k < scintPool.length; k++) if (!scintPool[k].c.hidden) { scintPool[k].c.hidden = true; scintPool[k].key = ''; }
+}
+function hideScint() { for (const e of scintPool) if (!e.c.hidden) { e.c.hidden = true; e.key = ''; } }
+function drawLight(now, rot, lift, partial) {
+  computeScreens(rot, lift);
+  if (partial && scintOn) { drawScint(now); return; }
+  const l = cL;
+  l.setTransform(1, 0, 0, 1, 0, 0);
+  l.clearRect(0, 0, cvL.width, cvL.height);
+  l.save(); l.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawPointerGlint(l, now, rot, lift);
+  l.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawIndex(l);
+  drawSignature(l);
+  drawSledGlint(l, now);
+  drawHexagon(l, now);
+  drawGlints(l, now, partial);
+  drawStella(l, now);
+  drawSwarf(l, now);
+  drawLeader(l);
+  l.restore();
+  if (partial) { scintOn = true; drawScint(now); }
+  else if (scintOn) { scintOn = false; hideScint(); }
+}
+
+function drawFrame(now, partial) {
+  const rot = S.lst * 15 * DEG;
+  const sw = swapState(now);
+  const lift = sw ? sw.lift : 1;
+  if (underDirty || sw) { drawUnder(now, sw); underDirty = !!sw; }
+  const still = (S.mode === 'idle' || S.mode === 'follow') && !drag;
+  const lightSettled = Math.abs(wrapPI(S.sheenTarget - S.sheen)) < 0.02;
+  if (!bake.valid || (still && (Math.abs(rot - bake.rot) > 1e-7 || (lightSettled && Math.abs(wrapPI(S.sheen - bake.light)) > 0.45)))) { bakeRete(rot); partial = false; }
+
+  // only layers whose content changed are repainted
+  wedgeOut = sw ? sw.wedge : 0;
+  const liftK = sw ? sw.liftK : 0;
+  const key = rot.toFixed(6) + '|' + lift.toFixed(4) + '|' + Math.round(S.sheen / 0.004) + '|' + bake.rot + '|' + S.t.toFixed(3) + '|' + wedgeOut.toFixed(3) + '|' + liftK.toFixed(3);
+  const m = S.moment, e = S.egg[S.plate];
+  const ins = (m.on && now - m.start < 7000) || (m.on && m.resume && now - m.resume < 600) || (!m.on && m.level > 0) || eggBusy(e, now) || !!sw;
+  const shadeNeeded = layersDirty || key !== shadeKey || ins || insWas;
+  const brassNeeded = layersDirty || key !== brassKey;
+  if (shadeNeeded || brassNeeded) partial = false;
+  insWas = ins; layersDirty = false;
+  const lx = Math.cos(S.sheen), ly = Math.sin(S.sheen);
+  const rg = ruleGeom();
+
+  // shade layer: engravings that appear on the plate, and the shadows of rete and rule
+  if (shadeNeeded) {
+  shadeKey = key;
+  const g = cS;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.clearRect(0, 0, cvS.width, cvS.height);
+  g.save();
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.beginPath(); g.arc(cx, cy, Rcap, 0, TAU); g.clip();
+  // at midnight the plate's grid steps back so the light line owns the frame
+  plateDim = 0.42 * momentLevel(now);
+  if (plateDim > 0) { g.fillStyle = rgba('night-0', plateDim); g.fillRect(cx - Rcap, cy - Rcap, 2 * Rcap, 2 * Rcap); }
+  if (!sw) drawPoleInscription(g, now);
+  drawMidnightInscription(g, now);
+  const off = 2.2 + (lift - 1) * 520 + liftK * 3.2;
+  drawBaked(g, reteShBmp, rot, lift, -lx * off, -ly * off);
+  if (liftK > 0) { g.globalAlpha = 0.4 * liftK; drawBaked(g, reteShBmp, rot, lift, -lx * off * 1.4, -ly * off * 1.4); g.globalAlpha = 1; }
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.translate(-lx * 4, -ly * 4); g.fillStyle = rgba('shadow', 0.35); g.fill(rg.p);
+  g.restore();
+  }
+
+  // brass layer: rete, rule and pin, lit by the sheen
+  if (brassNeeded) {
+  brassKey = key;
+  const b = cB;
+  b.setTransform(1, 0, 0, 1, 0, 0);
+  b.clearRect(0, 0, cvB.width, cvB.height);
+  drawBaked(b, reteBmp, rot, lift, 0, 0);
+  b.save(); b.setTransform(dpr, 0, 0, dpr, 0, 0);
+  b.globalCompositeOperation = 'source-atop';
+  b.translate(-lx * 3, -ly * 3); b.fillStyle = rgba('engrave', 0.36); b.fill(rg.p);
+  b.restore();
+  b.save(); b.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const rgr = b.createLinearGradient(cx - rg.n.x * rg.hw, cy - rg.n.y * rg.hw, cx + rg.n.x * rg.hw, cy + rg.n.y * rg.hw);
+  rgr.addColorStop(0, C['brass-lo']); rgr.addColorStop(0.5, mix('brass', 'brass-hi', 0.35)); rgr.addColorStop(1, C['brass-lo']);
+  b.fillStyle = rgr; b.fill(rg.p);
+  b.lineWidth = 0.7; b.strokeStyle = rgba('engrave', 0.8); b.stroke(rg.p);
+  b.beginPath(); b.moveTo(cx, cy); b.lineTo(cx + rg.d.x * (rg.tip - 1), cy + rg.d.y * (rg.tip - 1));
+  b.strokeStyle = rgba('engrave', 0.85); b.lineWidth = 0.6; b.stroke();
+  b.restore();
+  drawPin(b);
+  applySheen(b);
+  const sd = S.sheen / DEG + 90;
+  if (!(Math.abs(sd - sheenDeg) <= 0.004)) { sheenDeg = sd; sheenXform(); }
+  }
+
+  // light layer: stars, glints, the hexagon
+  drawLight(now, rot, lift, partial);
+  positionTag();
+}
+
+/* ---------------- sky ---------------- */
+// three static star layers, each faded on its own slow period
+let skyStars = [];
+(function buildSky() {
+  const r = rngFor(1);
+  for (let i = 0; i < 700; i++) {
+    skyStars.push({ x: r(), y: r(), s: 0.35 + Math.pow(r(), 6) * 1.5, b: 0.16 + Math.pow(r(), 2.2) * 0.6, layer: Math.floor(r() * 3), warm: r() < 0.12, keep: r() });
+  }
+})();
+function sizeSky() {
+  const w = innerWidth, h = innerHeight, sd = Math.min(1.5, window.devicePixelRatio || 1);
+  const frac = Math.min(1, (w * h / 6200) / skyStars.length);
+  skies.forEach((c, li) => {
+    c.width = Math.round(w * sd); c.height = Math.round(h * sd);
+    const g = c.getContext('2d');
+    g.setTransform(sd, 0, 0, sd, 0, 0);
+    for (const s of skyStars) {
+      if (s.keep > frac || s.layer !== li) continue;
+      g.globalAlpha = s.b;
+      g.fillStyle = s.warm ? C['star-warm'] : C.star;
+      const x = s.x * w, y = s.y * h;
+      if (s.s < 0.9) g.fillRect(x, y, s.s * 1.3, s.s * 1.3);
+      else { g.beginPath(); g.arc(x, y, s.s, 0, TAU); g.fill(); }
+    }
+  });
+}
+(function makeGrain() {
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 160;
+    const g = c.getContext('2d'), id = g.createImageData(160, 160), r = rngFor(2);
+    for (let i = 0; i < id.data.length; i += 4) {
+      const v = r() < 0.5 ? 0 : 255;
+      id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = Math.floor(r() * 26);
+    }
+    g.putImageData(id, 0, 0);
+    document.documentElement.style.setProperty('--grain', `url(${c.toDataURL()})`);
+  } catch (e) { /* grain is optional */ }
+})();
+
+/* ---------------- readouts ---------------- */
+let lastLabel = 0;
+function clock(t) {
+  const tm = Math.round(t), total = 18 * 60 + tm;
+  return { h: Math.floor(total / 60) % 24, m: total % 60, next: total >= 24 * 60 };
+}
+const fmtClock = t => { const c = clock(t); return pad(c.h) + ':' + pad(c.m); };
+function fmtAlt(a) { return (a >= 0 ? '+' : '−') + Math.abs(a).toFixed(1) + '°'; }
+function updateReadouts() {
+  const P = PLATES[S.plate];
+  const c = clock(S.t);
+  const day = c.next ? 25 : 24;
+  RO.date.textContent = `${day} DEC ${YEAR}`;
+  RO.time.textContent = `${pad(c.h)}:${pad(c.m)}`;
+  const l = S.lst, lh = Math.floor(l), lm = Math.floor((l - lh) * 60), ls = Math.floor(((l - lh) * 60 - lm) * 60);
+  RO.lst.textContent = `${pad(lh)}:${pad(lm)}:${pad(ls)}`;
+  const sa = altitude(STARS[SIRIUS].ra, STARS[SIRIUS].dec, l, P.lat);
+  RO.sirius.textContent = fmtAlt(sa);
+  RO.plate.textContent = `${P.latTxt} N · ${P.name}`;
+  // the live pip: the rete is following the viewer's own clock
+  const isLive = FX.tonight && S.following && SZ.night && (S.mode === 'intro' || Math.abs(S.t - SZ.liveT) < 3);
+  if (RO.pip.hidden === isLive) RO.pip.hidden = !isLive;
+  if (isLive !== seasonLive) { seasonLive = isLive; if (seasonReady) paintSeason(true); }
+  const tz = S.mode === 'drift' ? 'LMT · drifting' : 'LMT';
+  if (RO.tz.textContent !== tz) RO.tz.textContent = tz;
+  const vt = `${pad(c.h)}:${pad(c.m)}, ${day} December`;
+  hour.setAttribute('aria-valuetext', vt);
+  dial.setAttribute('aria-valuetext', vt); dial.setAttribute('aria-valuenow', String(Math.round(S.t)));
+  if (S.src !== 'range' || S.mode === 'idle') {
+    const v = String(S.t === MID ? MID : Math.round(S.t / 4) * 4);
+    if (hour.value !== v) { hour.value = v; lastRange = +v; }
+    if (S.mode === 'idle') S.src = 'other';
+  }
+  if (tagEl.classList.contains('show')) updateTagAlt();
+  const now = performance.now();
+  if (now - lastLabel > 500 || S.mode === 'idle') {
+    lastLabel = now;
+    cv.setAttribute('aria-label', `Brass astrolabe set for ${P.name}, ${pad(c.h)}:${pad(c.m)} local mean time on ${day} December ${YEAR}. Sirius is ${Math.abs(sa).toFixed(0)} degrees ${sa >= 0 ? 'above' : 'below'} the horizon.`);
+  }
+}
+// a quiet line changes by fading out and back in
+function setLine(el, txt, fade) {
+  if (el.dataset.txt === txt) return;
+  el.dataset.txt = txt;
+  if (!fade || reduced || !el.textContent) { el.textContent = txt; return; }
+  el.classList.add('swap');
+  setTimeout(() => { el.textContent = el.dataset.txt; el.classList.remove('swap'); }, 200);
+}
+
+/* ---------------- twilight ---------------- */
+// the sun's place on Christmas Eve, and when each plate's sky passes 18 degrees below the horizon
+let SUN_EQ = null;
+function sunAlt(t, plate) {
+  if (!SUN_EQ) SUN_EQ = eclToEq(sunLambda(daysJ2000(MID, 35.2)));
+  const P = PLATES[plate];
+  return altitude(SUN_EQ.ra, SUN_EQ.dec, lstAt(t, P.lon), P.lat);
+}
+const duskCache = [];
+function duskTime(plate) {
+  if (duskCache[plate] !== undefined) return duskCache[plate];
+  let r = -1;
+  for (let t = 0; t <= SPAN; t++) if (sunAlt(t, plate) < -18) { r = t; break; }
+  return (duskCache[plate] = r);
+}
+function plateNoteFor(i) {
+  if (i === 2) return 'the noon sun only skims the horizon';
+  const t = duskTime(i);
+  return `${PLATES[i].name} · ${t > 0 ? 'night from ' + fmtClock(t) : 'night by 18:00'}`;
+}
+
+/* ---------------- tag ---------------- */
+const tagBox = { x: 0, y: 0, w: 0, h: 0, i: -1, plate: -1, ev: null, events: [] };
+function fmtMag(s) { return s.magTxt ? minus(s.magTxt) : minus(s.mag.toFixed(2)); }
+const DRY = { sirius: 'the Dog Star', procyon: 'before the dog', pollux: 'the immortal twin', capella: 'the little she-goat', aldebaran: 'the follower', rigel: 'Orion’s foot', betelgeuse: 'still there (probably)' };
+// altitude to the sparkline's height, opened out near the horizon where rising and setting happen
+const altY = a => 12 - Math.sign(a) * Math.pow(Math.min(90, Math.abs(a)) / 90, 0.6) * 11;
+function buildSpark(i) {
+  const s = STARS[i], P = PLATES[S.plate], svg = tagEl.querySelector('.spark svg');
+  tagBox.events = [];
+  if (!svg) return;
+  let d = '';
+  for (let k = 0; k <= 48; k++) {
+    const t = k * 15, a = altitude(s.ra, s.dec, lstAt(t, P.lon), P.lat);
+    d += (k ? 'L' : 'M') + (k * 2.5).toFixed(1) + ' ' + altY(a).toFixed(2);
+  }
+  svg.querySelector('.up').setAttribute('d', d); svg.querySelector('.dn').setAttribute('d', d);
+  // risings and settings in the night, to the minute
+  let prev = altitude(s.ra, s.dec, lstAt(0, P.lon), P.lat);
+  for (let t = 2; t <= SPAN; t += 2) {
+    const a = altitude(s.ra, s.dec, lstAt(t, P.lon), P.lat);
+    if ((prev < 0) !== (a < 0)) tagBox.events.push({ t: Math.round(t - 2 + 2 * prev / (prev - a)), rise: a >= 0 });
+    prev = a;
+  }
+}
+function showTag(i, kb) {
+  if (i < 0) { tagEl.classList.remove('show', 'kb', 'pinned'); tagBox.i = -1; tagBox.w = 0; return; }
+  if (i === STELLA_I) {
+    if (tagBox.i !== i) {
+      tagEl.innerHTML = '<b>Jupiter &amp; Saturn</b><span>7 BC, together in Pisces</span><span class="dim">Kepler’s guess for the star</span>';
+      tagBox.i = i; tagBox.plate = S.plate; tagBox.w = tagEl.offsetWidth; tagBox.h = tagEl.offsetHeight;
+    }
+  } else {
+    const s = STARS[i];
+    if (tagBox.i !== i || tagBox.plate !== S.plate) {
+      let extra = s.old ? `<span class="dim">on old retes: ${s.old}</span>` : '';
+      if (i === POLARIS) extra = `<span class="dim">its altitude gives the latitude</span><span class="dim egg"></span>`;
+      const spark = FX.tags && i !== POLARIS ? '<span class="spark"><svg viewBox="0 0 120 24" aria-hidden="true" focusable="false"><defs><clipPath id="sp-up"><rect x="-4" y="-6" width="128" height="18"/></clipPath><clipPath id="sp-dn"><rect x="-4" y="12" width="128" height="18"/></clipPath></defs><line class="hz" x1="0" y1="12" x2="120" y2="12"/><line class="mk" x1="60" y1="9.5" x2="60" y2="14.5"/><path class="dn" clip-path="url(#sp-dn)"/><path class="up" clip-path="url(#sp-up)"/><circle r="1.9"/></svg><span class="rs"></span></span>' : '';
+      const dry = FX.tags && DRY[s.id] ? `<span class="dry">${DRY[s.id]}</span>` : '';
+      tagEl.innerHTML = `<b>${s.name}</b><span>${s.bayer} · ${s.sp}</span><span>${s.col}</span><span>mag ${fmtMag(s)} · ${s.dist}</span><span class="alt"></span><span class="below" hidden>below the horizon</span>${spark}${dry}${extra}<span class="dim night" hidden>astronomical night</span>`;
+      tagBox.i = i; tagBox.plate = S.plate;
+      buildSpark(i);
+      updateTagAlt();
+      tagBox.w = tagEl.offsetWidth; tagBox.h = tagEl.offsetHeight;
+    }
+    updateTagAlt();
+  }
+  tagEl.classList.add('show');
+  tagEl.classList.toggle('kb', !!kb);
+  tagEl.classList.toggle('pinned', i === S.sel && i !== STELLA_I);
+  positionTag();
+}
+// the next rising or setting from the rete's hour, else the last one, else the whole night
+function starEvent() {
+  const ev = tagBox.events;
+  if (!ev.length) return null;
+  return ev.find(e => e.t > S.t + 0.5) || ev[ev.length - 1];
+}
+function updateTagAlt() {
+  if (tagBox.i < 0 || tagBox.i === STELLA_I) return;
+  const s = STARS[tagBox.i], P = PLATES[S.plate];
+  if (tagBox.plate !== S.plate) { const k = tagBox.i; tagBox.i = -1; showTag(k, tagEl.classList.contains('kb')); return; }
+  const a = altitude(s.ra, s.dec, S.lst, P.lat);
+  const el = tagEl.querySelector('.alt');
+  if (el) el.textContent = `alt ${fmtAlt(a)} from ${P.name}`;
+  let hChange = false;
+  const bh = tagEl.querySelector('.below');
+  if (bh && bh.hidden !== (a >= 0)) { bh.hidden = a >= 0; hChange = true; }
+  const nt = tagEl.querySelector('.night');
+  if (nt && nt.hidden === (S.night === 1)) { nt.hidden = S.night !== 1; hChange = true; }
+  const dot = tagEl.querySelector('.spark circle');
+  if (dot) { dot.setAttribute('cx', (S.t / SPAN * 120).toFixed(1)); dot.setAttribute('cy', altY(a).toFixed(2)); }
+  const rs = tagEl.querySelector('.rs');
+  if (rs) {
+    const e = starEvent(); tagBox.ev = e;
+    const past = e && e.t <= S.t + 0.5;
+    const txt = !e ? (a >= 0 ? 'up all night' : 'down all night') : (e.rise ? (past ? 'rose ' : 'rises ') : (past ? 'set ' : 'sets ')) + fmtClock(e.t);
+    if (rs.textContent !== txt) rs.textContent = txt;
+  }
+  const eg = tagEl.querySelector('.egg');
+  if (eg) eg.textContent = S.egg[S.plate] ? 'engraved above: ELEVATIO POLI' : `${FINE ? 'click' : 'tap'} it to engrave the plate`;
+  if (hChange) tagBox.h = tagEl.offsetHeight;
+}
+function positionTag() {
+  const i = tagBox.i;
+  if (i < 0 || !tagEl.classList.contains('show')) return;
+  const p = scr[i], w = tagBox.w, h = tagBox.h, gap = 22;
+  // Polaris's tag hangs below the pin so the engraving it announces, at the top of the plate, stays in view
+  let x = p.x + gap, y = i === POLARIS ? p.y + gap : p.y - gap - h;
+  if (x + w > W - 2) x = p.x - gap - w;
+  if (y < 2) y = p.y + gap;
+  x = clamp(x, 0, Math.max(0, W - w)); y = clamp(y, 0, Math.max(0, H - h));
+  tagBox.x = x; tagBox.y = y;
+  tagEl.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+}
+// the rising or setting time in a pinned tag can be dragged sideways to turn the rete, or pressed to go to it
+let scrub = null;
+tagEl.addEventListener('pointerdown', e => {
+  const rs = e.target.closest ? e.target.closest('.rs') : null;
+  if (!rs || !tagEl.classList.contains('pinned')) return;
+  e.preventDefault();
+  try { rs.setPointerCapture(e.pointerId); } catch (_) { /* capture is optional */ }
+  scrub = { id: e.pointerId, x0: e.clientX, t0: S.mode === 'settle' ? S.target : S.t, moved: false };
+  noteInput();
+});
+tagEl.addEventListener('pointermove', e => {
+  if (!scrub || e.pointerId !== scrub.id) return;
+  const dx = e.clientX - scrub.x0;
+  if (Math.abs(dx) > 3) scrub.moved = true;
+  if (scrub.moved) { S.following = false; goTo(clamp(scrub.t0 + dx * 2, 0, SPAN), 50, 'scrub'); noteInput(); }
+});
+tagEl.addEventListener('pointerup', e => {
+  if (!scrub || e.pointerId !== scrub.id) return;
+  if (!scrub.moved && tagBox.ev) { S.following = false; goTo(tagBox.ev.t, 220); }
+  scrub = null; hintProgress('turn');
+});
+tagEl.addEventListener('pointercancel', () => { scrub = null; });
+
+/* ---------------- sound ---------------- */
+// synthesised, quiet and opt-in: everything passes a compressor and a master well below full scale.
+// Pitched sounds keep to one key: G (the bell's strike note) and its pentatonic scale.
+let actx = null, bus = null, master = null, distIn = null, soundOn = false, lastTickT = -1, tinkBuf = null, noiseBuf = null, pinkBuf = null;
+const MASTER_GAIN = 0.056;   // about -25 dB: the loudest strokes peak near -24 dBFS
+const sndRnd = rngFor(15);
+function audio(create) {
+  if (!actx) {
+    if (!create) return null;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    try { actx = new AC(); } catch (e) { actx = null; return null; }
+    bus = actx.createGain();
+    const comp = actx.createDynamicsCompressor();
+    // a high threshold keeps the compressor's automatic make-up gain small, so quiet sounds stay quiet
+    comp.threshold.value = -10; comp.knee.value = 6; comp.ratio.value = 4; comp.attack.value = 0.003; comp.release.value = 0.25;
+    master = actx.createGain(); master.gain.value = MASTER_GAIN;
+    bus.connect(comp); comp.connect(master); master.connect(actx.destination);
+    buildBuffers(); buildDistance();
+  }
+  if (create && actx.state === 'suspended') actx.resume();
+  return actx;
+}
+const ready = () => (soundOn && actx && actx.state !== 'closed') ? actx : null;
+function buildBuffers() {
+  const sr = actx.sampleRate, rnd = rngFor(9);
+  // a brass tink: three inharmonic partials of a small struck bar over a 1 ms noise transient
+  const n = Math.round(sr * 0.04); tinkBuf = actx.createBuffer(1, n, sr);
+  const d = tinkBuf.getChannelData(0); let pk = 0;
+  for (let i = 0; i < n; i++) {
+    const t = i / sr;
+    let v = Math.sin(TAU * 2400 * t) * Math.exp(-t / 0.006) + 0.5 * Math.sin(TAU * 2400 * 2.76 * t) * Math.exp(-t / 0.003) + 0.28 * Math.sin(TAU * 2400 * 5.4 * t) * Math.exp(-t / 0.0015);
+    if (t < 0.001) v += (rnd() * 2 - 1) * 0.5 * (1 - t / 0.001);
+    d[i] = v; pk = Math.max(pk, Math.abs(v));
+  }
+  for (let i = 0; i < n; i++) d[i] /= pk;
+  // white noise for the purr of a fast turn, pink noise for a plate sliding in the mater
+  noiseBuf = actx.createBuffer(1, sr, sr); const w = noiseBuf.getChannelData(0);
+  for (let i = 0; i < sr; i++) w[i] = rnd() * 2 - 1;
+  const pn = Math.round(sr * 0.4); pinkBuf = actx.createBuffer(1, pn, sr); const pk2 = pinkBuf.getChannelData(0);
+  let b0 = 0, b1 = 0, b2 = 0;
+  for (let i = 0; i < pn; i++) { const x = rnd() * 2 - 1; b0 = 0.99765 * b0 + x * 0.099046; b1 = 0.963 * b1 + x * 0.2965164; b2 = 0.57 * b2 + x * 1.0526913; pk2[i] = (b0 + b1 + b2 + x * 0.1848) * 0.2; }
+}
+function buildDistance() {
+  // the town's bells are heard from a distance: a lowpass and a short generated hall, 35 per cent wet
+  distIn = actx.createGain();
+  const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400; lp.Q.value = 0.5;
+  const dry = actx.createGain(); dry.gain.value = 0.65;
+  const wet = actx.createGain(); wet.gain.value = 0.35;
+  const cvn = actx.createConvolver();
+  const len = Math.round(actx.sampleRate * 2.5), ir = actx.createBuffer(2, len, actx.sampleRate), rnd = rngFor(14);
+  for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (rnd() * 2 - 1) * Math.exp(-i / len * 6.9); }
+  cvn.buffer = ir;
+  distIn.connect(lp); lp.connect(dry); dry.connect(bus); lp.connect(cvn); cvn.connect(wet); wet.connect(bus);
+}
+function tink(rate, gain, when) {
+  const a = ready(); if (!a || !tinkBuf) return;
+  const src = a.createBufferSource(), g = a.createGain();
+  src.buffer = tinkBuf; src.playbackRate.value = rate; g.gain.value = gain;
+  src.connect(g); g.connect(bus); src.start(when || a.currentTime);
+}
+// 4-minute marks crossed per second
+const crossRate = () => S.spd * 1000 / 4;
+function tickSound(hourMark) {
+  const a = ready(); if (!a) return;
+  const t = a.currentTime; if (t - lastTickT < 0.03) return; lastTickT = t;
+  const rate = crossRate();
+  if (rate > 22 && !hourMark) return;
+  const g = 0.16 / (1 + rate / 15), j = 1 + (sndRnd() - 0.5) * 0.08;
+  if (hourMark) {
+    tink(0.62 * j, g * 1.5);
+    if (drag && drag.type !== 'mouse' && navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) { try { navigator.vibrate(3); } catch (e) { /* no haptics */ } }
+  } else tink(j, g);
+}
+// above about twenty marks a second the ticks run together into a quiet purr that follows the speed
+let purr = null;
+function purrSet(level) {
+  const a = ready();
+  if (!a || !FX.purr) { if (purr && !a) purr = null; return; }
+  if (!purr) {
+    if (level <= 0) return;
+    const src = a.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+    const bp = a.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3200; bp.Q.value = 8;
+    const g = a.createGain(); g.gain.value = 0;
+    src.connect(bp); bp.connect(g); g.connect(bus); src.start();
+    purr = { src, g, on: false, quiet: 0 };
+  }
+  const t = a.currentTime;
+  if (level > 0 || purr.on) purr.g.gain.setTargetAtTime(level, t, level > 0 ? 0.025 : 0.035);
+  purr.on = level > 0;
+  if (level > 0) purr.quiet = 0;
+  else if (!purr.quiet) purr.quiet = t;
+  else if (t - purr.quiet > 1.5) { try { purr.src.stop(); } catch (e) { /* already stopped */ } purr.g.disconnect(); purr = null; }
+}
+function thock() {
+  const a = ready(); if (!a) return;
+  const t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.08);
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.22, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+  o.connect(g); g.connect(bus); o.start(t); o.stop(t + 0.17);
+  tink(0.33, 0.12, t);
+}
+// bronze bell partials: hum, prime and its beating twin, minor-third tierce, quint, nominal
+const BELL = [[0.5, 0.32, 5.5], [1, 0.5, 4.6], [1.0021, 0.22, 4.4], [1.183, 0.24, 3.4], [1.506, 0.16, 2.8], [2, 0.28, 2.4], [2.0034, 0.1, 2.2], [2.514, 0.1, 1.6], [2.662, 0.08, 1.4], [3.011, 0.06, 1.1], [4.166, 0.035, 0.8]];
+function bellStroke(dest, t0, amp) {
+  const a = actx, out = a.createGain(); out.gain.value = amp; out.connect(dest);
+  for (const [r, am, dec] of BELL) {
+    const o = a.createOscillator(), gn = a.createGain();
+    o.type = 'sine'; o.frequency.value = 392 * r;
+    gn.gain.setValueAtTime(0.0001, t0); gn.gain.linearRampToValueAtTime(am, t0 + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + dec);
+    o.connect(gn); gn.connect(out); o.start(t0); o.stop(t0 + dec + 0.1);
+  }
+}
+// the town strikes the hour: strokes 1.8 s apart, each a little softer; turning away damps the rest
+const peal = { timer: 0, out: null, k: 0, n: 0, next: 0, hour: -1, at: 0 };
+function ringHour(n, hourT, delay) {
+  const a = ready(); if (!a || !FX.bells || !distIn) return;
+  stopPeal(0.3);
+  peal.out = a.createGain(); peal.out.gain.value = 1; peal.out.connect(distIn);
+  peal.n = n; peal.k = 0; peal.hour = hourT; peal.at = performance.now(); peal.next = a.currentTime + (delay || 0.05);
+  pealPump();
+}
+function pealPump() {
+  peal.timer = 0;
+  if (!peal.out || !actx) return;
+  while (peal.k < peal.n && peal.next < actx.currentTime + 0.3) { bellStroke(peal.out, Math.max(peal.next, actx.currentTime), 1.1 * Math.pow(0.92, peal.k)); peal.k++; peal.next += 1.8; }
+  if (peal.k < peal.n) peal.timer = setTimeout(pealPump, Math.max(60, (peal.next - actx.currentTime - 0.25) * 1000));
+}
+function stopPeal(fade) {
+  if (peal.timer) clearTimeout(peal.timer);
+  peal.timer = 0;
+  if (peal.out && actx) { const g = peal.out.gain, t = actx.currentTime; g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(0, t + fade); }
+  peal.out = null; peal.n = peal.k = 0; peal.hour = -1;
+}
+// the six corner stars of the figure sound D5 E5 G5 A5 B5 D6, panned by where they stand
+const PENTA = [587.33, 659.25, 783.99, 880.0, 987.77, 1174.66];
+function chimeNote(freq, pan, t0, amp) {
+  const a = actx, g = a.createGain();
+  let dest = bus;
+  if (a.createStereoPanner) { const pn = a.createStereoPanner(); pn.pan.value = pan; pn.connect(bus); dest = pn; }
+  g.connect(dest);
+  g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(amp, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.5);
+  for (const [r, am] of [[1, 1], [2, 0.12], [3.01, 0.04]]) {
+    const o = a.createOscillator(), og = a.createGain();
+    o.type = 'sine'; o.frequency.value = freq * r; og.gain.value = am;
+    o.connect(og); og.connect(g); o.start(t0); o.stop(t0 + 1.6);
+  }
+}
+function playFigure() {
+  const a = ready(); if (!a) return;
+  const t = a.currentTime + 0.02;
+  HEX.forEach((id, k) => chimeNote(PENTA[k], clamp((scr[id].x - cx) / Ro, -1, 1) * 0.6, t + (HEX_T0 + k * HEX_STEP) / 1000, 0.34));
+  ringHour(12, MID, (HEX_CLOSE + 600) / 1000);
+}
+function slideSound() {
+  const a = ready(); if (!a || !pinkBuf) return;
+  const t = a.currentTime, src = a.createBufferSource(), bp = a.createBiquadFilter(), g = a.createGain();
+  src.buffer = pinkBuf; bp.type = 'bandpass'; bp.Q.value = 1.4;
+  bp.frequency.setValueAtTime(1200, t); bp.frequency.exponentialRampToValueAtTime(600, t + 0.3);
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.3, t + 0.04); g.gain.setValueAtTime(0.3, t + 0.2); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+  src.connect(bp); bp.connect(g); g.connect(bus); src.start(t); src.stop(t + 0.35);
+}
+function seatSound() {
+  const a = ready(); if (!a) return;
+  const t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+  o.type = 'sine'; o.frequency.value = 180;
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.4, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+  o.connect(g); g.connect(bus); o.start(t); o.stop(t + 0.06);
+  tink(0.5, 0.12, t + 0.004);
+}
+const soundState = soundBtn.querySelector('.state');
+function setSound(on) {
+  soundOn = on;
+  soundBtn.setAttribute('aria-pressed', String(on));
+  soundState.textContent = on ? 'on' : 'off';
+}
+soundBtn.addEventListener('click', () => {
+  setSound(!soundOn); store.set('sound', soundOn);
+  if (soundOn) { audio(true); tink(1, 0.22); }
+  else { stopPeal(0.2); purrSet(0); if (actx && actx.state === 'running') actx.suspend(); }
+});
+// a remembered 'on' creates no audio until the first gesture
+if (store.get('sound', false) === true) setSound(true);
+function unlockAudio(e) {
+  if (!soundOn || (actx && actx.state === 'running')) return;
+  if (e.type === 'pointerdown' && e.pointerType !== 'mouse') return;
+  if (e.type === 'pointerup' && e.pointerType === 'mouse') return;
+  if (e.type === 'keydown' && (e.key === 'Escape' || e.repeat)) return;
+  audio(true);
+}
+['pointerdown', 'pointerup', 'keydown'].forEach(t => document.addEventListener(t, unlockAudio, true));
+
+/* ---------------- moment and time ---------------- */
+function startMoment(now) {
+  const m = S.moment;
+  m.on = true; m.start = now; m.level = 1; m.armed = false; m.resume = 0;
+  // the figure is rung for a midnight the viewer turned to, not for one the live clock reaches by itself
+  if (soundOn && !S.following && now - m.lastChime > 3000) { playFigure(); m.lastChime = now; }
+  live.textContent = 'Midnight, 25 December. The Winter Hexagon stands on the meridian.';
+  hintSeen.moment = true;
+}
+// back at midnight before the figure has re-armed: it returns at once, without the staging or the bells
+function resumeMoment(now) {
+  const m = S.moment;
+  m.on = true; m.start = now - 4000; m.resume = now; m.level = 1;
+}
+function setLst() {
+  S.lst = lstAt(S.t, PLATES[S.plate].lon);
+  computeAir();
+  S.night = FX.twilight && sunAlt(S.t, S.plate) < -18 ? 1 : 0;
+}
+// bells answer the viewer's own turning only: the drifting sky and the live clock pass the hours in silence
+const BELL_SRC = { other: 1, range: 1, scrub: 1 };
+function onTime(prev) {
+  setLst();
+  if (soundOn && actx) {
+    const md = S.frameMode || S.mode, turning = md === 'drag' || md === 'coast';
+    if (turning && Math.floor(prev / 4) !== Math.floor(S.t / 4)) tickSound(Math.floor(prev / 60) !== Math.floor(S.t / 60) || S.t % 60 === 0);
+    // the ends of the night stop the rete with one low thock
+    if ((S.t <= 0 || S.t >= SPAN) && prev > 0 && prev < SPAN && (turning || md === 'settle')) thock();
+    if (turning || (md === 'settle' && BELL_SRC[S.src])) hourBell(prev);
+  }
+  updateReadouts();
+}
+// a slow turn across a whole hour strikes it on a 12-hour clock; a fast turn keeps only its ticks
+function hourBell(prev) {
+  if (!FX.bells) return;
+  const up = S.t > prev, H = up ? Math.floor(S.t / 60) * 60 : Math.ceil(S.t / 60) * 60;
+  if (!(up ? (H > prev && H <= S.t) : (H < prev && H >= S.t))) return;
+  if (H === MID || S.spd > 0.06) return;
+  if (peal.hour === H && performance.now() - peal.at < 8000) return;
+  const h24 = (18 + H / 60) % 24;
+  // a step that lands on the hour waits a moment, so quick repeated steps pass without a bell
+  ringHour(h24 % 12 || 12, H, S.frameMode === 'settle' ? 0.4 : 0.05);
+}
+// how far the midnight moment has taken the instrument, 0 to 1
+function momentLevel(now) {
+  const m = S.moment;
+  return m.on ? Math.min(reduced ? 1 : clamp01((now - m.start) / 900), resumeK(now)) : m.level;
+}
+function magnet(f) {
+  const d = f - MID;
+  if (Math.abs(d) >= 8) return f;
+  return MID + Math.sign(d) * 8 * Math.pow(Math.abs(d) / 8, 2.2);
+}
+function goTo(v, tau, src) {
+  // every turn but the live clock's comes from the viewer (keys, slider, tags, a preview name, STELLA)
+  if ((src || 'other') !== 'live') noteInput();
+  S.target = clamp(v, 0, SPAN); S.tau = tau; S.mode = 'settle'; S.src = src || 'other'; S.vel = 0;
+  if (S.src !== 'live') S.following = false;
+  kick();
+}
+// back at the viewer's own hour, the rete takes up the clock again
+function reattach() {
+  if (FX.tonight && SZ.night && !S.following && Math.abs(S.t - SZ.liveT) <= 2) { S.following = true; updateReadouts(); }
+}
+let swarfK = 0;
+function swapCue(name) {
+  if (!soundOn) return;
+  if (name === 'wedge') tink(1.12, 0.07);
+  else if (name === 'slide') slideSound();
+  else if (name === 'seat') seatSound();
+  else if (name === 'tick') tink(1.26, 0.1);
+}
+
+function update(dt, now) {
+  let active = false;
+  const prev = S.t;
+  S.frameMode = S.mode;
+  switch (S.mode) {
+    case 'intro': {
+      if (!S.introStart) S.introStart = now;
+      const k = clamp01((now - S.introStart) / 2600);
+      S.t = S.introFrom + (S.rest - S.introFrom) * easeInOut(k);
+      if (k >= 1) { S.t = S.rest; S.mode = 'idle'; }
+      active = true; break;
+    }
+    case 'drag': S.t = magnet(S.finger); break;
+    case 'coast': {
+      S.t += S.vel * dt; S.vel *= Math.exp(-dt / 340);
+      if (S.t < 0) { S.t = 0; S.vel = 0; } if (S.t > SPAN) { S.t = SPAN; S.vel = 0; }
+      const d = S.t - MID;
+      if (Math.abs(d) < 8 && Math.abs(S.vel) < 0.12) { S.mode = 'settle'; S.target = MID; S.tau = 230; }
+      else if (Math.abs(S.vel) < 0.004) { S.mode = 'settle'; S.target = Math.abs(d) < 8 ? MID : Math.round(S.t / 4) * 4; S.tau = 110; }
+      active = true; break;
+    }
+    case 'settle': {
+      const k = 1 - Math.exp(-dt / S.tau);
+      S.t += (S.target - S.t) * k;
+      if (Math.abs(S.target - S.t) < 0.015) {
+        S.t = S.target; S.mode = 'idle';
+        if (soundOn && S.src !== 'live' && S.src !== 'jump') tickSound(false);
+        reattach();
+      }
+      active = true; break;
+    }
+    case 'drift': {
+      // one hour of sky a minute; it parks short of midnight so the moment is left to the viewer
+      S.t = Math.min(S.driftTo, S.t + dt * 0.001);
+      if (S.t >= S.driftTo) S.mode = 'idle';
+      break;
+    }
+  }
+  S.spd = S.spd * 0.6 + 0.4 * Math.abs(S.t - prev) / Math.max(dt, 1);
+  if (S.t !== prev) { dirty = true; onTime(prev); }
+
+  // the sky keeps turning when nobody touches it
+  if (FX.drift && S.mode === 'idle' && !drag && !reduced && !S.following && S.prevPlate < 0 && !S.moment.on && Math.abs(S.t - MID) > 2 && !S.flip.shown && now - lastInput > 20000) {
+    const to = S.t < MID ? MID - 5 : SPAN - 5;
+    if (S.t < to - 0.5) { S.mode = 'drift'; S.driftTo = to; updateReadouts(); }
+  }
+
+  // midnight
+  const m = S.moment, d = S.t - MID;
+  const atMid = Math.abs(d) < 0.35;
+  if (atMid) { if (m.hold == null) m.hold = now; if (!m.on && now - m.hold > 280) { if (m.armed) startMoment(now); else resumeMoment(now); } }
+  else { m.hold = null; if (m.on && Math.abs(d) > 1.2) { m.offFrom = resumeK(now); m.on = false; m.off = now; m.res = 1; m.resume = 0; } }
+  if (!m.armed && !m.on && Math.abs(d) > 20) m.armed = true;
+  if (m.hold != null && !m.on) active = true;
+  if (m.on) { if (now - m.start < 6500 || (m.resume && now - m.resume < 500)) active = true; }
+  else if (m.level > 0) { m.level = Math.max(0, m.offFrom * (1 - (now - m.off) / (reduced ? 300 : 1300))); active = true; }
+  if (m.armed && m.res > 0) { m.res = Math.max(0, m.res - dt / 400); active = true; }
+  if (peal.out && peal.hour >= 0 && Math.abs(S.t - peal.hour) > 15) stopPeal(peal.k <= 1 && actx && actx.currentTime < peal.next - 1.7 ? 0.02 : 0.6);
+
+  // the light follows the pointer with some weight (two smoothing stages give it an ease in and out)
+  const tl = reduced ? 50 : 170;
+  const dm = wrapPI(S.sheenTarget - S.sheenMid), ds = wrapPI(S.sheenMid - S.sheen);
+  if (Math.abs(dm) > 0.0015 || Math.abs(ds) > 0.0015) {
+    S.sheenMid = wrapPI(S.sheenMid + dm * (1 - Math.exp(-dt / tl)));
+    S.sheen = wrapPI(S.sheen + wrapPI(S.sheenMid - S.sheen) * (1 - Math.exp(-dt / tl)));
+    active = true;
+  }
+  // left alone, the streaks on the turned mater wander a few degrees, as if a candle moved; only the sheen layer turns
+  S.airK = AMBIENT && FX.air && !reduced ? ambK(now) : 0;
+  const ct = candleOn(now) ? clamp01((now - lastPointer - 6000) / 5000) * ambK(now) * (0.13 * Math.sin(now / 1000 * TAU / 23) + 0.07 * Math.sin(now / 1000 * TAU / 37 + 1.3)) : 0;
+  S.candle += (ct - S.candle) * (1 - Math.exp(-dt / 350));
+  if (Math.abs(S.candle - candleShown) > 0.0015 || (ct === 0 && S.candle !== candleShown && Math.abs(S.candle) < 0.0015)) {
+    if (ct === 0 && Math.abs(S.candle) < 0.0015) S.candle = 0;
+    candleShown = S.candle;
+    sheenXform();
+  }
+  if (ct === 0 && S.candle !== 0) active = true;
+
+  // raking light on the rim
+  if (Math.abs(S.sigTarget - S.sig) > 0.004) { S.sig += (S.sigTarget - S.sig) * (1 - Math.exp(-dt / (reduced ? 1 : 60))); active = true; }
+  else if (S.sig !== S.sigTarget) { S.sig = S.sigTarget; dirty = true; }
+  if (S.sig > 0.8 && !secrets.sig) { secrets.sig = 1; store.set('secrets', secrets); live.textContent = 'A signature cut in the rim catches the light: fecit in nocte nativitatis.'; }
+
+  // astronomical night arrives, or leaves, gently
+  const nl0 = S.nightLvl;
+  if (Math.abs(S.night - S.nightLvl) > 0.002) { S.nightLvl += (S.night - S.nightLvl) * (reduced ? 1 : 1 - Math.exp(-dt / 200)); active = true; }
+  else S.nightLvl = S.night;
+  if (S.nightLvl !== nl0) underDirty = true;
+
+  // changing plates: sounds on their beats, swarf off the graver
+  if (S.prevPlate >= 0) {
+    active = true;
+    if (FX.ritual && !reduced) {
+      const el = now - S.swapStart;
+      while (S.swapCue < SWAP_CUES.length && el >= SWAP_CUES[S.swapCue][0]) { swapCue(SWAP_CUES[S.swapCue][1]); S.swapCue++; }
+      if (S.swapEngrave && swarfK < 3) {
+        const f = clamp01((el - 640) / 900), at = [0.22, 0.5, 0.78][swarfK];
+        if (f >= at) {
+          const a1 = -Math.PI / 2 + TAU * easeInOut(f), rr = Rcap * (0.45 + swarfRnd() * 0.45);
+          S.swarf.push({ t0: now, x: cx + Math.cos(a1) * rr, y: cy + Math.sin(a1) * rr, vx: (swarfRnd() - 0.5) * 60, vy: -40 - swarfRnd() * 50, rot: swarfRnd() * TAU, spin: (swarfRnd() - 0.5) * 9, s: Math.max(2.4, 0.0055 * D) * (0.8 + swarfRnd() * 0.5) });
+          swarfK++;
+        }
+      }
+    }
+  }
+  if (S.swarf.length) { S.swarf = S.swarf.filter(c => now - c.t0 < 820); active = true; }
+
+  // Rovaniemi's sled
+  if (FX.sled && S.plate === 2) {
+    const near = Math.abs(S.t - MID) <= 10;
+    if (near && !S.sledOn) { S.sledOn = true; S.sledAt = now; } else if (!near && S.sledOn) { S.sledOn = false; dirty = true; }
+    if (S.sledOn && now - S.sledAt < 950) active = true;
+  }
+
+  // the conjunction of 7 BC lingers a minute
+  if (S.stella) {
+    const el = now - S.stella.start;
+    if (el < 1500 || (el > 59900 && el < 62600)) active = true;
+    if (el >= 62600) { S.stella = null; if (tagBox.i === STELLA_I) showTag(S.sel >= 0 ? S.sel : -1); dirty = true; }
+  }
+
+  // the instrument turning over
+  if (S.flip.on) { active = true; flipStep(now); }
+
+  // the purr of a fast turn, which fades 120 ms after the turning stops
+  if (purr || (soundOn && actx)) {
+    const rate = crossRate(), moving = S.mode === 'drag' || S.mode === 'coast';
+    purrSet(moving && rate > 18 ? 0.24 * sstep(18, 34, rate) * clamp(rate / 60, 0.5, 1) : 0);
+    if (purr && purr.on) active = true;
+  }
+
+  if (eggBusy(S.egg[S.plate], now)) active = true;
+  // a chosen star breathes while someone is with the page, then rests
+  S.focusK = ambK(now);
+  if ((S.hover >= 0 || S.sel >= 0) && !reduced && S.focusK > 0) active = true;
+  if (S.glint.i >= 0 && now - S.glint.start < 750) active = true;
+  return active;
+}
+const swarfRnd = rngFor(11);
+let candleShown = 0, sheenDeg = NaN;
+// the light's angle and the candle's wander, as one rotation of the sheen layer
+function sheenXform() { sheenEl.style.transform = `rotate(${((sheenDeg || 0) + S.candle / DEG).toFixed(3)}deg)`; }
+const candleOn = now => FX.candle && AMBIENT && !reduced && !drag && !S.flip.shown && now - lastPointer > 6000 && now - lastInput < AMB_LIVE;
+
+// ambient life (twinkling low stars, the drifting sky, the candle) runs at a low frame rate between real animation,
+// and only while someone is with the page: it fades over the last eight seconds of the forty after the last input,
+// and then nothing is drawn until the pointer comes back. On a software renderer the page stays as still at rest as
+// it always was: low stars keep their colour and dimming but do not scintillate, the candle does not move, and the
+// drifting sky steps three times a second
+let ambT = 0;
+const AMBIENT = !SLOWGL, AMB_LIVE = 40000;
+const ambK = now => 1 - sstep(AMB_LIVE - 8000, AMB_LIVE, now - lastInput);
+function ambient(now) {
+  if (S.mode === 'drift') return { ms: AMBIENT ? 100 : 333, partial: false };
+  if (!AMBIENT || S.flip.shown || S.flip.on) return null;
+  // twinkle about eight times a second, on the small canvases over the low stars only
+  if (S.airK > 0 && airActive()) return { ms: 125, partial: true };
+  // once it has faded, one full frame puts the low stars back on the still layer
+  if (scintOn) return { ms: 40, partial: false };
+  // the candle turns only the CSS sheen layer: nothing needs repainting
+  if (candleOn(now)) return { ms: 120, partial: true, none: true };
+  return null;
+}
+function tick(now) {
+  raf = 0;
+  if (document.hidden) return;
+  const dt = Math.min(S.mode === 'drift' ? 400 : 100, now - (lastFrame || now)); lastFrame = now;
+  const active = update(dt, now);
+  const amb = active ? null : ambient(now);
+  if ((dirty || active || (amb && !amb.none)) && W > 0) { drawFrame(now, !!amb && amb.partial && !dirty); dirty = false; }
+  if (active) raf = requestAnimationFrame(tick);
+  else if (amb) { if (ambT) clearTimeout(ambT); ambT = setTimeout(() => { ambT = 0; if (!raf && !document.hidden) raf = requestAnimationFrame(tick); }, amb.ms); }
+}
+function kick() {
+  dirty = true;
+  if (ambT) { clearTimeout(ambT); ambT = 0; }
+  if (!raf && !document.hidden) { lastFrame = performance.now(); raf = requestAnimationFrame(tick); }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopPeal(0.3);
+    if (actx && actx.state === 'running') actx.suspend();
+  } else {
+    if (soundOn && actx && actx.state === 'suspended') actx.resume();
+    refreshSeason(false);
+    kick();
+  }
+});
+
+/* ---------------- season: the line, the live sky, midnight travelling ---------------- */
+const ZONES = [[14, 'Kiritimati'], [13.75, 'the Chatham Islands'], [13, 'Auckland'], [12, 'Suva'], [11, 'Sydney'], [10.5, 'Adelaide'], [10, 'Brisbane'], [9.5, 'Darwin'], [9, 'Tokyo'], [8.75, 'Eucla'], [8, 'Perth'], [7, 'Bangkok'], [6.5, 'Yangon'], [6, 'Dhaka'], [5.75, 'Kathmandu'], [5.5, 'Delhi'], [5, 'Karachi'], [4.5, 'Kabul'], [4, 'Dubai'], [3.5, 'Tehran'], [3, 'Nairobi'], [2, 'Bethlehem'], [1, 'Nuremberg'], [0, 'London'], [-1, 'the Azores'], [-2, 'South Georgia'], [-3, 'Rio de Janeiro'], [-3.5, 'St John’s'], [-4, 'Halifax'], [-5, 'New York'], [-6, 'Mexico City'], [-7, 'Denver'], [-8, 'Los Angeles'], [-9, 'Anchorage'], [-9.5, 'the Marquesas'], [-10, 'Honolulu'], [-11, 'Pago Pago'], [-12, 'Baker Island']];
+// on laptop heights the two lines share one row and take turns every thirty seconds
+const compactMq = matchMedia('(min-width: 761px) and (orientation: landscape) and (max-height: 940px)');
+let travelTxt = '', travelTurn = false;
+function paintSeason(fade) {
+  const compact = compactMq.matches && !!travelTxt;
+  RO.travelRow.hidden = !travelTxt || compact;
+  if (travelTxt && !compact) setLine(RO.travel, travelTxt, fade);
+  setLine(RO.season, compact && travelTurn ? travelTxt : seasonLine(SZ), fade);
+}
+if (compactMq.addEventListener) compactMq.addEventListener('change', () => paintSeason(false));
+function updateTravel(turn) {
+  const now = clockNow();
+  const inWin = FX.travel && now.getMonth() === 11 && now.getDate() >= 20 && now.getDate() <= 26;
+  if (turn) travelTurn = !travelTurn;
+  if (!inWin) { travelTxt = ''; paintSeason(true); if (TRAVEL) { TRAVEL = null; kick(); } return; }
+  const utc = now.getTime(), xmas = Date.UTC(now.getFullYear(), 11, 25);
+  const n = ZONES.filter(z => utc + z[0] * 3600e3 >= xmas).length;
+  const txt = n === 0 ? 'Christmas reaches Kiritimati first, at UTC+14'
+    : n === ZONES.length ? 'Christmas has reached all 38 time zones'
+    : `Christmas in ${n} of 38 time zones · next ${ZONES[n][1]}`;
+  travelTxt = txt;
+  paintSeason(true);
+  // the ember index: mean time in Bethlehem now, on the hour ring
+  const lmt = ((utc / 3600e3 + 35.2 / 15) % 24 + 24) % 24, psi = (lmt - 12) * 15 * DEG;
+  if (!TRAVEL || Math.abs(TRAVEL.psi - psi) > 0.0004) { TRAVEL = { psi }; kick(); }
+}
+function refreshSeason(fromHash) {
+  SZ = season(clockNow());
+  if (SZ.year !== YEAR) { YEAR = SZ.year; SUN_EQ = null; duskCache.length = 0; setLst(); }
+  if (fromHash) backDrawn = 0;
+  updateTravel();
+  if (FX.tonight) {
+    const idle = S.mode === 'idle' || S.mode === 'drift';
+    if (fromHash) {
+      if (!drag) goTo(SZ.night ? SZ.liveT : REST, 600, 'jump');
+      S.following = liveOffered = SZ.night;
+    } else if (SZ.night) {
+      // following, the rete steps on each minute like a clock hand (a quarter of a degree, in under a second)
+      if (S.following && idle && !drag && Math.abs(S.t - SZ.liveT) > 0.01) goTo(SZ.liveT, Math.abs(S.t - SZ.liveT) > 3 ? 1200 : 140, 'live');
+      // once a night, after a minute left alone, the rete takes up the viewer's clock; turned away again, it stays where it is put
+      else if (!S.following && !liveOffered && idle && !drag && performance.now() - lastInput > 60000) { goTo(SZ.liveT, 1200, 'live'); S.following = liveOffered = true; }
+    } else { liveOffered = false; if (S.following) S.following = false; }
+  }
+  updateReadouts();
+}
+function minuteLoop() {
+  refreshSeason(false);
+  setTimeout(minuteLoop, 60000 - ((Date.now() + clockShift) % 60000) + 40);
+}
+addEventListener('hashchange', () => { readHash(); refreshSeason(true); });
+
+/* ---------------- hints that retire ---------------- */
+// one at a time, after four seconds without progress, engraved outside the limb; each retires after two successes or three showings
+const hintSeen = { moment: false, turned: false, star: false, lat: false }, hintVisit = {};
+const hintState = { turn: { s: 0, ok: 0 }, star: { s: 0, ok: 0 }, lat: { s: 0, ok: 0 } };
+(function () { const h = store.get('hints', null); if (h && typeof h === 'object') for (const k in hintState) if (h[k]) { hintState[k].s = +h[k].s || 0; hintState[k].ok = +h[k].ok || 0; } })();
+let hintNow = null, hintAt = 0, lastProgress = performance.now() + 2600, keyMode = false, plateHover = -1;
+const retired = id => hintState[id].ok >= 2 || hintState[id].s >= 3;
+const colHint = $('#hint-text');
+const onScreen = el => { const r = el.getBoundingClientRect(); return r.width > 0 && r.bottom > 8 && r.top < innerHeight - 8; };
+function hintProgress(id) {
+  lastProgress = performance.now();
+  hintSeen[id === 'turn' ? 'turned' : id] = true;
+  const h = hintState[id];
+  if (h && h.ok < 2) { h.ok++; store.set('hints', hintState); }
+  if (hintNow === id) hideHint();
+}
+function setLoreArc() {
+  const r = Ro + Math.max(12, 0.017 * D), a0 = 174 * DEG, a1 = 106 * DEG;
+  const P = a => (cx + r * Math.sin(a)).toFixed(1) + ' ' + (cy - r * Math.cos(a)).toFixed(1);
+  lore.querySelector('#lore-arc').setAttribute('d', `M${P(a0)} A${r.toFixed(1)} ${r.toFixed(1)} 0 0 0 ${P(a1)}`);
+}
+function setLore(keys, txt) {
+  lore.querySelectorAll('textPath').forEach((tp, k) => {
+    tp.textContent = '';
+    if (keys) { const t = document.createElementNS('http://www.w3.org/2000/svg', 'tspan'); if (k) t.setAttribute('class', 'key'); t.textContent = keys; tp.appendChild(t); }
+    tp.appendChild(document.createTextNode(txt));
+  });
+}
+function showHint(id) {
+  const h = hintState[id]; h.s++; store.set('hints', hintState);
+  hintNow = id; hintAt = performance.now(); hintVisit[id] = true;
+  let txt;
+  if (id === 'lat') { txt = 'try another latitude'; plateNote.textContent = txt; plateNote.classList.add('show'); }
+  else {
+    txt = id === 'turn' ? 'turn the night' : (FINE ? 'click a star' : 'tap a star');
+    setLore(id === 'turn' && keyMode ? '← →  ' : '', txt);
+    lore.classList.add('show');
+  }
+  live.textContent = txt.charAt(0).toUpperCase() + txt.slice(1) + '.';
+}
+function hideHint() {
+  if (hintNow === 'lat') { if (plateHover < 0) plateNote.classList.remove('show'); }
+  else lore.classList.remove('show');
+  hintNow = null;
+}
+function hintCheck() {
+  if (!FX.hints || document.hidden) return;
+  const now = performance.now();
+  if (hintNow) { if (now - hintAt > 9000 || S.flip.shown) hideHint(); return; }
+  if (now - lastProgress < 4000 || drag || S.mode === 'intro' || S.flip.shown || S.prevPlate >= 0) return;
+  let id = null;
+  if (!hintSeen.turned && !retired('turn') && !hintVisit.turn) id = 'turn';
+  else if (hintSeen.turned && !hintSeen.star && !retired('star') && !hintVisit.star) id = 'star';
+  else if (hintSeen.moment && !hintSeen.lat && !retired('lat') && !hintVisit.lat && plateHover < 0) id = 'lat';
+  // one voice per gesture: the rim speaks only when the column's own hint is off screen
+  // (or, for turning, to show a keyboard user the arrow keys) and the instrument is on screen
+  if (id && id !== 'lat' && (!onScreen(inst) || (onScreen(colHint) && !(id === 'turn' && keyMode)))) id = null;
+  if (id) showHint(id);
+}
+const secrets = (() => { const v = store.get('secrets', null); return v && typeof v === 'object' ? v : {}; })();
+
+/* ---------------- interaction ---------------- */
+let drag = null;
+function localPt(e) { const r = inst.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+function hitStar(p, rad) {
+  let best = -1, bd = rad;
+  if (stellaLevel(performance.now()) > 0.5 && Math.hypot(scr[STELLA_I].x - p.x, scr[STELLA_I].y - p.y) < rad) return STELLA_I;
+  const pr = Math.hypot(p.x - cx, p.y - cy);
+  if (pr < Math.max(12, 0.03 * D)) return POLARIS;
+  for (let i = 0; i < STARS.length; i++) {
+    if (i === POLARIS) continue;
+    const d = Math.hypot(scr[i].x - p.x, scr[i].y - p.y);
+    if (d < bd) { bd = d; best = i; }
+  }
+  return best;
+}
+function setHover(i) {
+  if (i === S.hover) return;
+  S.hover = i;
+  if (i >= 0 && i !== S.sel) { S.glint = { i, start: performance.now() }; hintProgress('star'); }
+  dial.classList.toggle('on-star', i >= 0);
+  showTag(S.sel >= 0 ? S.sel : i, false);
+  kick();
+}
+// the horse answers to its name on hover, or for a moment after a tap
+let wtagT = 0;
+function onWedge(p) {
+  const w = WEDGE;
+  return FX.ritual && !!w && !S.flip.shown && p.x >= w.x0 && p.x <= w.x1 && p.y >= w.y0 - 2 && p.y <= w.y1 + 2 && Math.hypot(p.x - cx, p.y - cy) > Math.max(12, 0.03 * D);
+}
+function showWedgeTag(ms) {
+  if (!WEDGE) return;
+  const ww = wtag.offsetWidth || 130;
+  wtag.style.transform = `translate(${Math.round(clamp(WEDGE.hx - 8, 0, W - ww))}px, ${Math.round(WEDGE.hy - 28)}px)`;
+  wtag.classList.add('show');
+  clearTimeout(wtagT); if (ms) wtagT = setTimeout(hideWedgeTag, ms);
+}
+function hideWedgeTag() { if (wtag.classList.contains('show')) wtag.classList.remove('show'); }
+// twenty seconds after the last input one frame runs, so the idle drift can begin even when nothing else is drawing
+let driftT = 0;
+function armDrift() { clearTimeout(driftT); if (FX.drift && !reduced) driftT = setTimeout(kick, 20100); }
+function noteInput() {
+  lastInput = performance.now();
+  armDrift();
+  if (S.mode === 'drift') { S.mode = 'idle'; updateReadouts(); kick(); }
+}
+['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(t => addEventListener(t, noteInput, { passive: true, capture: true }));
+addEventListener('pointerdown', () => { keyMode = false; }, { passive: true, capture: true });
+addEventListener('keydown', () => { keyMode = true; }, { passive: true, capture: true });
+window.addEventListener('pointermove', e => {
+  const p = localPt(e);
+  lastPointer = performance.now(); noteInput();
+  if (drag && drag.type !== 'mouse') return;
+  S.sheenTarget = S.sheenBase = Math.atan2(p.y - cy, p.x - cx);
+  if (e.pointerType === 'mouse') sigAim(p);
+  kick();
+}, { passive: true });
+
+// a finger that moves mostly straight across the dial (not around it) scrolls the page instead of turning the rete
+let fling = 0;
+function stopFling() { if (fling) { cancelAnimationFrame(fling); fling = 0; } }
+function flingScroll(v) {
+  stopFling();
+  let last = performance.now();
+  const step = now => {
+    const dt = Math.min(50, now - last); last = now;
+    scrollBy(0, v * dt); v *= Math.exp(-dt / 325);
+    fling = Math.abs(v) > 0.02 ? requestAnimationFrame(step) : 0;
+  };
+  fling = requestAnimationFrame(step);
+}
+function turnIntent(p) {
+  if (!pageScrolls()) return true;
+  const mx = p.x - drag.x0, my = p.y - drag.y0, rx = drag.x0 - cx, ry = drag.y0 - cy, rl = Math.hypot(rx, ry);
+  if (Math.abs(mx) > Math.abs(my) * 1.2) return true;
+  if (rl < 0.12 * D) return false;
+  const radial = Math.abs(mx * rx + my * ry) / rl, tang = Math.abs(mx * ry - my * rx) / rl;
+  return tang >= radial * 0.85;
+}
+const onLimb = p => { const pr = Math.hypot(p.x - cx, p.y - cy); return pr > Ri + 2 && pr <= Ro; };
+dial.addEventListener('pointerdown', e => {
+  if (e.button !== undefined && e.button > 0) return;
+  stopFling();
+  const p = localPt(e);
+  try { dial.setPointerCapture(e.pointerId); } catch (_) { /* capture is optional */ }
+  drag = { id: e.pointerId, x0: p.x, y0: p.y, ang: Math.atan2(p.y - cy, p.x - cx), moved: false, back: !!S.flip.shown, intent: S.flip.shown ? (e.pointerType === 'mouse' ? 'none' : 'scroll') : (e.pointerType === 'mouse' ? 'turn' : ''), samples: [{ t: e.timeStamp, v: S.t }], lastY: e.clientY, ys: [{ t: e.timeStamp, y: e.clientY }], type: e.pointerType, t0: S.t, down: performance.now(), limb: FX.back && e.pointerType !== 'mouse' && onLimb(p) };
+  if (S.flip.shown) return;
+  S.finger = S.t; S.vel = 0; S.src = 'other';
+  if (S.mode === 'intro' || S.mode === 'coast' || S.mode === 'settle' || S.mode === 'drift') S.mode = 'idle';
+  S.sheenTarget = S.sheenBase = drag.ang;
+});
+dial.addEventListener('pointermove', e => {
+  const p = localPt(e);
+  if (!drag || drag.id !== e.pointerId) {
+    if (e.pointerType === 'mouse' && !S.flip.shown) {
+      const i = hitStar(p, 15);
+      setHover(i);
+      if (i < 0 && onWedge(p)) showWedgeTag(0); else hideWedgeTag();
+    }
+    return;
+  }
+  const ang = Math.atan2(p.y - cy, p.x - cx);
+  if (!drag.moved && Math.hypot(p.x - drag.x0, p.y - drag.y0) > (drag.type === 'mouse' ? 5 : 9)) {
+    drag.moved = true;
+    if (!drag.intent) drag.intent = turnIntent(p) ? 'turn' : 'scroll';
+    if (drag.intent === 'turn') { S.mode = 'drag'; S.following = false; dial.classList.add('dragging'); hideWedgeTag(); }
+  }
+  if (drag.intent === 'none') return;
+  if (drag.intent === 'scroll') {
+    if (drag.moved) { scrollBy(0, drag.lastY - e.clientY); }
+    drag.lastY = e.clientY;
+    drag.ys.push({ t: e.timeStamp, y: e.clientY });
+    while (drag.ys.length > 2 && e.timeStamp - drag.ys[0].t > 90) drag.ys.shift();
+    return;
+  }
+  // near the pin a small movement sweeps a large angle, so turning there is damped
+  const rr = Math.hypot(p.x - cx, p.y - cy);
+  if (drag.moved && rr > 0.05 * D) {
+    const da = wrapPI(ang - drag.ang) * clamp01((rr - 0.05 * D) / (0.13 * D));
+    S.finger = clamp(S.finger + da / DEG * MIN_PER_DEG, 0, SPAN);
+    drag.samples.push({ t: e.timeStamp, v: S.finger });
+    while (drag.samples.length > 2 && e.timeStamp - drag.samples[0].t > 90) drag.samples.shift();
+    if (FX.polish && rr < Rcap) polishAdd(p, S.lst * 15 * DEG);
+    // on touch the turning hand is the light: its sheen follows the rete, and it can rake the rim
+    if (drag.type !== 'mouse') { S.sheenTarget = S.sheenBase = ang; sigAim(p); }
+    kick();
+  }
+  drag.ang = ang;
+});
+function endDrag(e, cancelled) {
+  if (!drag || drag.id !== e.pointerId) return;
+  const p = localPt(e);
+  dial.classList.remove('dragging');
+  if (drag.type !== 'mouse' && S.sigTarget) { S.sigTarget = 0; }
+  // a finger held still on the limb and lifted turns the instrument over; one that pauses and then turns only turns.
+  // With the back showing, a tap or click turns it face up again
+  const still = !drag.moved && !cancelled;
+  if (still && drag.limb && performance.now() - drag.down >= 650) flipTo(!S.flip.shown);
+  else if (drag.back && still) { if (S.flip.shown && !S.flip.on) flipTo(false); }
+  else if (drag.intent === 'none') { /* a press on the back that moved: nothing to turn */ }
+  else if (drag.moved && drag.intent === 'scroll') {
+    const a = drag.ys[0], b = drag.ys[drag.ys.length - 1];
+    const v = b.t > a.t ? (a.y - b.y) / (b.t - a.t) : 0;
+    if (!cancelled && !reduced && Math.abs(v) > 0.08) flingScroll(clamp(v, -4, 4));
+    S.mode = 'settle'; S.target = Math.abs(S.t - MID) < 8 ? MID : Math.round(S.t / 4) * 4; S.tau = 110;
+  } else if (!drag.moved && !cancelled) {
+    const i = hitStar(p, drag.type === 'mouse' ? 15 : 24);
+    if (i < 0 && drag.type !== 'mouse' && onWedge(p)) showWedgeTag(2400);
+    if (i === POLARIS) engraveEgg();
+    if (i >= 0) { S.sel = (S.sel === i && i !== POLARIS) ? -1 : i; S.glint = { i, start: performance.now() }; hintProgress('star'); }
+    else S.sel = -1;
+    showTag(S.sel >= 0 ? S.sel : (drag.type === 'mouse' ? S.hover : -1), false);
+    S.mode = 'settle'; S.target = Math.abs(S.t - MID) < 8 ? MID : Math.round(S.t / 4) * 4; S.tau = 110;
+  } else if (drag.moved) {
+    const sm = drag.samples, a = sm[0], b = sm[sm.length - 1];
+    const v = b.t > a.t ? (b.v - a.v) / (b.t - a.t) : 0;
+    S.t = magnet(S.finger);
+    if (reduced) { S.mode = 'settle'; S.target = Math.abs(S.t - MID) < 8 ? MID : Math.round(S.t / 4) * 4; S.tau = 90; }
+    else { S.vel = clamp(v, -2.5, 2.5); S.mode = 'coast'; }
+    if (Math.abs(S.finger - drag.t0) >= 8) hintProgress('turn');
+    if (polishDirty) { polishSave(); bake.valid = false; }
+  }
+  drag = null;
+  kick();
+}
+dial.addEventListener('pointerup', e => endDrag(e, false));
+document.addEventListener('pointerdown', e => {
+  if (S.sel >= 0 && e.target !== dial && !tagEl.contains(e.target)) { S.sel = -1; showTag(-1); kick(); }
+});
+dial.addEventListener('pointercancel', e => endDrag(e, true));
+dial.addEventListener('pointerleave', e => { if (!drag && e.pointerType === 'mouse') { setHover(-1); hideWedgeTag(); } });
+dial.addEventListener('contextmenu', e => { if (drag && drag.type !== 'mouse') e.preventDefault(); });
+dial.addEventListener('dblclick', e => { if (FX.back && onLimb(localPt(e))) { e.preventDefault(); flipTo(!S.flip.shown); } });
+
+let lastRange = +hour.value;
+hour.addEventListener('input', () => {
+  let v = +hour.value;
+  const toward = Math.abs(v - MID) < Math.abs(lastRange - MID);
+  if (toward && Math.abs(v - MID) <= 8) { v = MID; hour.value = String(MID); }
+  lastRange = v;
+  if (S.flip.shown) flipTo(false);
+  goTo(v, 80, 'range');
+  hintProgress('turn');
+});
+hour.addEventListener('focus', () => { lastRange = Math.round(S.t); });
+
+// one key map for the rete, the hour slider and (on a page that does not scroll) the bare page
+const KEY_STEP = { ArrowRight: 4, ArrowUp: 4, ArrowLeft: -4, ArrowDown: -4, PageUp: 60, PageDown: -60 };
+function timeKey(e, keys) {
+  if (e.altKey || e.ctrlKey || e.metaKey || !keys.includes(e.key)) return false;
+  e.preventDefault();
+  if (S.flip.shown) flipTo(false);
+  hintProgress('turn');
+  if (e.key === 'Home' || e.key === 'End') { goTo(e.key === 'Home' ? 0 : SPAN, 160); lastRange = S.target; return true; }
+  const base = S.mode === 'settle' ? S.target : S.t;
+  let v = clamp(Math.round((base + KEY_STEP[e.key]) / 4) * 4, 0, SPAN);
+  const toward = Math.abs(v - MID) < Math.abs(base - MID);
+  if (toward && Math.abs(v - MID) <= 8) v = MID;
+  goTo(v, 90);
+  lastRange = v;
+  return true;
+}
+const ALL_KEYS = ['ArrowRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'];
+dial.addEventListener('keydown', e => {
+  if (FX.back && (e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey) { flipTo(!S.flip.shown); return; }
+  timeKey(e, ALL_KEYS);
+});
+// the native slider keeps its arrow steps; page and end keys follow the instrument's hour steps and midnight magnet
+hour.addEventListener('keydown', e => timeKey(e, ['PageUp', 'PageDown', 'Home', 'End']));
+const pageScrolls = () => document.documentElement.scrollHeight > innerHeight + 2;
+let keyBuf = '';
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { S.sel = -1; showTag(-1); hideWedgeTag(); if (S.flip.shown) flipTo(false); kick(); return; }
+  const tg = e.target;
+  // typing STELLA anywhere outside a field
+  if (FX.stella && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && !(tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.isContentEditable))) {
+    keyBuf = (keyBuf + e.key.toUpperCase()).slice(-12);
+    if (keyBuf.endsWith('STELLA')) { keyBuf = ''; summonStella(); }
+  }
+  if (tg && tg !== document.body && tg !== document.documentElement) return;
+  if (!pageScrolls()) timeKey(e, ALL_KEYS);
+});
+
+function choosePlate(i) {
+  if (i === S.plate) return;
+  if (S.flip.shown) flipTo(false);
+  S.prevPlate = S.plate; S.plate = i; S.swapStart = performance.now(); S.swapCue = 0; swarfK = 0;
+  S.swapEngrave = FX.ritual && !reduced && !S.seen[i]; S.seen[i] = true;
+  plateBtns.forEach(o => o.setAttribute('aria-pressed', String(+o.dataset.plate === i)));
+  placeEl.textContent = PLATES[i].place;
+  setLst(); updateReadouts();
+  if (tagBox.i >= 0) updateTagAlt();
+  live.textContent = `Plate for ${PLATES[i].place}.`;
+  hintProgress('lat');
+  kick();
+}
+function showPlateNote(i) { if (!FX.twilight) return; plateHover = i; plateNote.textContent = plateNoteFor(i); plateNote.classList.add('show'); }
+function hidePlateNote() {
+  plateHover = -1;
+  if (hintNow === 'lat') plateNote.textContent = 'try another latitude';
+  else plateNote.classList.remove('show');
+}
+let noteT = 0;
+plateBtns.forEach(b => {
+  const i = +b.dataset.plate;
+  b.addEventListener('click', e => {
+    choosePlate(i);
+    // touch has no hover: the note shows for a moment after the plate is chosen
+    if (e.pointerType === 'touch' || (!FINE && e.pointerType !== 'mouse' && !keyMode)) { showPlateNote(i); clearTimeout(noteT); noteT = setTimeout(hidePlateNote, 3000); }
+  });
+  b.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') showPlateNote(i); });
+  b.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') hidePlateNote(); });
+  b.addEventListener('focus', () => { if (keyMode) showPlateNote(i); });
+  b.addEventListener('blur', () => { if (plateHover === i) hidePlateNote(); });
+});
+
+// keyboard access to the stars; pressing one turns the rete to its next rising or setting
+const list = $('#star-list');
+STARS.forEach((s, i) => {
+  const li = document.createElement('li'), b = document.createElement('button');
+  b.type = 'button'; b.id = 'star-' + s.id; b.textContent = s.name + (i === POLARIS ? ' (engraves the latitude)' : '');
+  b.addEventListener('focus', () => { S.sel = i; S.glint = { i, start: performance.now() }; showTag(i, true); hintProgress('star'); kick(); });
+  b.addEventListener('blur', () => { if (S.sel === i) { S.sel = -1; showTag(-1); kick(); } });
+  b.addEventListener('click', () => {
+    if (i === POLARIS) { engraveEgg(); updateTagAlt(); kick(); return; }
+    const ev = tagBox.i === i ? tagBox.ev : null;
+    if (FX.tags && ev) { goTo(ev.t, 220); live.textContent = `${s.name} ${ev.rise ? 'rises' : 'sets'} at ${fmtClock(ev.t)}; the rete is turned to that hour.`; }
+  });
+  li.appendChild(b); list.appendChild(li);
+});
+
+/* ---------------- STELLA ---------------- */
+function summonStella() {
+  const swap = S.plate !== 0;
+  if (S.flip.shown) flipTo(false);
+  if (swap) choosePlate(0);
+  goTo(0, 420, 'jump');
+  const delay = swap ? (S.swapEngrave ? 1500 : 1200) : 650;
+  S.stella = { start: performance.now() + delay };
+  S.sel = -1; showTag(-1);
+  setTimeout(() => { if (S.stella && S.sel < 0 && S.hover < 0) showTag(STELLA_I); }, delay + 1300);
+  setTimeout(() => { if (tagBox.i === STELLA_I && S.hover !== STELLA_I && S.sel !== STELLA_I) showTag(S.sel >= 0 ? S.sel : -1); }, delay + 7500);
+  setTimeout(kick, delay + 60000);
+  if (!secrets.stella) { secrets.stella = 1; store.set('secrets', secrets); }
+  live.textContent = 'Jupiter and Saturn together in Pisces, 7 BC: Kepler’s guess for the star of Bethlehem.';
+  kick();
+}
+
+/* ---------------- the back of the instrument ---------------- */
+// calendar and zodiac scales, a shadow square, and the alidade resting on today's date
+const SIGNS = ['ARIES', 'TAURUS', 'GEMINI', 'CANCER', 'LEO', 'VIRGO', 'LIBRA', 'SCORPIO', 'SAGITTARIUS', 'CAPRICORNUS', 'AQUARIUS', 'PISCES'];
+const MONTHS = ['IAN', 'FEB', 'MAR', 'APR', 'MAI', 'IVN', 'IVL', 'AVG', 'SEP', 'OCT', 'NOV', 'DEC'];
+let backDrawn = 0;
+function renderBack() {
+  cvK.width = Math.round(W * dpr); cvK.height = Math.round(H * dpr);
+  const g = cvK.getContext('2d', VIS);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  const psiOf = lam => (90 - lam) * DEG;            // Aries at the right, the signs running anticlockwise
+  const at = (psi, r) => ({ x: cx + r * Math.sin(psi), y: cy - r * Math.cos(psi) });
+  // shadow, body and suspension ring
+  g.save();
+  g.shadowColor = rgba('shadow', 0.62); g.shadowBlur = 0.035 * D * dpr; g.shadowOffsetX = 10000 * dpr; g.shadowOffsetY = 0.012 * D * dpr;
+  g.translate(-10000, 0); g.beginPath(); g.arc(cx, cy, Ro, 0, TAU); throneShape(g); g.fillStyle = C.shadow; g.fill();
+  g.restore();
+  const tmp = new Path2D(), { K } = throneShape(tmp);
+  const rr0 = 0.024 * D, rc = { x: cx, y: K.y - rr0 + 0.003 * D };
+  g.lineWidth = 0.0062 * D; g.strokeStyle = mix('brass', 'brass-lo', 0.3); g.beginPath(); g.arc(rc.x, rc.y, rr0, 0, TAU); g.stroke();
+  const body = new Path2D(); body.arc(cx, cy, Ro, 0, TAU); throneShape(body);
+  const lin = g.createLinearGradient(cx - Ro, cy - Ro, cx + Ro * 0.8, cy + Ro);
+  lin.addColorStop(0, mix('brass', 'brass-hi', 0.1)); lin.addColorStop(0.5, mix('brass', 'brass-lo', 0.45)); lin.addColorStop(1, mix('brass-lo', 'brass-deep', 0.3));
+  g.fillStyle = lin; g.fill(body);
+  g.save(); g.globalCompositeOperation = 'destination-out'; g.beginPath(); g.arc(K.x, K.y, 0.0105 * D, 0, TAU); g.fill(); g.restore();
+  const rnd = rngFor(16);
+  g.save(); g.clip(body);
+  for (let i = 0; i < 220; i++) {
+    g.lineWidth = 0.4 + rnd() * 1.1; g.strokeStyle = rnd() < 0.5 ? rgba('brass-hi', 0.02 + rnd() * 0.05) : rgba('brass-deep', 0.03 + rnd() * 0.06);
+    g.beginPath(); g.arc(cx, cy, rnd() * Ro, 0, TAU); g.stroke();
+  }
+  g.restore();
+  const edge = g.createLinearGradient(cx - Ro, cy - Ro, cx + Ro, cy + Ro);
+  edge.addColorStop(0, rgba('brass-hi', 0.85)); edge.addColorStop(0.5, rgba('brass-hi', 0.12)); edge.addColorStop(1, rgba('engrave', 0.5));
+  g.lineWidth = 1.2; g.strokeStyle = edge; g.beginPath(); g.arc(cx, cy, Ro - 0.7, 0, TAU); g.stroke();
+
+  const rA = Ro - 0.012 * D, rB = Ro - 0.05 * D, rC = rB - 0.052 * D, rE = rC - 0.05 * D;
+  const rings = new Path2D();
+  for (const r of [rA, rA - 0.012 * D, rB, rC, rE]) { rings.moveTo(cx + r, cy); rings.arc(cx, cy, r, 0, TAU); }
+  // the four quadrants of the altitude scale run 0 to 90 from the horizontal
+  const ticks = new Path2D();
+  const tk = (psi, r0, r1) => { const a = at(psi, r0), b = at(psi, r1); ticks.moveTo(a.x, a.y); ticks.lineTo(b.x, b.y); };
+  for (let d = 0; d < 360; d++) tk(d * DEG, rA, rA - (d % 10 === 0 ? 0.012 : d % 5 === 0 ? 0.008 : 0.005) * D);
+  // zodiac scale: a tick a degree, longer each fifth and tenth, a line between the signs
+  for (let l = 0; l < 360; l++) tk(psiOf(l), rB, rB - (l % 30 === 0 ? 0.052 : l % 10 === 0 ? 0.012 : l % 5 === 0 ? 0.008 : 0.004) * D);
+  // calendar scale: each day placed where the sun stands on it, so the alidade reads both scales at once
+  const y0 = clockNow().getFullYear();
+  const lamOn = (m, d) => sunLambda(jdUT(y0, m + 1, d, 12) - 2451545.0);
+  const dim = [31, (y0 % 4 === 0 && (y0 % 100 !== 0 || y0 % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  for (let m = 0; m < 12; m++) for (let d = 1; d <= dim[m]; d++) tk(psiOf(lamOn(m, d)), rC, rC - (d === 1 ? 0.05 : d % 10 === 0 ? 0.012 : d % 5 === 0 ? 0.008 : 0.004) * D);
+  engraveStroke(g, rings, 0.75); engraveStroke(g, ticks, D > 560 ? 0.7 : 0.55);
+  const fq = Math.max(6.5, 0.0098 * D);
+  if (D > 420) for (let d = 10; d <= 90; d += 10) for (const q of [0, 1, 2, 3]) {
+    const psi = (q * 90 + (q % 2 ? 90 - d : d)) * DEG, p = at(psi, rA - 0.0195 * D), lower = psi > Math.PI / 2 && psi < Math.PI * 1.5;
+    if (d < 90 || q % 2 === 0) engraveText(g, String(d), p.x, p.y, lower ? psi + Math.PI : psi, FM(fq));
+  }
+  const arcText = (txt, r, psiC, size, track, font) => {
+    const bottom = Math.cos(psiC) < 0, arc = placeArc(layoutArc(txt, font, size, track), r, psiC, bottom);
+    for (const o of arc.glyphs) engraveText(g, o.ch, o.x, o.y, o.rot, font);
+  };
+  const fs = Math.max(7, 0.0175 * D), fz = FD(500, fs);
+  SIGNS.forEach((n, k) => arcText(n, (rB + rC) / 2 + 0.006 * D, psiOf(k * 30 + 15), fs, 0.08, fz));
+  MONTHS.forEach((n, m) => arcText(n, (rC + rE) / 2 + 0.008 * D, psiOf(lamOn(m, 16)), fs, 0.1, fz));
+  // Christmas Day, marked with a small star
+  const xp = at(psiOf(lamOn(11, 25)), rE + 0.012 * D);
+  gildedStar(g, xp.x, xp.y, Math.max(3.2, 0.0085 * D), false);
+  // shadow square below the centre
+  const q = 0.15 * D, top = cy + 0.035 * D, sq = new Path2D();
+  sq.rect(cx - q, top, 2 * q, q); sq.moveTo(cx, top); sq.lineTo(cx, top + q);
+  const inner = 0.02 * D;
+  sq.rect(cx - q + inner, top, 2 * q - 2 * inner, q - inner);
+  for (let k = 1; k < 12; k++) {
+    const f = k / 12;
+    sq.moveTo(cx - q, top + f * (q - inner)); sq.lineTo(cx - q + inner * (k % 3 ? 0.5 : 1), top + f * (q - inner));
+    sq.moveTo(cx + q, top + f * (q - inner)); sq.lineTo(cx + q - inner * (k % 3 ? 0.5 : 1), top + f * (q - inner));
+    sq.moveTo(cx - q + inner + f * (q - inner), top + q); sq.lineTo(cx - q + inner + f * (q - inner), top + q - inner * (k % 3 ? 0.5 : 1));
+    sq.moveTo(cx + inner * 0 + f * (q - inner), top + q); sq.lineTo(cx + f * (q - inner), top + q - inner * (k % 3 ? 0.5 : 1));
+  }
+  engraveStroke(g, sq, 0.65);
+  const fl = Math.max(6, 0.0105 * D);
+  engraveText(g, 'VMBRA VERSA', cx - q * 0.5, top + q * 0.42, 0, FD(500, fl));
+  engraveText(g, 'VMBRA VERSA', cx + q * 0.5, top + q * 0.42, 0, FD(500, fl));
+  engraveText(g, 'VMBRA RECTA', cx, top + q + fl * 1.2, 0, FD(500, fl));
+  // Chaucer to his son, and the maker's line
+  engraveText(g, 'Litel Lowys my sone', cx, cy - 0.17 * D, 0, FD(500, Math.max(10, 0.03 * D)));
+  arcText('SET FOR 31°42′ N · EPOCH J2000 · FECIT MMXXVI', rE - 0.024 * D, 0, Math.max(6, 0.011 * D), 0.06, FM(Math.max(6, 0.011 * D)));
+  // the alidade, its fiducial edge on today's date
+  const now = clockNow(), lamT = lamOn(now.getMonth(), now.getDate()), pa = psiOf(lamT);
+  const dx = Math.sin(pa), dy = -Math.cos(pa), nx = Math.cos(pa), ny = Math.sin(pa), L = Ro - 0.006 * D, w = 0.012 * D;
+  const al = new Path2D();
+  al.moveTo(cx + dx * L, cy + dy * L); al.lineTo(cx + dx * (L - 0.06 * D) + nx * w, cy + dy * (L - 0.06 * D) + ny * w);
+  al.lineTo(cx - dx * (L - 0.06 * D) + nx * w, cy - dy * (L - 0.06 * D) + ny * w); al.lineTo(cx - dx * L, cy - dy * L);
+  al.closePath();
+  g.save(); g.translate(1.6, 2.2); g.fillStyle = rgba('shadow', 0.45); g.fill(al); g.restore();
+  const agr = g.createLinearGradient(cx + nx * w, cy + ny * w, cx, cy);
+  agr.addColorStop(0, C['brass-lo']); agr.addColorStop(1, mix('brass', 'brass-hi', 0.4));
+  g.fillStyle = agr; g.fill(al); g.lineWidth = 0.7; g.strokeStyle = rgba('engrave', 0.85); g.stroke(al);
+  // sighting vanes
+  for (const sgn of [1, -1]) {
+    const c0 = { x: cx + dx * sgn * 0.27 * D, y: cy + dy * sgn * 0.27 * D };
+    g.save(); g.translate(c0.x, c0.y); g.rotate(pa);
+    g.fillStyle = mix('brass', 'brass-hi', 0.25); g.fillRect(-w * 0.1, -0.02 * D, w * 1.1, 0.04 * D);
+    g.strokeStyle = rgba('engrave', 0.85); g.lineWidth = 0.6; g.strokeRect(-w * 0.1, -0.02 * D, w * 1.1, 0.04 * D);
+    g.beginPath(); g.arc(w * 0.45, 0, Math.max(0.8, 0.0022 * D), 0, TAU); g.fillStyle = C.shadow; g.fill();
+    g.restore();
+  }
+  const r0 = Math.max(6, 0.024 * D), pg = g.createRadialGradient(cx - r0 * 0.4, cy - r0 * 0.4, 0, cx, cy, r0);
+  pg.addColorStop(0, C['brass-hi']); pg.addColorStop(0.55, C.brass); pg.addColorStop(1, C['brass-lo']);
+  g.beginPath(); g.arc(cx, cy, r0 * 0.8, 0, TAU); g.fillStyle = pg; g.fill(); g.lineWidth = 0.75; g.strokeStyle = rgba('engrave', 0.8); g.stroke();
+  backDrawn = D;
+}
+function flipTo(back) {
+  if (!FX.back || S.flip.on || !!S.flip.shown === back) return;
+  if (back) { if (backDrawn !== D) renderBack(); S.sel = -1; S.hover = -1; showTag(-1); hideWedgeTag(); if (hintNow && hintNow !== 'lat') hideHint(); }
+  S.flip = { on: true, start: performance.now(), to: back ? 1 : 0, shown: S.flip.shown, swapped: false };
+  face.classList.toggle('fade', reduced);
+  live.textContent = back ? 'The back of the astrolabe: calendar and zodiac scales, with the alidade on today’s date. Press Escape to turn it back.' : 'The front of the astrolabe.';
+  kick();
+}
+function flipStep(now) {
+  const f = S.flip, k = clamp01((now - f.start) / (reduced ? 320 : 500));
+  if (reduced) {
+    if (!f.swapped) { face.classList.toggle('back', f.to === 1); f.swapped = true; f.shown = f.to; }
+  } else {
+    const sx = k < 0.5 ? 1 - Math.pow(k * 2, 3) : easeOut((k - 0.5) * 2);
+    if (k >= 0.5 && !f.swapped) { face.classList.toggle('back', f.to === 1); f.swapped = true; f.shown = f.to; }
+    face.style.transform = k >= 1 ? '' : `scaleX(${Math.max(0.004, sx).toFixed(4)})`;
+  }
+  if (k >= 1) {
+    f.on = false; face.style.transform = '';
+    dial.setAttribute('aria-label', f.shown ? 'Back of the astrolabe; press F or Escape to turn it over' : 'Rete, hour of Christmas Eve');
+  }
+}
+
+/* ---------------- boot ---------------- */
+computeFlames();
+// opens on tonight: after dusk the rete starts at the viewer's own clock time on the night of 24 to 25 December
+if (FX.tonight && SZ.night) { S.rest = SZ.liveT; S.following = liveOffered = true; }
+S.introFrom = Math.max(0, S.rest - 60);
+S.t = S.introFrom;
+setLst();
+S.nightLvl = S.night;
+if (reduced) { S.t = S.rest; S.mode = 'idle'; setLst(); }
+seasonLive = FX.tonight && S.following && SZ.night;
+updateTravel();
+seasonReady = true;
+updateReadouts();
+const ro = new ResizeObserver(() => { layout(); });
+ro.observe(inst);
+// a slow twinkle: each star layer breathes on its own period. It is stepped about three times a second
+// and a layer is only touched when its value moves, so the compositor redraws a few times a second rather
+// than every frame (a CSS animation here measured as continuous full-screen recompositing)
+const TW = [[9000, 0], [13000, 2.1], [17000, 4.4]], twLast = [-1, -1, -1];
+function twinkle() {
+  const t = performance.now();
+  skies.forEach((c, i) => {
+    const v = reduced ? 0.8 : Math.round((0.775 + 0.225 * Math.cos(t / TW[i][0] * TAU + TW[i][1])) * 200) / 200;
+    if (v !== twLast[i]) { twLast[i] = v; c.style.opacity = String(v); }
+  });
+}
+twinkle();
+setInterval(() => { if (!document.hidden && !reduced) twinkle(); }, 330);
+if (rmq.addEventListener) rmq.addEventListener('change', twinkle);
+let skyW = 0, skyH = 0;
+window.addEventListener('resize', () => {
+  if (Math.abs(innerWidth - skyW) > 40 || Math.abs(innerHeight - skyH) > 120) { skyW = innerWidth; skyH = innerHeight; sizeSky(); }
+});
+skyW = innerWidth; skyH = innerHeight;
+sizeSky();
+layout();
+setTimeout(minuteLoop, 60000 - ((Date.now() + clockShift) % 60000) + 40);
+setInterval(() => { if (!document.hidden) updateTravel(true); }, 30000);
+setInterval(hintCheck, 500);
+armDrift();
+const fontsWanted = ['300 40px "Cormorant Unicase"', '500 20px "Cormorant Unicase"', '400 12px "Fragment Mono"'];
+if (document.fonts && document.fonts.load) {
+  Promise.all(fontsWanted.map(f => document.fonts.load(f))).then(() => {
+    glyphCache.clear();
+    if (W) { buildRete(); bake.valid = false; renderMater(); plateCache = []; blankCache.length = 0; backCache.length = 0; buildSignature(); backDrawn = 0; if (S.flip.shown) renderBack(); underDirty = true; layersDirty = true; }
+    tagBox.i = -1; kick();
+  }).catch(() => {});
+}
+})();
+</script>

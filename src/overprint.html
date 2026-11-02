@@ -1,0 +1,2729 @@
+<title>Overprint Noël</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap">
+<style>
+/* Layout: a print-room wall on a 12-column grid. Giant two-ink masthead across the top; a cutting mat with the A6 sheet (cols 1-7) laid over it; drums, stamp drawer and press (cols 8-12); a full-width drying line underneath. */
+:root {
+  --paper: #eeeee8;
+  --paper-shade: #e3e4dd;
+  --paper-deep: #cfd1c8;
+  --paper-hi: #f7f7f3;
+  --sheet: #f6f6f2;
+  --line: #c3c6bd;
+  --mat: #24574d;
+  --mat-deep: #1b463e;
+  --mat-grid: #8fb9ad;
+  --ink-text: #3D5588;
+  --ink-text-2: #52648f;
+  --tape: rgba(219, 219, 207, .92);
+  --tape-edge: rgba(40, 52, 70, .14);
+  --steel: #c3c8ca;
+  --steel-hi: #eef0f0;
+  --steel-lo: #8f979b;
+  --steel-ink: #39424a;
+  --peg: #c8b48c;
+  --peg-hi: #dccdaa;
+  --peg-dark: #937e55;
+  --string: #6f7872;
+  --master-ink: #2e3134;
+  --master-film: #e2e4df;
+  --master-edge: #c4c7c0;
+  --master-clamp: #b9bdb6;
+  --knock: #ffffff;
+  --white: #ffffff;
+  --shade-k: #161a22;
+  --shadow: rgba(22, 34, 46, .30);
+  --shadow-soft: rgba(22, 34, 46, .16);
+  --shadow-rule: rgba(10, 30, 26, .35);
+  --shadow-ghost: rgba(20, 30, 40, .22);
+  --rib-dark: rgba(16, 20, 28, .14);
+  --rib-light: rgba(255, 255, 255, .08);
+  --veil: rgba(212, 215, 206, .88);
+  --select: rgba(61, 85, 136, .2);
+  --fibre-dark: rgba(61, 85, 136, .085);
+  --fibre-light: rgba(255, 255, 255, .55);
+  --riso-medium-blue: #3255A4;
+  --riso-fl-orange: #FF7477;
+  --riso-teal: #00838A;
+  --riso-bright-red: #F15060;
+  --riso-green: #00A95C;
+  --riso-federal-blue: #3D5588;
+  --riso-purple: #765BA7;
+  --riso-yellow: #FFE800;
+  --riso-fl-pink: #FF48B0;
+  --ink-a: var(--riso-medium-blue);
+  --ink-b: var(--riso-fl-orange);
+  --pencil: #5a5e62;
+  --pencil-soft: rgba(84, 88, 94, .55);
+  --tissue: rgba(250, 250, 246, .78);
+  --tissue-crease: rgba(120, 124, 120, .28);
+  --rim: #b59a6a;
+  --rim-hi: #e9dcbc;
+  --rim-lo: #7c6640;
+  --glass: rgba(255, 255, 255, .06);
+  --reticle: rgba(30, 36, 44, .55);
+  --sheen: rgba(255, 255, 255, .5);
+  --wall-red: var(--riso-bright-red);
+  --light-pool: none;
+  --light-mat: none;
+  --shx: 0px;
+  --mm: clamp(2.5px, min(((min(100vw, 1440px) - 296px) * 7 / 12 + 144px) / 213, (100vh - 218px) / 184), 3.8px);
+  color-scheme: light;
+}
+
+html { background-color: var(--paper); }
+body {
+  background-color: var(--paper);
+  background-image: var(--light-pool, none), var(--paper-tex, none);
+  background-size: 100% 1300px, 360px 360px;
+  background-repeat: no-repeat, repeat;
+  color: var(--ink-text);
+  font-family: "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 28px;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-align: inherit; -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--ink-text); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+
+.studio {
+  --mh: clamp(36px, calc((min(100vw, 1440px) - 32px) / 13.8), 104px);
+  max-width: 1408px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+}
+
+/* ---------- top strip ---------- */
+.topbar {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-block: 10px 7px;
+  font-size: 10.5px; letter-spacing: .03em; font-stretch: 87.5%;
+  border-bottom: 1px solid var(--ink-text);
+}
+.topbar p { margin: 0; }
+.topbar b { font-weight: 700; }
+.tb-c { display: flex; align-items: center; gap: 14px; }
+.tb-btn { white-space: nowrap; border: 1px solid var(--ink-text); border-radius: 2px; padding: 3px 8px 2px; font-size: 10px; letter-spacing: .05em; text-transform: uppercase; }
+.tb-btn[aria-pressed="true"] { background: var(--ink-text); color: var(--paper-hi); }
+
+/* ---------- masthead ---------- */
+.masthead {
+  grid-column: 1 / -1;
+  position: relative; isolation: isolate;
+  margin: 0; padding-top: 0;
+  font-family: Anybody, "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 900; font-stretch: 150%;
+  font-size: var(--mh); line-height: .8; letter-spacing: -.004em;
+  white-space: nowrap; user-select: none;
+}
+.mh-ink { display: block; padding-top: .245em; }
+.mh-ink > span { display: inline-block; }
+.mh-a {
+  position: relative; color: var(--riso-medium-blue);
+  -webkit-mask-image: var(--grain-a); mask-image: var(--grain-a);
+  -webkit-mask-size: 520px auto; mask-size: 520px auto;
+}
+.mh-b {
+  position: absolute; left: 0; right: 0; top: 0;
+  color: transparent;
+  background-image: radial-gradient(circle at 50% 50%, var(--riso-fl-orange) 0 41%, transparent 44%);
+  background-size: calc(var(--mh) * .062) calc(var(--mh) * .062);
+  -webkit-background-clip: text; background-clip: text;
+  transform: translate(.045em, .05em) rotate(.25deg);
+  mix-blend-mode: multiply;
+}
+.mh-b::after { content: none; }
+
+/* ---------- bench: mat + sheet ---------- */
+.bench {
+  grid-column: 1 / span 7;
+  position: relative; z-index: 2;
+  margin-top: 0;
+}
+.mat {
+  --sx: calc(var(--mm) * 16);
+  position: relative;
+  height: calc(var(--mm) * 168 - var(--mh) * .18 + 36px);
+  background-color: var(--mat);
+  background-image: var(--light-mat, none);
+  border-radius: 2px;
+  box-shadow: 0 1px 0 var(--mat-deep), 0 22px 34px -26px var(--shadow);
+}
+.mat-marks { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.mat-marks .g1 { stroke: var(--mat-grid); stroke-opacity: .3; stroke-width: .16; }
+.mat-marks .g5 { stroke: var(--mat-grid); stroke-opacity: .5; stroke-width: .24; }
+.mat-marks .tk { stroke: var(--mat-grid); stroke-opacity: .75; stroke-width: .2; }
+.mat-marks .ang { stroke: var(--mat-grid); stroke-opacity: .38; stroke-width: .2; stroke-dasharray: 2 1.4; fill: none; }
+.mat-marks .num { fill: var(--mat-grid); font: 500 2.5px "Martian Mono", ui-monospace, monospace; }
+.mat-marks .lbl { fill: var(--mat-grid); fill-opacity: .8; font: 500 2.2px "Martian Mono", ui-monospace, monospace; letter-spacing: .2px; }
+.rule { position: absolute; display: block; pointer-events: none; filter: drop-shadow(0 3px 2px var(--shadow-rule)); }
+.rule .rt { stroke: var(--steel-ink); stroke-width: .16; }
+.rule .rn { fill: var(--steel-ink); font: 600 2.4px "Martian Mono", ui-monospace, monospace; }
+.rule .rs { fill: var(--steel-ink); font: 500 1.7px "Martian Mono", ui-monospace, monospace; letter-spacing: .1px; }
+
+.sheet-wrap {
+  position: absolute;
+  left: var(--sx);
+  top: calc(var(--mh) * -.18);
+  transform: rotate(var(--rot, -1.3deg));
+  z-index: 3;
+}
+.sheet {
+  position: relative; display: block;
+  width: calc(var(--mm) * 125);
+  aspect-ratio: 125 / 168;
+  background-color: var(--sheet);
+  background-image: var(--sheet-tex, none);
+  background-size: 240px 240px;
+  isolation: isolate;
+  container-type: inline-size;
+  border-radius: 1px;
+}
+.sheet-wrap > .sheet { box-shadow: 0 1px 1px var(--shadow-soft), calc(var(--shx) * 1.6) 12px 22px -10px var(--shadow); }
+.furn { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--ink-text); pointer-events: none; display: block; }
+.furn .fl { fill: none; stroke: currentColor; stroke-width: .2; }
+.furn .dim, .plate .slug { fill: currentColor; font: 500 2.1px "Martian Mono", ui-monospace, monospace; letter-spacing: .08px; }
+.plate {
+  position: absolute; inset: 0;
+  color: var(--ink-a);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  -webkit-mask-image: var(--grain-a); mask-image: var(--grain-a);
+  -webkit-mask-size: 112% auto; mask-size: 112% auto;
+  -webkit-mask-repeat: repeat; mask-repeat: repeat;
+}
+.plate.pb { color: var(--ink-b); -webkit-mask-image: var(--grain-b); mask-image: var(--grain-b); }
+.plate > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; display: block; }
+.plate .reg { fill: none; stroke: currentColor; stroke-width: .22; }
+.ko { fill: var(--knock); }
+.ln { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.lnk { fill: none; stroke: var(--knock); stroke-linecap: round; stroke-linejoin: round; }
+.hit { fill: transparent; pointer-events: all; cursor: grab; touch-action: none; }
+.stamp { touch-action: none; outline: none; }
+.stamp:focus-visible .hit { stroke: var(--ink-text); stroke-width: 1.5px; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+.sq { transform-box: fill-box; transform-origin: 50% 78%; }
+.sq.thunk { animation: thunk .44s cubic-bezier(.3, .6, .35, 1) both; }
+.sq.reink { animation: reink .3s cubic-bezier(.3, .6, .35, 1) both; }
+@keyframes thunk {
+  0% { transform: translateY(-10%) scale(1.42); opacity: 0; }
+  34% { transform: translateY(0) scale(1.13, .85); opacity: 1; }
+  58% { transform: scale(.96, 1.05); }
+  80% { transform: scale(1.015, .99); }
+  100% { transform: none; }
+}
+@keyframes reink { 0% { transform: scale(.9, .94); } 55% { transform: scale(1.04, 1.02); } 100% { transform: none; } }
+
+.greet {
+  position: absolute; left: 14.4%; right: 14.4%; bottom: 10.6%;
+  margin: 0;
+  font-family: Anybody, "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 860;
+  font-size: calc(var(--gfs, 11) * 1cqw);
+  font-stretch: var(--gw, 125%);
+  line-height: .86; letter-spacing: -.004em;
+  text-transform: uppercase;
+  overflow-wrap: normal; word-break: normal;
+  color: currentColor;
+}
+.greet[contenteditable] { pointer-events: auto; cursor: text; caret-color: var(--ink-text); outline: none; min-height: 1em; }
+.greet[contenteditable]:focus-visible, .greet[contenteditable]:focus { outline: 1.5px dashed var(--ink-text); outline-offset: 6px; }
+.greet[data-empty]::before { content: "Type a greeting"; position: absolute; left: 0; top: 0; white-space: nowrap; opacity: .35; pointer-events: none; }
+.greet::selection { background-color: var(--select); }
+#liveSheet { -webkit-user-select: none; user-select: none; }
+#liveSheet .greet { -webkit-user-select: text; user-select: text; }
+
+.tape {
+  position: absolute; z-index: 6;
+  display: inline-block;
+  padding: 6px 12px 5px;
+  font: 500 9.5px/1.25 "Martian Mono", ui-monospace, monospace;
+  font-stretch: 87.5%;
+  letter-spacing: .07em; text-transform: uppercase;
+  color: var(--ink-text);
+  background-color: var(--tape);
+  box-shadow: 0 1px 1.5px var(--tape-edge);
+  clip-path: polygon(1.6% 0, 98.4% 0, 100% 18%, 98.8% 36%, 100% 55%, 98.6% 76%, 100% 100%, 1.4% 100%, 0 84%, 1.3% 62%, 0 44%, 1.2% 24%);
+  transform: rotate(var(--r, -2deg));
+  white-space: nowrap;
+  pointer-events: none;
+}
+.t-hint, .t-greet { font-size: 9px; letter-spacing: .06em; line-height: 1.5; }
+/* both tapes reach over the card's right margin, as if they hold it to the mat */
+.t-hint { left: calc(var(--sx) + var(--mm) * 114); top: calc(var(--mm) * 30); --r: 2.4deg; }
+.t-greet { left: calc(var(--sx) + var(--mm) * 113); top: calc(var(--mm) * 128); --r: -3.5deg; }
+/* verbs follow the input device */
+.v-touch { display: none; }
+@media (hover: none), (pointer: coarse) { .v-touch { display: inline; } .v-fine { display: none; } }
+:root[data-input="touch"] .v-touch, :root[data-input="fine"] .v-fine { display: inline; }
+:root[data-input="touch"] .v-fine, :root[data-input="fine"] .v-touch { display: none; }
+
+/* ---------- console ---------- */
+.console {
+  grid-column: 8 / -1;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.42fr) minmax(0, 1fr);
+  grid-template-areas: "drums drums" "drawer ctl" "print print";
+  gap: 16px 20px;
+  align-content: start;
+  padding-top: 26px;
+}
+.drums { grid-area: drums; position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.drum {
+  position: relative;
+  display: grid; grid-template-columns: minmax(0, 1fr); align-items: end;
+  row-gap: 5px;
+  padding: 0 2px 2px;
+  border-radius: 2px;
+  --ink: var(--ink-a);
+}
+.drum[data-w="B"] { --ink: var(--ink-b); }
+.drum { container-type: inline-size; }
+.cyl {
+  grid-column: 1 / -1;
+  position: relative; display: block;
+  height: 58px; margin: 0 11px;
+  border-radius: 2px;
+  background-image: linear-gradient(180deg,
+    color-mix(in srgb, var(--ink) 42%, var(--shade-k)) 0%,
+    color-mix(in srgb, var(--ink) 84%, var(--shade-k)) 13%,
+    var(--ink) 28%,
+    color-mix(in srgb, var(--ink) 60%, var(--white)) 41%,
+    var(--ink) 55%,
+    color-mix(in srgb, var(--ink) 72%, var(--shade-k)) 84%,
+    color-mix(in srgb, var(--ink) 38%, var(--shade-k)) 100%);
+  box-shadow: 0 10px 12px -10px var(--shadow);
+  transition: transform .14s cubic-bezier(.3, .7, .4, 1);
+}
+.cyl::before, .cyl::after {
+  content: ""; position: absolute; top: -4px; bottom: -4px; width: 22px; border-radius: 50%;
+  background-image: radial-gradient(circle at 50% 50%, var(--steel-lo) 0 18%, var(--steel) 20% 46%, var(--steel-hi) 52%, var(--steel) 70%, var(--steel-lo) 100%);
+  box-shadow: inset 0 0 0 1px var(--steel-lo);
+}
+.cyl::before { left: -11px; }
+.cyl::after { right: -11px; }
+.cyl-body { position: absolute; inset: 0; display: block; overflow: hidden; border-radius: 2px; }
+.ribs {
+  position: absolute; left: 0; right: 0; bottom: 0; top: -400px; display: block;
+  background-image: repeating-linear-gradient(180deg, transparent 0 6px, var(--rib-dark) 6px 7px, var(--rib-light) 7px 8px);
+  background-size: 100% 16px; background-position: 0 100%;
+}
+.drum:hover .cyl { transform: translateY(-2px); }
+.drum:active .cyl { transform: translateY(1px) scaleY(.97); }
+.drum-name { margin-top: 4px; font-family: Anybody, "Arial Black", Arial, sans-serif; font-weight: 800; font-stretch: 108%; font-size: clamp(15px, 1.36vw, 19px); line-height: 1; letter-spacing: -.005em; white-space: nowrap; }
+.drum-meta { font-size: 9.5px; line-height: 1.35; font-stretch: 87.5%; color: var(--ink-text-2); white-space: nowrap; }
+@container (max-width: 250px) { .drum-meta .sc { display: none; } }
+@container (max-width: 205px) { .drum-name { font-stretch: 74%; } }
+.t-drum { left: -2px; top: -12px; --r: -3deg; padding: 4px 9px 3px; font-weight: 700; }
+.drum[data-w="B"] .t-drum { --r: 2.2deg; left: auto; right: -2px; }
+
+.drawer {
+  grid-area: drawer; position: relative;
+  padding: 30px 10px 10px;
+  background-color: var(--paper-shade);
+  border: 1.5px solid var(--ink-text); border-radius: 2px;
+  box-shadow: inset 0 3px 0 var(--paper-deep);
+}
+.t-drawer { left: 10px; top: -11px; --r: -1.6deg; font-weight: 700; }
+.drawer-next { position: absolute; right: 10px; top: 8px; margin: 0; font-size: 9px; font-stretch: 87.5%; letter-spacing: .03em; display: flex; align-items: center; gap: 5px; }
+.drawer-next.full { font-weight: 700; }
+.drawer-next.full::before { content: ""; width: 9px; height: 9px; border-radius: 1px; background-color: var(--riso-bright-red); }
+.chip { display: inline-block; width: 9px; height: 9px; border-radius: 1px; background-color: var(--ink-b); }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tile {
+  position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto;
+  aspect-ratio: 1 / 1.02;
+  padding: 5px 6px 5px;
+  background-color: var(--paper-hi);
+  border: 1px solid var(--line); border-radius: 2px;
+  box-shadow: 0 2px 0 var(--paper-deep);
+  --knock: var(--paper-hi);
+  color: var(--ink-text);
+  container-type: inline-size;
+  transition: transform .12s cubic-bezier(.3, .7, .4, 1), box-shadow .12s;
+}
+.tile.refuse { animation: refuse .36s cubic-bezier(.3, .6, .4, 1); }
+@keyframes refuse { 0%, 100% { translate: 0 0; } 20% { translate: -4px 0; } 45% { translate: 3px 0; } 70% { translate: -2px 0; } }
+.tile svg { width: 100%; height: 100%; display: block; overflow: visible; }
+@media (hover: hover) { .tile:hover { transform: translateY(-2px) rotate(var(--tl, 1deg)); box-shadow: 0 4px 0 var(--paper-deep), var(--shx) 9px 10px -7px var(--shadow-soft); } }
+.tile:active, .tile.press { transform: translateY(1px) scale(.97); box-shadow: 0 1px 0 var(--paper-deep); }
+.tile.firm { transform: translateY(2px) scale(.95, .93); box-shadow: 0 0 0 var(--paper-deep); transition-duration: .3s; }
+.tile-name { display: flex; justify-content: space-between; gap: 3px; font-size: 8px; line-height: 1.2; letter-spacing: .02em; text-transform: uppercase; font-stretch: 75%; white-space: nowrap; }
+.tile-name i { font-style: normal; color: var(--ink-text-2); }
+@container (max-width: 66px) { .tile-name { justify-content: center; } .tile-name i { display: none; } }
+
+.ctls { grid-area: ctl; display: flex; flex-direction: column; gap: 13px; padding-top: 2px; }
+.ctl { display: block; }
+.ctl-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ctl label { font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; font-stretch: 87.5%; }
+.ctl output { font-family: Anybody, "Arial Black", Arial, sans-serif; font-weight: 750; font-stretch: 115%; font-size: 15px; line-height: 1; white-space: nowrap; }
+.ctl output small { font-family: "Martian Mono", ui-monospace, monospace; font-weight: 500; font-size: 9px; font-stretch: 87.5%; color: var(--ink-text-2); }
+.scale { display: flex; justify-content: space-between; font-size: 8.5px; font-stretch: 80%; color: var(--ink-text-2); margin-top: 1px; padding: 0 3px; }
+.ticks { height: 5px; margin: 0 7px; background-image: repeating-linear-gradient(90deg, var(--ink-text-2) 0 1px, transparent 1px 10%); background-size: calc(100% + 1px) 100%; opacity: .7; }
+input[type="range"] { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 30px; margin: 2px 0 0; background: transparent; cursor: pointer; }
+input[type="range"]::-webkit-slider-runnable-track { height: 2px; background-color: var(--ink-text); border-radius: 0; }
+input[type="range"]::-moz-range-track { height: 2px; background-color: var(--ink-text); }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 15px; height: 26px; margin-top: -12px;
+  border: 1.5px solid var(--ink-text); border-radius: 2px;
+  background-image: linear-gradient(90deg, var(--paper-hi) 0 5.5px, var(--ink-text) 5.5px 7px, var(--paper-hi) 7px);
+  box-shadow: 0 2px 0 var(--ink-text);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 23px;
+  border: 1.5px solid var(--ink-text); border-radius: 2px;
+  background-image: linear-gradient(90deg, var(--paper-hi) 0 4.5px, var(--ink-text) 4.5px 6px, var(--paper-hi) 6px);
+  box-shadow: 0 2px 0 var(--ink-text);
+}
+input[type="range"]:focus-visible { outline: 2px solid var(--ink-text); outline-offset: 2px; }
+.mini-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--ink-text); border-radius: 2px; padding: 5px 9px 4px; font-size: 9.5px; letter-spacing: .05em; text-transform: uppercase; font-stretch: 87.5%; background-color: var(--paper-hi); box-shadow: 0 2px 0 var(--ink-text); transition: transform .1s, box-shadow .1s; }
+.mini-btn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--ink-text); }
+.mini-btn .chip { background-color: var(--ink-a); }
+.mini-btn[data-on="B"] .chip { background-color: var(--ink-b); }
+
+.print {
+  grid-area: print; position: relative;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px;
+  padding: 16px 16px 14px 22px;
+  background-color: var(--paper-hi);
+  border: 2px solid var(--ink-text); border-radius: 2px;
+  box-shadow: 0 7px 0 var(--ink-text);
+  margin-bottom: 7px;
+  transition: transform .09s ease-out, box-shadow .09s ease-out;
+  isolation: isolate;
+}
+.print:hover { box-shadow: 0 8px 0 var(--ink-text); transform: translateY(-1px); }
+.print:active, .print.down { transform: translateY(5px); box-shadow: 0 2px 0 var(--ink-text); }
+.print[aria-disabled="true"] { cursor: progress; }
+.print-word { position: relative; display: block; font-family: Anybody, "Arial Black", Arial, sans-serif; font-weight: 900; font-stretch: 150%; font-size: clamp(44px, 4.3vw, 62px); line-height: .8; letter-spacing: .005em; }
+.pw-a { position: relative; display: block; color: var(--ink-text); mix-blend-mode: multiply; }
+.pw-b { position: absolute; left: 0; top: 0; display: block; color: var(--ink-b); transform: translate(5px, 4px); }
+.print-meta { display: block; margin-top: 11px; font-size: 10px; letter-spacing: .03em; font-stretch: 87.5%; color: var(--ink-text-2); }
+.ph { white-space: nowrap; }
+.print-meta b { color: var(--ink-text); font-weight: 700; }
+.lever { width: 58px; height: 74px; display: block; overflow: visible; }
+.lever .lv-base { fill: var(--paper-deep); stroke: var(--ink-text); stroke-width: 1.5; }
+.lever .lv-rod { fill: var(--steel); stroke: var(--ink-text); stroke-width: 1.5; }
+.lever .lv-knob { fill: var(--ink-text); }
+.lever .lv-shine { fill: var(--paper-hi); fill-opacity: .5; }
+.lever .lv-pivot { fill: var(--paper-hi); stroke: var(--ink-text); stroke-width: 1.5; }
+.lv-arm { transform-box: view-box; transform-origin: 29px 58px; transform: rotate(-24deg); transition: transform .22s cubic-bezier(.3, 1.5, .5, 1); }
+.print:active .lv-arm, .print.down .lv-arm, .print-chip:active .lv-arm, .print-chip.down .lv-arm { transform: rotate(38deg); transition-duration: .12s; transition-timing-function: cubic-bezier(.4, 0, .6, 1); }
+
+/* sticky press pedal for narrow screens, shown only while the real PRINT is off screen */
+.print-chip {
+  position: fixed; z-index: 35;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  display: none; grid-template-columns: auto auto; align-items: center; gap: 6px;
+  padding: 8px 6px 7px 12px;
+  background-color: var(--paper-hi);
+  border: 2px solid var(--ink-text); border-radius: 2px;
+  box-shadow: 0 5px 0 var(--ink-text), 0 16px 22px -12px var(--shadow);
+  visibility: hidden; opacity: 0; transform: translateY(18px);
+  transition: opacity .18s, transform .24s cubic-bezier(.3, .7, .4, 1), box-shadow .09s, visibility 0s .24s;
+  isolation: isolate;
+}
+.print-chip.on { visibility: visible; opacity: 1; transform: none; transition: opacity .18s, transform .24s cubic-bezier(.3, .7, .4, 1), box-shadow .09s, visibility 0s; }
+.print-chip.instant { transition: none; }
+.print-chip.on:active, .print-chip.on.down { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink-text), 0 10px 16px -12px var(--shadow); }
+.pc-txt { display: block; }
+.pc-word { position: relative; display: block; font-family: Anybody, "Arial Black", Arial, sans-serif; font-weight: 900; font-stretch: 150%; font-size: 23px; line-height: .8; }
+.print-chip .pw-b { transform: translate(2.5px, 2px); }
+.pc-no { display: block; margin-top: 6px; font-size: 9px; letter-spacing: .05em; font-stretch: 87.5%; color: var(--ink-text-2); }
+.pc-lever { width: 27px; height: 35px; }
+
+.specs { grid-column: 1 / -1; margin: 0 0 6px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto auto; grid-auto-flow: column; gap: 2px 24px; font-size: 9.5px; font-stretch: 87.5%; letter-spacing: .02em; color: var(--ink-text); }
+.specs dt { text-transform: uppercase; letter-spacing: .07em; color: var(--ink-text-2); }
+.specs dd { margin: 0; text-wrap: pretty; }
+
+/* ---------- print run ---------- */
+/* the run flies inside a page-sized layer that clips sideways, so the rollers never widen the page */
+.run-layer { position: absolute; left: 0; top: 0; width: 100%; height: 0; overflow: clip; z-index: 40; pointer-events: none; }
+.run { position: absolute; z-index: 40; pointer-events: none; transform-origin: 50% 50%; will-change: transform; }
+.run > .sheet { width: 100%; box-shadow: 0 1px 1px var(--shadow-soft), 0 14px 26px -12px var(--shadow); }
+.run .wipe { position: absolute; inset: 0; overflow: hidden; mix-blend-mode: multiply; will-change: transform; }
+.run .counter { position: absolute; inset: 0; will-change: transform; }
+.roller {
+  position: absolute; left: -7%; right: -7%; top: 0; height: 6.4%;
+  border-radius: 2px;
+  background-image: linear-gradient(180deg,
+    color-mix(in srgb, var(--ink) 40%, var(--shade-k)) 0%,
+    var(--ink) 24%,
+    color-mix(in srgb, var(--ink) 58%, var(--white)) 40%,
+    var(--ink) 56%,
+    color-mix(in srgb, var(--ink) 45%, var(--shade-k)) 100%);
+  box-shadow: 0 9px 12px -6px var(--shadow);
+  transform: translateY(-50%);
+  opacity: 0;
+}
+.roller::before, .roller::after { content: ""; position: absolute; top: -10%; bottom: -10%; width: 3.2%; border-radius: 50%; background-image: radial-gradient(circle, var(--steel-lo) 0 22%, var(--steel) 26% 55%, var(--steel-hi) 62%, var(--steel-lo) 100%); }
+.roller::before { left: -1.6%; }
+.roller::after { right: -1.6%; }
+.roller .ribs { background-size: 100% 12px; }
+.roller .cyl-body { border-radius: 2px; }
+
+.ghost { position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; mix-blend-mode: multiply; filter: drop-shadow(0 10px 6px var(--shadow-ghost)); transition: opacity .15s; }
+.ghost svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.ghost.off { opacity: .45; }
+.ghost-tag { position: fixed; z-index: 61; pointer-events: none; font: 600 9.5px/1 "Martian Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-text); background-color: var(--tape); padding: 5px 8px 4px; transform: rotate(-3deg); }
+
+/* ---------- drying line ---------- */
+.line { grid-column: 1 / -1; position: relative; margin-top: 22px; }
+.line-head { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; padding: 0 0 0 4px; position: relative; z-index: 3; }
+.line-head p { margin: 0; font-size: 10px; font-stretch: 87.5%; color: var(--ink-text-2); max-width: 70ch; text-wrap: pretty; }
+@media (min-width: 1181px) { .line-head p { max-width: none; } }
+.t-line { position: relative; --r: -1.8deg; font-weight: 700; }
+.line-scroll { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: var(--line) transparent; margin-top: -4px; }
+.line-track { position: relative; height: var(--track-h, 252px); min-width: 100%; }
+.string { position: absolute; left: 0; top: 0; height: 70px; display: block; overflow: visible; pointer-events: none; }
+.string .cord { fill: none; stroke: var(--string); stroke-width: 1.3; }
+.string .nail { fill: var(--steel); stroke: var(--steel-lo); stroke-width: 1; }
+.hung { position: absolute; left: var(--x); top: var(--y); width: var(--hw); transform: translateX(-50%); transition: left .5s cubic-bezier(.3, .7, .3, 1); border-radius: 1px; }
+.hung-swing { position: relative; display: block; transform-origin: 50% 0; transform: rotate(var(--tilt, 0deg)); }
+.hung.swaying .hung-swing { animation: sway var(--sd, 6s) ease-in-out var(--sdl, 0s) infinite alternate; }
+.hung.landed .hung-swing { animation: settle 1.1s cubic-bezier(.3, .6, .4, 1) both; }
+@keyframes sway { from { transform: rotate(calc(var(--tilt, 0deg) - .7deg)); } to { transform: rotate(calc(var(--tilt, 0deg) + .7deg)); } }
+@keyframes settle { 0% { transform: rotate(calc(var(--tilt, 0deg) + 5deg)); } 30% { transform: rotate(calc(var(--tilt, 0deg) - 3deg)); } 55% { transform: rotate(calc(var(--tilt, 0deg) + 1.4deg)); } 78% { transform: rotate(calc(var(--tilt, 0deg) - .6deg)); } 100% { transform: rotate(calc(var(--tilt, 0deg) - .7deg)); } }
+.hung .sheet { width: 100%; box-shadow: 0 1px 1px var(--shadow-soft), 0 8px 12px -8px var(--shadow); transition: transform .16s; }
+.hung:hover .sheet { transform: translateY(2px); }
+.hung:focus-visible { outline-offset: 6px; }
+.peg { position: absolute; left: 50%; top: -17px; width: 12px; height: 34px; margin-left: -6px; z-index: 3; display: block; transform-origin: 50% 40%; }
+.peg svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.peg .pg { fill: var(--peg); stroke: var(--peg-dark); stroke-width: .8; }
+.peg .pg2 { fill: var(--peg-hi); stroke: var(--peg-dark); stroke-width: .8; }
+.peg .sp { fill: none; stroke: var(--steel-ink); stroke-width: 1.1; }
+.hung.landed .peg { animation: clamp .26s cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes clamp { 0% { transform: scale(1.25, .7) translateY(-8px); } 100% { transform: none; } }
+.hung-no { display: block; margin-top: 7px; text-align: center; font-size: 9.5px; letter-spacing: .06em; font-stretch: 87.5%; }
+.hung.falling { pointer-events: none; }
+.hung { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+/* ---------- viewer ---------- */
+.viewer {
+  box-sizing: border-box;
+  width: min(1040px, calc(100vw - 32px)); max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px);
+  padding: 16px 18px 18px;
+  background-color: var(--paper); background-image: var(--paper-tex, none); background-size: 360px 360px;
+  color: var(--ink-text);
+  border: 1.5px solid var(--ink-text); border-radius: 2px;
+  box-shadow: 0 30px 60px -30px var(--shadow);
+  margin: max(clamp(16px, 4vh, 40px), env(safe-area-inset-top, 0px)) auto auto;
+}
+.viewer::backdrop { background-color: var(--veil); }
+.viewer-head { display: flex; align-items: center; gap: 10px 12px; flex-wrap: wrap; border-bottom: 1px solid var(--ink-text); padding-bottom: 10px; }
+.viewer-btns { display: flex; gap: 8px; margin-left: auto; }
+.viewer-head h2 { margin: 0; font-family: Anybody, "Arial Black", Arial, sans-serif; font-weight: 900; font-stretch: 150%; font-size: 30px; line-height: 1; }
+.viewer-stage { display: flex; justify-content: center; align-items: flex-start; gap: 28px; flex-wrap: wrap; padding: 22px 0 8px; }
+.viewer-stage figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.viewer-stage figcaption { font-size: 9.5px; line-height: 1.5; letter-spacing: .05em; text-transform: uppercase; font-stretch: 87.5%; }
+.viewer-stage figcaption b { font-weight: 700; }
+.viewer-stage .sheet { box-shadow: 0 1px 1px var(--shadow-soft), 0 16px 28px -16px var(--shadow); }
+.viewer-spec { margin: 10px 0 0; font-size: 10px; line-height: 1.6; font-stretch: 87.5%; color: var(--ink-text-2); }
+.viewer-spec b { color: var(--ink-text); font-weight: 700; }
+.sheet.master { background-color: var(--master-film); background-image: none; box-shadow: 0 0 0 1px var(--master-edge), 0 16px 28px -16px var(--shadow); }
+.sheet.master::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2.6%; z-index: 2; background-color: var(--master-clamp); background-image: radial-gradient(circle at 50% 50%, var(--paper) 0 26%, transparent 30%); background-size: 5% 100%; }
+.sheet.master .plate { mix-blend-mode: normal; color: var(--master-ink); --knock: var(--master-film); }
+
+/* ---------- colophon ---------- */
+.colophon { grid-column: 1 / -1; margin-top: 26px; padding-top: 12px; border-top: 1px solid var(--ink-text); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; row-gap: 10px; font-size: 9.5px; font-stretch: 87.5%; line-height: 1.6; color: var(--ink-text-2); }
+.colophon p { margin: 0; grid-column: span 4; text-wrap: pretty; }
+.colophon .seed { grid-column: span 4; color: var(--ink-text); }
+
+/* ---------- v2 details: each block belongs to one flag in FX ---------- */
+/* mechanical counter */
+.odo { display: inline-flex; vertical-align: top; }
+.odo-c { display: inline-block; height: 1.5em; overflow: hidden; }
+.odo-s { display: flex; flex-direction: column; transition: transform .46s cubic-bezier(.2, .9, .3, 1.25); }
+.odo-s > span { display: block; height: 1.5em; line-height: 1.5em; }
+/* thermal head making the masters */
+.thermal { position: absolute; inset: 0; z-index: 5; overflow: hidden; pointer-events: none; }
+.thermal i { position: absolute; left: 0; right: 0; top: 0; height: 2px; background-color: var(--ink); box-shadow: 0 0 3px color-mix(in srgb, var(--ink) 70%, transparent); }
+.thermal i::before { content: ""; position: absolute; left: 0; right: 0; bottom: 2px; height: 3.2cqw; background-image: linear-gradient(180deg, transparent, color-mix(in srgb, var(--ink) 16%, transparent)); }
+.idle-key { position: absolute; left: 50%; top: 18px; z-index: 4; translate: -50% 0; padding: 4px 7px 3px; font-size: 8.5px; line-height: 1.2; letter-spacing: .08em; text-transform: uppercase; font-stretch: 75%; border: 1px solid var(--ink-text); border-radius: 2px; background-color: var(--paper-hi); box-shadow: 0 2px 0 var(--ink-text); transition: transform .1s, box-shadow .1s; }
+.idle-key::before { content: ""; position: absolute; inset: -8px -11px; }
+.idle-key:active, .idle-key.down { transform: translateY(2px); box-shadow: 0 0 0 var(--ink-text); }
+/* linen tester */
+.tester { position: absolute; left: calc(var(--sx) + var(--mm) * 125 + 18px); bottom: 14px; z-index: 5; width: 40px; height: 40px; touch-action: none; cursor: grab; filter: drop-shadow(var(--shx) 3px 2px var(--shadow-rule)); transition: transform .12s cubic-bezier(.3, .7, .4, 1), opacity .12s; }
+.tester svg { width: 100%; height: 100%; display: block; overflow: visible; }
+@media (hover: hover) { .tester:hover { transform: translateY(-2px) rotate(-4deg); } }
+.tester.lifted { opacity: 0; }
+.mat > .tester:focus-visible { outline-color: var(--paper-hi); outline-offset: 4px; }
+.tester .tp { fill: var(--steel); stroke: var(--steel-lo); stroke-width: .8; }
+.tester .tf { fill: var(--steel-hi); stroke: var(--steel-lo); stroke-width: .7; }
+.tester .tg { fill: color-mix(in srgb, var(--mat) 70%, var(--white)); stroke: var(--rim-lo); stroke-width: 1; }
+.tester .th { fill: none; stroke: var(--white); stroke-opacity: .7; stroke-width: 1.2; stroke-linecap: round; }
+.tester .tk { stroke: var(--steel-ink); stroke-width: .5; }
+.lens { position: fixed; left: 0; top: 0; z-index: 70; --ls: 150px; width: var(--ls); height: var(--ls); margin: calc(var(--ls) / -2) 0 0 calc(var(--ls) / -2); border-radius: 50%; overflow: hidden; pointer-events: none; background-color: var(--sheet); isolation: isolate; box-shadow: 0 0 0 1px var(--rim-lo), 0 0 0 2.5px var(--rim), 0 0 0 3.5px var(--rim-hi), 0 0 0 4.5px var(--rim-lo), 0 16px 26px -8px var(--shadow); opacity: 0; transform: scale(.94); transition: opacity .12s, transform .14s cubic-bezier(.2, .8, .3, 1); }
+.lens.on { opacity: 1; transform: none; }
+.lens.empty { background-color: var(--paper); }
+.lens-src { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.lens-src > .sheet { box-shadow: none; }
+.lens-src .greet[data-empty]::before { content: none; }
+.micro { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 4; pointer-events: none; }
+.micro path { fill: none; stroke-linecap: round; }
+.lens-ret { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 6; }
+.lens-ret path { stroke: var(--reticle); stroke-width: 1; fill: none; }
+.lens-ret rect { fill: var(--paper-hi); fill-opacity: .82; }
+.lens-ret text { fill: var(--reticle); font: 600 9px "Martian Mono", ui-monospace, monospace; letter-spacing: .03em; }
+.lens::after { content: ""; position: absolute; inset: 0; border-radius: 50%; z-index: 7; background-image: radial-gradient(circle at 32% 24%, rgba(255, 255, 255, .2), transparent 36%), radial-gradient(circle at 50% 50%, transparent 64%, rgba(20, 26, 34, .16) 100%); }
+/* advent row of the drawer */
+.advent { display: flex; align-items: center; gap: 6px; margin-top: 9px; padding: 8px 1px 3px; border-top: 1px dashed var(--line); min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.advent.pre { position: absolute; left: 14px; top: 11px; margin: 0; padding: 0; border: 0; overflow: visible; pointer-events: none; }
+.drawer:has(.drawer-next.full) .advent.pre { visibility: hidden; }
+/* when the strip runs on past the drawer's edge, the paper fades out on that side */
+.advent.more-r { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); }
+.advent.more-l { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px); mask-image: linear-gradient(90deg, transparent, #000 36px); }
+.advent.more-l.more-r { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); }
+.pencil { font-family: "Martian Mono", ui-monospace, monospace; font-weight: 300; font-stretch: 87.5%; color: var(--pencil); letter-spacing: .02em; }
+.advent .pencil { flex: 0 0 auto; font-size: 9px; white-space: nowrap; transform: rotate(-1.4deg); }
+.atile { position: relative; flex: 0 0 38px; height: 40px; padding: 3px; background-color: var(--paper-hi); border: 1px solid var(--line); border-radius: 2px; box-shadow: 0 2px 0 var(--paper-deep); --knock: var(--paper-hi); color: var(--ink-text); transition: transform .12s cubic-bezier(.3, .7, .4, 1), box-shadow .12s; }
+.atile svg { width: 100%; height: 100%; display: block; overflow: visible; }
+@media (hover: hover) { .atile:hover { transform: translateY(-2px) rotate(var(--tl, 1deg)); box-shadow: 0 4px 0 var(--paper-deep); } }
+.atile:active, .atile.press { transform: translateY(1px) scale(.97); box-shadow: 0 1px 0 var(--paper-deep); }
+.tissue { position: absolute; inset: -1px; border-radius: 2px; background-color: var(--tissue); transform-origin: 50% 0; display: grid; place-items: end center; padding-bottom: 3px; }
+.tissue svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tissue path { stroke: var(--tissue-crease); stroke-width: .8; fill: none; }
+.tissue b { position: relative; font: 300 7.5px/1 "Martian Mono", ui-monospace, monospace; color: var(--pencil); letter-spacing: .02em; }
+.tissue.open { animation: unwrap .3s cubic-bezier(.5, 0, .7, .4) forwards; }
+/* on a wide desk the drawer keeps its v1 height in December: the strip is a little lower and the nine blocks a little shallower */
+@media (min-width: 1181px) {
+  .drawer:has(.advent:not([hidden]):not(.pre)) .tile { aspect-ratio: 1 / .84; }
+  .advent { margin-top: 6px; padding-top: 6px; padding-bottom: 2px; }
+  .atile { flex-basis: 34px; height: 36px; }
+}
+@keyframes unwrap { 0% { transform: none; opacity: 1; } 60% { transform: perspective(120px) rotateX(68deg) scaleY(.7); opacity: .7; } 100% { transform: perspective(120px) rotateX(88deg) scaleY(.2); opacity: 0; } }
+/* pencil marginalia: on the green mat the pencil is a pale one */
+.mat > .hint { left: calc(var(--sx) + var(--mm) * 125 + 14px); bottom: -22px; color: var(--pencil); }
+.hint { position: absolute; z-index: 8; pointer-events: none; display: flex; align-items: center; gap: 2px; font-size: 10px; white-space: nowrap; }
+.hint svg { width: 30px; height: 22px; overflow: visible; flex: none; }
+.hint path { fill: none; stroke: var(--pencil); stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 70; stroke-dashoffset: 70; transition: stroke-dashoffset .6s cubic-bezier(.4, 0, .2, 1); }
+.hint span { clip-path: inset(0 100% 0 0); transition: clip-path .6s steps(14, end); }
+.hint.on path { stroke-dashoffset: 0; }
+.hint.on span { clip-path: inset(0 0 0 0); }
+.hint.out { opacity: 0; transition: opacity .2s; }
+/* the back of a print */
+.card3d { position: relative; perspective: 1600px; }
+.card3d-in { position: relative; display: block; transform-style: preserve-3d; transition: transform .62s cubic-bezier(.45, .05, .25, 1); }
+.card3d.turned .card3d-in { transform: rotateY(180deg); }
+.card3d .face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.card3d .back { position: absolute; inset: 0; transform: rotateY(180deg); }
+.sheet.back { background-color: var(--paper-hi); overflow: hidden; }
+.setoff { position: absolute; inset: 0; transform: scaleX(-1); opacity: .07; filter: blur(.4px); pointer-events: none; }
+.setoff > .sheet { width: 100%; background: none; box-shadow: none !important; }
+.ticket { position: absolute; left: 50%; top: 9%; width: 62%; translate: -50% 0; rotate: .5deg; padding: 4cqw 4.2cqw 3.6cqw; background-color: var(--sheet); background-image: var(--sheet-tex, none); background-size: 240px 240px; box-shadow: 0 1px 1px var(--shadow-soft), 0 6px 10px -8px var(--shadow); font: 400 max(8.5px, 2.45cqw)/1.6 "Martian Mono", ui-monospace, monospace; font-stretch: 87.5%; color: var(--ink-text); }
+.ticket h3 { margin: 0 0 2.4cqw; padding-bottom: 1.6cqw; border-bottom: 1px solid var(--ink-text); font: 900 max(11px, 3.6cqw)/1 Anybody, "Arial Black", Arial, sans-serif; font-stretch: 150%; display: flex; justify-content: space-between; gap: 8px; }
+.ticket dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 3cqw; }
+.ticket dt { color: var(--ink-text-2); text-transform: uppercase; letter-spacing: .05em; }
+.ticket dd { margin: 0; overflow-wrap: anywhere; }
+.ticket .wall { margin: 2.4cqw 0 0; color: var(--wall-red); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.ticket label { display: flex; align-items: baseline; gap: 6px; margin-top: 2.6cqw; padding-top: 2cqw; border-top: 1px dashed var(--line); color: var(--ink-text-2); text-transform: uppercase; letter-spacing: .05em; }
+.ticket input { width: 6ch; font: inherit; font-weight: 700; color: var(--ink-text); text-transform: uppercase; letter-spacing: .1em; background: transparent; border: 0; border-bottom: 1px solid var(--ink-text); border-radius: 0; padding: 0 2px; }
+.ticket input:focus-visible { outline: 2px solid var(--ink-text); outline-offset: 2px; }
+.imprint { position: absolute; left: 0; right: 0; bottom: 6%; margin: 0; text-align: center; font-size: max(7.5px, 2cqw); letter-spacing: .08em; text-transform: uppercase; font-stretch: 87.5%; color: var(--ink-text-2); }
+.ed { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; z-index: 2; }
+.ed text { fill: var(--pencil); font: 300 2.15px "Martian Mono", ui-monospace, monospace; letter-spacing: .06px; }
+.chop { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; mix-blend-mode: multiply; color: var(--wall-red); }
+/* wet ink */
+.sheen { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.sheen::before { content: ""; position: absolute; top: -12%; bottom: -12%; left: 34%; width: 15%; background-image: linear-gradient(90deg, transparent, var(--sheen) 50%, transparent); transform: rotate(9deg); animation: sheen var(--sd, 6s) ease-in-out var(--sdl, 0s) infinite alternate; animation-play-state: paused; }
+@keyframes sheen { from { translate: -40% 0; } to { translate: 40% 0; } }
+.line.draught .sheen::before { animation-play-state: running; }
+.sheen { opacity: var(--wet, 0); }
+/* the draught: the line hangs still until the room has been quiet for a while */
+.hung.swaying .hung-swing { animation-play-state: paused; }
+.line.draught .hung.swaying .hung-swing { animation-play-state: running; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1180px) {
+  :root { --mm: clamp(2.5px, min((100vw - 40px) / 205, (100vh - 200px) / 178), 3.6px); }
+  body { padding-block: 0 96px; }
+  .bench, .console { grid-column: 1 / -1; }
+  .mat { --sx: calc(50% - var(--mm) * 98); height: calc(var(--mm) * 168 - var(--mh) * .06 + 30px); }
+  .sheet-wrap { top: calc(var(--mh) * -.06); }
+  /* the drawer sits right under the card so a new stamp lands in view */
+  .console { padding-top: 34px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "drawer drawer" "drums print" "ctl ctl"; gap: 30px 28px; }
+  .tiles { grid-template-columns: repeat(9, minmax(0, 1fr)); max-width: 940px; margin-inline: auto; }
+  .print { align-self: center; }
+  .ctls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 28px; padding-top: 0; }
+  .ctls .mini-btn { grid-column: 1 / -1; justify-self: start; }
+  .print-chip { display: grid; }
+}
+@media (max-width: 1000px) {
+  .topbar .tb-b { display: none; }
+  .specs { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(4, auto); }
+}
+@media (max-width: 699px) {
+  :root { --mm: min(3.4px, calc((100vw - 36px) / 125)); }
+  .studio { grid-template-columns: minmax(0, 1fr); --mh: calc((100vw - 32px) / 5.25); }
+  .topbar .tb-b, .topbar .tb-a span { display: none; }
+  .tb-btn { white-space: nowrap; }
+  .masthead { white-space: normal; line-height: .9; }
+  .mh-ink { padding-top: .12em; }
+  .mh-ink > span:last-child { display: block; text-align: right; margin-top: .05em; }
+  .mh-ink .ov { display: block; }
+  .bench, .console, .line, .colophon { grid-column: 1 / -1; }
+  .bench { margin-top: calc(var(--mh) * -.02); margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); }
+  .mat { --sx: calc(50% - var(--mm) * 62.5); height: calc(var(--mm) * 168 + 118px); border-radius: 0; }
+  .sheet-wrap { top: 22px; }
+  .t-hint, .t-greet { top: auto; font-size: 9px; letter-spacing: .03em; }
+  .t-hint { left: max(14px, env(safe-area-inset-left, 0px)); bottom: 57px; --r: -1.4deg; }
+  /* on a phone the tester waits in the drawer's first compartment, clear of the floating PRINT pedal */
+  .tiles > .tester { position: relative; left: auto; bottom: auto; width: auto; height: auto; aspect-ratio: 1 / 1.02; display: grid; place-items: center; border: 1px dashed var(--line); border-radius: 2px; filter: none; }
+  .tiles > .tester svg { width: 34px; height: 34px; filter: drop-shadow(0 2px 1.5px var(--shadow-rule)); }
+  .tiles:has(> .tester)::after { content: none; }
+  .t-greet { left: calc(max(14px, env(safe-area-inset-left, 0px)) + 10px); bottom: 13px; --r: 1.5deg; }
+  .bw { display: none; }
+  .console { grid-template-columns: minmax(0, 1fr); grid-template-areas: "drawer" "drums" "ctl" "print"; padding-top: 30px; gap: 24px; }
+  .tiles { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .tiles::after { content: ""; border: 1px dashed var(--line); border-radius: 2px; }
+  .tile { padding: 4px 4px 4px; }
+  .ctls { display: flex; flex-direction: column; gap: 13px; }
+  .colophon p, .colophon .seed, .specs { grid-column: 1 / -1; }
+  .specs { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: none; grid-auto-flow: row; gap: 3px 14px; }
+  .line-scroll { margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); }
+}
+@media (max-width: 380px) {
+  .pc-lever { display: none; }
+  .print-chip { padding-right: 12px; }
+  .pc-word { font-size: 21px; }
+}
+@media (max-width: 420px) {
+  .drum-name { font-size: 15.5px; font-stretch: 72%; }
+  .drum-meta { font-size: 8.5px; }
+  .drum-meta .sc { display: none; }
+  .print-word { font-size: clamp(34px, 11.2vw, 46px); }
+  .print { padding-left: 16px; padding-right: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hung.swaying .hung-swing, .hung.landed .hung-swing { animation: none; }
+  .sq.thunk, .sq.reink, .hung.landed .peg { animation: none; }
+  .lv-arm, .cyl, .tile, .print, .print-chip { transition: none; }
+  .tile.refuse { animation: none; }
+  .tile, .atile, .tester, .lens, .odo-s, .idle-key { transition: none; }
+  .tissue.open { animation: unwrap-rm .2s linear forwards; }
+  .sheen::before { animation: none; }
+  .card3d-in { transition: none; }
+  .card3d.turned .card3d-in { transform: none; }
+  .card3d .face { transition: opacity .2s; }
+  .card3d .back { transform: none; opacity: 0; }
+  .card3d.turned .back { opacity: 1; }
+  .card3d.turned .front { opacity: 0; }
+  .hint path, .hint span { transition: none; }
+}
+@keyframes unwrap-rm { to { opacity: 0; } }
+</style>
+
+<div class="studio" id="studio">
+  <header class="topbar">
+    <p class="tb-a"><b>Overprint Noël</b><span> · two-drum print room</span></p>
+    <p class="tb-b">A6 Christmas cards · two spot inks · one pass</p>
+    <p class="tb-c"><span>Pulled <b id="pulled">003</b> today</span><button type="button" class="tb-btn" id="soundBtn" aria-pressed="false">Sound <span id="soundState" aria-hidden="true">off</span></button></p>
+  </header>
+
+  <h1 class="masthead" id="masthead">
+    <span class="mh-ink mh-b" aria-hidden="true"><span><span class="ov">OVER</span>PRINT</span> <span>NOËL</span></span>
+    <span class="mh-ink mh-a"><span><span class="ov">OVER</span>PRINT</span> <span>NOËL</span></span>
+  </h1>
+
+  <section class="bench" aria-label="The card on the cutting mat">
+    <div class="mat" id="mat">
+      <svg class="mat-marks" id="matMarks" aria-hidden="true"></svg>
+      <svg class="rule" id="rule" aria-hidden="true"></svg>
+      <div class="sheet-wrap" id="sheetWrap"></div>
+      <span class="tape t-hint"><span class="v-fine">Click</span><span class="v-touch">Tap</span> a stamp<br class="bw"> to swap drums.<br>Drag it off to bin it.</span>
+      <span class="tape t-greet">Type on the card,<br>up to 40 characters</span>
+      <button type="button" class="tester" id="tester" aria-label="Linen tester, 6× lens. Drag it over a print, or press Enter and use the arrow keys." aria-pressed="false"><svg viewBox="0 0 40 40" aria-hidden="true"><rect class="tp" x="3" y="5" width="34" height="32" rx="2"/><path class="tk" d="M6 34.5v-2M9 34.5v-1.2M12 34.5v-1.2M15 34.5v-1.2M18 34.5v-2M21 34.5v-1.2M24 34.5v-1.2M27 34.5v-1.2M30 34.5v-2M33 34.5v-1.2"/><rect class="tf" x="6.5" y="2" width="27" height="27" rx="1.6"/><circle class="tg" cx="20" cy="15.5" r="10"/><path class="th" d="M13.6 11.4a7.4 7.4 0 0 1 5-4"/><rect class="tp" x="15" y="28.6" width="10" height="2.6" rx=".8"/></svg></button>
+    </div>
+  </section>
+
+  <section class="console" aria-label="Press controls">
+    <div class="drums">
+      <button type="button" class="drum" id="drumA" data-w="A">
+        <span class="tape t-drum">Drum A</span>
+        <span class="cyl"><span class="cyl-body"><span class="ribs"></span></span></span>
+        <span class="drum-name" id="drumAName">Medium Blue</span>
+        <span class="drum-meta" id="drumAMeta">#3255A4<span class="sc"> · screen 15°</span> · <span class="v-fine">click</span><span class="v-touch">tap</span> to re-ink</span>
+      </button>
+      <button type="button" class="drum" id="drumB" data-w="B">
+        <span class="tape t-drum">Drum B</span>
+        <span class="cyl"><span class="cyl-body"><span class="ribs"></span></span></span>
+        <span class="drum-name" id="drumBName">Fluorescent Orange</span>
+        <span class="drum-meta" id="drumBMeta">#FF7477<span class="sc"> · screen 75°</span> · <span class="v-fine">click</span><span class="v-touch">tap</span> to re-ink</span>
+      </button>
+      <button type="button" class="idle-key" id="idleKey" hidden aria-label="Idle the drums to bring the fresh ink up">Idle</button>
+    </div>
+
+    <div class="drawer">
+      <span class="tape t-drawer">Stamp drawer · hand-cut lino</span>
+      <p class="drawer-next" aria-live="off">Next stamp: <span class="chip" id="nextChip"></span><b id="nextDrum">Drum B</b></p>
+      <div class="tiles" id="tiles"></div>
+      <div class="advent" id="adventRow" hidden></div>
+    </div>
+
+    <div class="ctls">
+      <div class="ctl">
+        <div class="ctl-row"><label for="drift">Registration drift</label><output id="driftOut" for="drift">0.65 mm</output></div>
+        <input type="range" id="drift" min="0" max="2" step="0.05" value="0.65">
+        <div class="ticks" aria-hidden="true"></div>
+        <div class="scale" aria-hidden="true"><span>0</span><span>1.0</span><span>2.0 mm</span></div>
+      </div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="lpi">Halftone</label><output id="lpiOut" for="lpi">45 LPI</output></div>
+        <input type="range" id="lpi" min="35" max="85" step="1" value="45">
+        <div class="ticks" aria-hidden="true"></div>
+        <div class="scale" aria-hidden="true"><span>35</span><span>60</span><span>85 LPI</span></div>
+      </div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="typeW">Type width</label><output id="typeWOut" for="typeW">125</output></div>
+        <input type="range" id="typeW" min="50" max="150" step="1" value="125">
+        <div class="ticks" aria-hidden="true"></div>
+        <div class="scale" aria-hidden="true"><span>50</span><span>100</span><span>150 wdth</span></div>
+      </div>
+      <button type="button" class="mini-btn" id="greetDrum" data-on="A" aria-label="Greeting on Drum A. Move it to Drum B."><span class="chip"></span><span id="greetDrumTxt">Greeting on Drum A</span></button>
+    </div>
+
+    <button type="button" class="print" id="printBtn" aria-describedby="printMeta">
+      <span>
+        <span class="print-word" aria-hidden="true"><span class="pw-b">PRINT</span><span class="pw-a">PRINT</span></span>
+        <span class="sr">Print</span>
+        <span class="print-meta" id="printMeta"><span class="ph">Both drums, one pass.</span> <span class="ph">Pulls <b id="nextNo">№ 004</b> to the drying line.</span></span>
+      </span>
+      <svg class="lever" viewBox="0 0 58 74" aria-hidden="true">
+        <rect class="lv-base" x="10" y="54" width="38" height="16" rx="2"/>
+        <g class="lv-arm"><rect class="lv-rod" x="26" y="12" width="6" height="48" rx="2"/><circle class="lv-knob" cx="29" cy="11" r="10"/><circle class="lv-shine" cx="25.5" cy="7.5" r="3"/></g>
+        <circle class="lv-pivot" cx="29" cy="58" r="6"/>
+      </svg>
+    </button>
+
+  </section>
+
+  <section class="line" aria-label="Drying line">
+    <div class="line-head">
+      <span class="tape t-line">Drying line</span>
+      <p>Stencil ink sets by soaking into the paper, so a fresh run hangs overnight before stacking. <span class="v-fine">Click</span><span class="v-touch">Tap</span> a print to inspect it and its two masters.</p>
+    </div>
+    <div class="line-scroll" id="lineScroll">
+      <div class="line-track" id="lineTrack"><svg class="string" id="string" aria-hidden="true"></svg></div>
+    </div>
+  </section>
+
+  <footer class="colophon">
+    <dl class="specs">
+      <dt>Paper</dt><dd>300 gsm uncoated board, cool white, A6 trimmed from <span class="ph">125 × 168 mm</span></dd>
+      <dt>Masters</dt><dd>Thermal stencil film, one per drum, 600 dpi</dd>
+      <dt>Screens</dt><dd>Drum A at 15°, Drum B at 75°, so the dots never line up into moiré</dd>
+      <dt>Feed</dt><dd>Both drums print in one pass; drift is paper slipping between them</dd>
+    </dl>
+    <p class="seed">Seed <span class="ph">6368c033 48cd0583 a7cd6339 5517ca6d</span> <span class="ph">f3e5bea1 5b7ffcdc 65b0c62f 6b982105</span></p>
+    <p>Stamp spots, grain, drift and ink starvation are all drawn from that seed, so a print with a given number comes out the same on every screen.</p>
+    <p>Ink names follow the common risograph ink list. Hex values are screen stand-ins for soy inks. Set in Anybody and Martian Mono.</p>
+  </footer>
+  <button type="button" class="print-chip" id="printChip" tabindex="-1" aria-hidden="true">
+    <span class="pc-txt"><span class="pc-word"><span class="pw-b">PRINT</span><span class="pw-a">PRINT</span></span><span class="pc-no" id="chipNo">№ 004</span></span>
+    <svg class="lever pc-lever" viewBox="0 0 58 74">
+      <rect class="lv-base" x="10" y="54" width="38" height="16" rx="2"/>
+      <g class="lv-arm"><rect class="lv-rod" x="26" y="12" width="6" height="48" rx="2"/><circle class="lv-knob" cx="29" cy="11" r="10"/><circle class="lv-shine" cx="25.5" cy="7.5" r="3"/></g>
+      <circle class="lv-pivot" cx="29" cy="58" r="6"/>
+    </svg>
+  </button>
+</div>
+
+<dialog class="viewer" id="viewer" aria-labelledby="viewerTitle">
+  <div class="viewer-head">
+    <h2 id="viewerTitle">№ 001</h2>
+    <div class="viewer-btns">
+      <button type="button" class="mini-btn" id="flipBtn" aria-pressed="false">Turn over</button>
+      <button type="button" class="mini-btn" id="mastersBtn">Show masters</button>
+      <button type="button" class="mini-btn" id="closeViewer">Close</button>
+    </div>
+  </div>
+  <div class="viewer-stage" id="viewerStage"></div>
+  <p class="viewer-spec" id="viewerSpec"></p>
+</dialog>
+<p class="sr" id="status" aria-live="polite"></p>
+<div class="lens" id="lens" aria-hidden="true" hidden></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs id="fxDefs"></defs></svg>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const root = document.documentElement;
+
+/* ---------- seed ---------- */
+const SEED = '6368c03348cd0583a7cd63395517ca6df3e5bea15b7ffcdc65b0c62f6b982105';
+const W = [0, 8, 16, 24].map(i => parseInt(SEED.slice(i, i + 8), 16) >>> 0);
+function sfc32(a, b, c, d) {
+  return function () {
+    a |= 0; b |= 0; c |= 0; d |= 0;
+    const t = (a + b | 0) + d | 0;
+    d = d + 1 | 0; a = b ^ b >>> 9; b = c + (c << 3) | 0; c = c << 21 | c >>> 11; c = c + t | 0;
+    return (t >>> 0) / 4294967296;
+  };
+}
+function rngFor(tag) {
+  const r = sfc32(W[0] ^ Math.imul(tag | 0, 0x9E3779B1), W[1] ^ Math.imul(tag | 0, 0x85EBCA6B), W[2] ^ Math.imul(tag | 0, 0xC2B2AE35), W[3]);
+  for (let i = 0; i < 14; i++) r();
+  return r;
+}
+const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
+/* verbs follow the input in use: start from the media query or a small touch screen, then follow real presses */
+const touchFirst = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints > 0 && matchMedia('(max-width: 1180px)').matches);
+root.dataset.input = touchFirst ? 'touch' : 'fine';
+addEventListener('pointerdown', e => { const k = e.pointerType === 'mouse' ? 'fine' : e.pointerType === 'touch' ? 'touch' : null; if (k && root.dataset.input !== k) root.dataset.input = k; }, { passive: true, capture: true });
+const reduced = () => reduceMQ.matches;
+const pad3 = n => String(n).padStart(3, '0');
+const f2 = n => (Math.round(n * 100) / 100).toString();
+const f4 = n => (Math.round(n * 10000) / 10000).toString();
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const css = name => getComputedStyle(root).getPropertyValue(name).trim();
+
+/* ---------- v2 detail flags: set one to 0 to cut that detail on its own ---------- */
+const FX = { cycle: 1, wet: 1, lens: 1, rubber: 1, advent: 1, light: 1, detents: 1, carol: 1, misfeed: 1, edition: 1, draught: 1, hints: 1, copy: 1, moire: 1 };
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('overprint.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('overprint.' + k, JSON.stringify(v)); } catch (e) { /* storage is only a nicety */ } }
+};
+const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII'];
+
+/* ---------- season clock: the local clock, or a preview named in the hash ---------- */
+const PREVIEWS = { 'advent': [11, 6, 19, 0], 'christmas-eve': [11, 24, 21, 30], 'christmas-day': [11, 25, 10, 0] };
+let clockBase = null, clockT0 = 0;
+function readHash() {
+  let k = ''; try { k = decodeURIComponent(location.hash.slice(1)).toLowerCase(); } catch (e) { /* ignore */ }
+  const p = PREVIEWS[k];
+  if (p) { clockBase = new Date(new Date().getFullYear(), p[0], p[1], p[2], p[3]).getTime(); clockT0 = Date.now(); } else clockBase = null;
+}
+const isPreview = () => clockBase !== null;
+function now() { return clockBase === null ? new Date() : new Date(clockBase + (Date.now() - clockT0)); }
+function firstAdvent(y) { const x = new Date(y, 11, 25); return new Date(y, 11, 25 - (x.getDay() || 7) - 21); }
+function season(d = now()) {
+  const m = d.getMonth(), day = d.getDate(), y = d.getFullYear();
+  if (m === 11 && day <= 24) return { k: day === 24 && d.getHours() >= 18 ? 'eve' : 'advent', n: day, d };
+  if (m === 11 || (m === 0 && day <= 6)) return { k: m === 11 && day === 25 ? 'day' : 'twelve', n: 24, d };
+  if (m === 10) return { k: 'pre', n: 0, d };
+  return { k: 'out', n: 0, d };
+}
+function seasonLine(d = now()) {
+  const m = d.getMonth(), day = d.getDate(), y = d.getFullYear(), fa = firstAdvent(y), S = season(d);
+  if (S.k === 'eve') return 'Christmas Eve';
+  if (S.k === 'day') return 'Christmas Day';
+  if (S.k === 'twelve') { const n = m === 11 ? day - 24 : day + 7; return n > 12 ? 'Epiphany' : `Day ${ROMAN[n]} of Christmas`; }
+  const t = new Date(y, m, day);
+  if (t < fa) { const n = Math.round((fa - t) / 864e5); return (m === 10 || m === 11) ? `${n} day${n === 1 ? '' : 's'} to Advent` : 'Out of season'; }
+  if (m === 11 || m === 10) { const wk = Math.min(4, Math.floor((t - fa) / 6048e5) + 1); return `Advent ${ROMAN[wk]}` + (m === 11 ? ` · calendar day ${day}` : ''); }
+  return 'Out of season';
+}
+const noelYear = (d = now()) => d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear();
+readHash();
+
+/* ---------- idle: ambient behaviour waits for a quiet room and stops on the first input ---------- */
+let lastInput = performance.now();
+const idleSubs = [];
+function onInputActivity() { const t = performance.now(), fire = t - lastInput > 150; lastInput = t; if (fire) for (const f of idleSubs) f(); }
+for (const ev of ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart']) addEventListener(ev, onInputActivity, { passive: true, capture: true });
+
+/* ---------- inks ---------- */
+const INKS = [
+  { id: 'medium-blue', name: 'Medium Blue', hex: '#3255A4' },
+  { id: 'fl-orange', name: 'Fluorescent Orange', hex: '#FF7477' },
+  { id: 'teal', name: 'Teal', hex: '#00838A' },
+  { id: 'bright-red', name: 'Bright Red', hex: '#F15060' },
+  { id: 'green', name: 'Green', hex: '#00A95C' },
+  { id: 'federal-blue', name: 'Federal Blue', hex: '#3D5588' },
+  { id: 'purple', name: 'Purple', hex: '#765BA7' },
+  { id: 'yellow', name: 'Yellow', hex: '#FFE800' },
+  { id: 'fl-pink', name: 'Fluorescent Pink', hex: '#FF48B0' }
+];
+const inkVar = i => `var(--riso-${INKS[i].id})`;
+const ANG = { A: 15, B: 75 };
+const SW = 125, SH = 168;           /* sheet in mm: A6 trim 105 x 148 plus 10 mm margins */
+
+/* ---------- textures ---------- */
+function grainURL(r, size) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const x = c.getContext('2d'); const img = x.createImageData(size, size); const d = img.data;
+  const mk = G => { const g = new Float32Array(G * G); for (let i = 0; i < G * G; i++) g[i] = r(); return g; };
+  const G1 = 12, G2 = 48, g1 = mk(G1), g2 = mk(G2);
+  const sm = t => t * t * (3 - 2 * t);
+  const vn = (g, G, u, v) => {
+    const xi = Math.floor(u), yi = Math.floor(v), fx = sm(u - xi), fy = sm(v - yi);
+    const x0 = xi % G, y0 = yi % G, x1 = (x0 + 1) % G, y1 = (y0 + 1) % G;
+    const a = g[y0 * G + x0], b = g[y0 * G + x1], cc = g[y1 * G + x0], e = g[y1 * G + x1];
+    return a + (b - a) * fx + (cc - a) * fy + (a - b - cc + e) * fx * fy;
+  };
+  for (let y = 0; y < size; y++) for (let xx = 0; xx < size; xx++) {
+    let a = 1 - .17 * vn(g1, G1, xx / size * G1, y / size * G1) - .11 * vn(g2, G2, xx / size * G2, y / size * G2);
+    const q = r();
+    if (q < .05) a -= .3 + .5 * r(); else if (q < .22) a -= .12 * r();
+    const i = (y * size + xx) * 4; d[i] = d[i + 1] = d[i + 2] = 0; d[i + 3] = clamp(a, 0, 1) * 255;
+  }
+  x.putImageData(img, 0, 0);
+  x.globalCompositeOperation = 'destination-out'; x.lineCap = 'round';
+  for (let i = 0; i < 260; i++) {
+    const px = 8 + r() * (size - 16), py = 8 + r() * (size - 16), an = r() * Math.PI * 2, len = 5 + r() * 22;
+    x.strokeStyle = `rgba(0,0,0,${(.1 + r() * .22).toFixed(2)})`; x.lineWidth = .5 + r() * .9;
+    x.beginPath(); x.moveTo(px, py);
+    x.quadraticCurveTo(px + Math.cos(an + .6) * len * .5, py + Math.sin(an + .6) * len * .5, px + Math.cos(an) * len, py + Math.sin(an) * len);
+    x.stroke();
+  }
+  return c.toDataURL('image/png');
+}
+function paperURL(r, size, n, dark, light) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const x = c.getContext('2d'); x.lineCap = 'round';
+  for (let i = 0; i < n; i++) {
+    const px = r() * size, py = r() * size, an = r() * Math.PI * 2, len = 4 + r() * 26;
+    x.strokeStyle = r() < .62 ? dark : light; x.lineWidth = .4 + r() * .8;
+    x.beginPath(); x.moveTo(px, py);
+    x.quadraticCurveTo(px + Math.cos(an + .7) * len * .5, py + Math.sin(an + .7) * len * .5, px + Math.cos(an) * len, py + Math.sin(an) * len);
+    x.stroke();
+  }
+  for (let i = 0; i < n * 2; i++) { x.fillStyle = r() < .5 ? dark : light; x.fillRect(r() * size, r() * size, 1, 1); }
+  return c.toDataURL('image/png');
+}
+const texR = rngFor(11);
+root.style.setProperty('--grain-a', `url(${grainURL(texR, 512)})`);
+root.style.setProperty('--grain-b', `url(${grainURL(texR, 512)})`);
+root.style.setProperty('--paper-tex', `url(${paperURL(texR, 360, 520, css('--fibre-dark'), css('--fibre-light'))})`);
+root.style.setProperty('--sheet-tex', `url(${paperURL(texR, 240, 260, css('--fibre-dark'), css('--fibre-light'))})`);
+
+/* ---------- stamp geometry ---------- */
+function ell(cx, cy, rx, ry, n = 40, rot = 0) {
+  const out = [], c = Math.cos(rot * Math.PI / 180), s = Math.sin(rot * Math.PI / 180);
+  for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, x = Math.cos(a) * rx, y = Math.sin(a) * ry; out.push([cx + x * c - y * s, cy + x * s + y * c]); }
+  return out;
+}
+const rect = (x0, y0, x1, y1) => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+function chordBand(cx, cy, r, y1, y2, n = 7) {
+  const out = [], a1 = Math.asin((y1 - cy) / r), a2 = Math.asin((y2 - cy) / r);
+  for (let i = 0; i <= n; i++) { const a = a1 + (a2 - a1) * i / n; out.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); }
+  for (let i = 0; i <= n; i++) { const a = a2 + (a1 - a2) * i / n; out.push([cx - Math.cos(a) * r, cy + Math.sin(a) * r]); }
+  return out;
+}
+function rough(pts, r, amp, step, closed) {
+  const out = [], n = pts.length, segs = closed ? n : n - 1;
+  for (let i = 0; i < segs; i++) {
+    const a = pts[i], b = pts[(i + 1) % n], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+    const k = Math.max(1, Math.round(L / step)), nx = -dy / L, ny = dx / L;
+    for (let j = 0; j < k; j++) { const t = j / k, jit = (j === 0 ? .55 : 1) * (r() - .5) * 2 * amp; out.push([a[0] + dx * t + nx * jit, a[1] + dy * t + ny * jit]); }
+  }
+  if (!closed) { const e = pts[n - 1]; out.push([e[0] + (r() - .5) * amp, e[1] + (r() - .5) * amp]); }
+  return out;
+}
+const pathOf = (pts, closed) => 'M' + pts.map(p => (Math.round(p[0] * 10) / 10) + ' ' + (Math.round(p[1] * 10) / 10)).join('L') + (closed ? 'Z' : '');
+const sh = (pts, dy) => pts.map(([x, y]) => [x, y + dy]);
+const S = pts => ({ k: 's', pts, closed: true });
+const C = pts => ({ k: 'c', pts, closed: true });
+const T1 = pts => ({ k: 't1', pts, closed: true });
+const T2 = pts => ({ k: 't2', pts, closed: true });
+const Ln = (pts, w, closed = false) => ({ k: 'l', pts, closed, w });
+const LnC = (pts, w) => ({ k: 'lc', pts, closed: false, w });
+
+const STAMP_SRC = {
+  spruce: { label: 'Spruce', mm: 64, f() {
+    const L = sh([[0, -50], [-14, -28], [-7, -29], [-24, -7], [-13, -8], [-36, 21], [0, 21]], 6);
+    const R = sh([[0, -50], [15, -28], [8, -29], [25, -7], [14, -8], [37, 21], [0, 21]], 6);
+    return [S(L), T2(R), S(sh(rect(-6, 20, 6, 37), 6)),
+      C(ell(-6, -16, 2.3, 2.3, 10)), C(ell(-13, 5, 2.4, 2.4, 10)), C(ell(-24, 20, 2.4, 2.4, 10)), C(ell(-4, 15, 2, 2, 10)),
+      S(ell(7, -12, 2.8, 2.8, 10)), S(ell(15, 9, 2.8, 2.8, 10)), S(ell(26, 22, 2.8, 2.8, 10))];
+  } },
+  star: { label: 'Star', mm: 24, f() {
+    const P = [], Q = [], parts = [], c = [0, 4];
+    for (let i = 0; i < 5; i++) { const a = (-90 + i * 72) * Math.PI / 180, b = a + 36 * Math.PI / 180; P.push([Math.cos(a) * 50, Math.sin(a) * 50 + 4]); Q.push([Math.cos(b) * 21, Math.sin(b) * 21 + 4]); }
+    for (let i = 0; i < 5; i++) parts.push(S([c, Q[(i + 4) % 5], P[i]]));
+    for (let i = 0; i < 5; i++) parts.push(T2([c, P[i], Q[i]]));
+    return parts;
+  } },
+  bauble: { label: 'Bauble', mm: 22, f() {
+    const p = [T1(ell(0, 8, 38, 38, 56)), S(chordBand(0, 8, 38, -6, 2)), S(chordBand(0, 8, 38, 17, 22)), S(rect(-9, -36, 9, -26)), Ln(ell(0, -41, 5, 5, 18), 2.6, true), C(ell(-17, -16, 4, 8, 20, 35))];
+    for (const x of [-24, -12, 0, 12, 24]) p.push(C(ell(x, -2, 1.7, 1.7, 8)));
+    return p;
+  } },
+  reindeer: { label: 'Reindeer', mm: 40, f() {
+    const d = 7;
+    return [S(sh(ell(-5, 3, 25, 11, 40), d)), S(sh(ell(13, 0, 10, 10, 24), d)),
+      S(sh([[9, -4], [17, -24], [27, -23], [24, 4]], d)),
+      S(sh([[16, -28], [23, -32], [31, -30], [40, -25], [43, -21], [39, -18], [29, -19], [20, -21]], d)),
+      S(sh([[19, -29], [11, -35], [16, -27]], d)), S(sh([[-27, -3], [-35, -9], [-31, 2]], d)),
+      S(sh([[11, 9], [16, 9], [19, 36], [14, 36]], d)), S(sh([[4, 9], [9, 9], [12, 21], [18, 29], [15, 32], [8, 23]], d)),
+      S(sh([[-25, 7], [-20, 8], [-19, 36], [-24, 36]], d)), S(sh([[-16, 9], [-11, 9], [-9, 35], [-14, 35]], d)),
+      Ln(sh([[22, -31], [19, -39], [14, -45], [8, -48]], d), 2.6), Ln(sh([[19, -39], [25, -45]], d), 2.3), Ln(sh([[14, -45], [14, -51]], d), 2.2),
+      Ln(sh([[27, -30], [30, -38], [28, -46]], d), 2.6), Ln(sh([[30, -38], [36, -42]], d), 2.2),
+      C(sh(ell(32, -26, 1.4, 1.4, 8), d)), T2(sh([[-13, -7], [7, -8], [8, 8], [-12, 10]], d)), S(sh(ell(42, -22, 2.8, 2.6, 10), d))];
+  } },
+  mitten: { label: 'Mitten', mm: 24, f() {
+    const hand = [[-20, 20], [-23, -6], [-20, -26], [-11, -38], [3, -39], [12, -31], [15, -15], [16, -6], [21, -13], [28, -15], [33, -9], [31, 1], [24, 10], [17, 17], [16, 21]];
+    return [S(hand), T2(rect(-25, 17, 20, 40)), S(rect(-25, 17, 20, 21)),
+      C([[-14, -14], [-11, -18], [-8, -14], [-11, -10]]), C([[-4, -14], [-1, -18], [2, -14], [-1, -10]]), C([[6, -14], [9, -18], [12, -14], [9, -10]]),
+      LnC([[-16, -25], [-11, -29], [-6, -25], [-1, -29], [4, -25], [8, -28]], 1.8), LnC([[-18, -2], [-13, 2], [-8, -2], [-3, 2], [2, -2], [7, 2], [12, -2]], 1.8)];
+  } },
+  candle: { label: 'Candle', mm: 30, f() {
+    return [S([[-11, -13], [-5, -11], [-3, -4], [0, -10], [6, -11], [11, -13], [11, 36], [-11, 36]]),
+      LnC([[-6, -5], [-6, 8]], 2.2), LnC([[5, -7], [5, 1]], 2.2),
+      S([[0, -47], [5, -36], [6, -28], [3, -22], [0, -21], [-3, -22], [-6, -28], [-5, -36]]), C([[0, -35], [2.2, -28], [0, -24], [-2.2, -28]]),
+      Ln([[0, -21], [0, -13]], 1.8), Ln([[-11, -42], [-15, -46]], 2), Ln([[11, -42], [15, -46]], 2), Ln([[-13, -30], [-18, -30]], 2), Ln([[13, -30], [18, -30]], 2),
+      T2(ell(0, 39, 24, 6, 28)), Ln(ell(27, 37, 4.5, 4.5, 14), 2.2, true)];
+  } },
+  bell: { label: 'Bell', mm: 24, f() {
+    const d = 6;
+    return [S(sh([[-6, -37], [6, -37], [13, -32], [17, -21], [19, -5], [22, 9], [30, 19], [31, 24], [-31, 24], [-30, 19], [-22, 9], [-19, -5], [-17, -21], [-13, -32]], d)),
+      C(sh([[-25, 11], [25, 11], [27, 14], [-27, 14]], d)), T1(sh([[-28, 16], [28, 16], [31, 24], [-31, 24]], d)),
+      C(sh([[-11, -25], [-8, -27], [-9, 3], [-12, 3]], d)),
+      S(sh(ell(0, 30, 6, 6, 16), d)), S(sh(ell(0, -40, 5, 4, 12), d)),
+      S(sh([[0, -41], [-17, -50], [-15, -37]], d)), S(sh([[0, -41], [17, -50], [15, -37]], d))];
+  } },
+  snowflake: { label: 'Snowflake', mm: 14, f() {
+    const p = [];
+    for (let k = 0; k < 6; k++) {
+      const a = (k * 60 - 90) * Math.PI / 180, ux = Math.cos(a), uy = Math.sin(a);
+      p.push(Ln([[0, 0], [ux * 46, uy * 46]], 4.4));
+      for (const [rr, len] of [[19, 12], [32, 9]]) for (const s of [-1, 1]) {
+        const bx = ux * rr, by = uy * rr, b = a + s * .8;
+        p.push(Ln([[bx, by], [bx + Math.cos(b) * len, by + Math.sin(b) * len]], 3.6));
+      }
+    }
+    p.push(S(ell(0, 0, 8, 8, 6, 30)), C(ell(0, 0, 2.6, 2.6, 10)));
+    return p;
+  } },
+  house: { label: 'House', mm: 34, f() {
+    return [T1(rect(-25, -5, 25, 38)), S([[-36, -1], [0, -36], [36, -1]]),
+      C([[-15, -21], [0, -32], [15, -21], [10, -20], [5, -23], [0, -19], [-5, -23], [-10, -20]]),
+      S(rect(14, -37, 22, -16)), S(rect(-6, 16, 7, 38)), C(ell(4, 28, 1.3, 1.3, 8)),
+      S(rect(-20, 4, -9, 14)), S(rect(9, 4, 20, 14)),
+      LnC([[-14.5, 4.5], [-14.5, 13.5]], 1.4), LnC([[-19.5, 9], [-9.5, 9]], 1.4), LnC([[14.5, 4.5], [14.5, 13.5]], 1.4), LnC([[9.5, 9], [19.5, 9]], 1.4)];
+  } }
+};
+const ORDER = ['spruce', 'star', 'bauble', 'reindeer', 'mitten', 'candle', 'bell', 'snowflake', 'house'];
+const STAMPS = {};
+function cookStamp(key, src, r) {
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; const has = { t1: false, t2: false };
+  const solids = [];
+  const parts = src.f().map(p => {
+    const line = p.k === 'l' || p.k === 'lc';
+    const pts = rough(p.pts, r, line ? .28 : .6, line ? 4 : 3.2, p.closed);
+    const pd = (p.w || 0) / 2;
+    for (const [x, y] of pts) { x0 = Math.min(x0, x - pd); y0 = Math.min(y0, y - pd); x1 = Math.max(x1, x + pd); y1 = Math.max(y1, y + pd); }
+    if (p.k === 't1') has.t1 = true; if (p.k === 't2') has.t2 = true;
+    if (p.k === 's') solids.push(pts);
+    return { k: p.k, d: pathOf(pts, p.closed), w: p.w };
+  });
+  /* hand-cut: one or two nicks chipped out of the block's edge, the same on every impression */
+  if (FX.rubber && solids.length) {
+    const big = solids.map(pts => { let a = 1e9, b = 1e9, c = -1e9, d = -1e9; for (const [x, y] of pts) { a = Math.min(a, x); b = Math.min(b, y); c = Math.max(c, x); d = Math.max(d, y); } return { pts, size: Math.max(c - a, d - b), cx: (a + c) / 2, cy: (b + d) / 2 }; }).sort((u, v) => v.size - u.size)[0];
+    if (big.size > 18) {
+      const hw = clamp(1.3 * 30 / src.mm, .8, 2.6), nN = 1 + (r() < .5 ? 1 : 0);
+      for (let i = 0; i < nN; i++) {
+        const P = big.pts[Math.floor(r() * big.pts.length)], vx = P[0] - big.cx, vy = P[1] - big.cy, L = Math.hypot(vx, vy) || 1, nx = vx / L, ny = vy / L;
+        const tx = -ny, ty = nx, dep = hw * (1.1 + r() * .6);
+        parts.push({ k: 'c', d: pathOf([[P[0] + tx * hw + nx * hw * .8, P[1] + ty * hw + ny * hw * .8], [P[0] - nx * dep + tx * hw * .2, P[1] - ny * dep + ty * hw * .2], [P[0] - tx * hw + nx * hw * .8, P[1] - ty * hw + ny * hw * .8]], true) });
+      }
+    }
+  }
+  STAMPS[key] = { key, label: src.label, mm: src.mm, parts, has, bbox: [x0, y0, x1, y1], advent: src.day || 0 };
+}
+ORDER.forEach((key, idx) => cookStamp(key, STAMP_SRC[key], rngFor(100 + idx)));
+
+/* ---------- markup ---------- */
+const RF = { a: .27, b: .4 };
+const FO = { a: .26, b: .5 };
+const pitchOf = lpi => 25.4 / lpi;
+function pat(id, p, rf, tr) {
+  return `<pattern id="${id}" class="ht" data-rf="${rf}" patternUnits="userSpaceOnUse" width="${f4(p)}" height="${f4(p)}" patternTransform="${tr}"><circle cx="${f4(p / 2)}" cy="${f4(p / 2)}" r="${f4(p * rf)}" fill="currentColor"/></pattern>`;
+}
+function partsMarkup(def, ctx) {
+  const pid = ctx.pid || 'x';
+  let defs = '';
+  if (ctx.mode !== 'flat' && (def.has.t1 || def.has.t2)) {
+    if (def.has.t1) defs += pat(pid + 'a', ctx.pitch, RF.a, ctx.ptr);
+    if (def.has.t2) defs += pat(pid + 'b', ctx.pitch, RF.b, ctx.ptr);
+    defs = `<defs>${defs}</defs>`;
+  }
+  let body = '';
+  for (const p of def.parts) {
+    if (p.k === 's') body += `<path d="${p.d}" fill="currentColor"/>`;
+    else if (p.k === 'c') body += `<path d="${p.d}" class="ko"/>`;
+    else if (p.k === 'l') body += `<path d="${p.d}" class="ln" stroke-width="${p.w}"/>`;
+    else if (p.k === 'lc') body += `<path d="${p.d}" class="lnk" stroke-width="${p.w}"/>`;
+    else {
+      const t = p.k === 't2' ? 'b' : 'a';
+      body += `<path d="${p.d}" class="ko"/>`;
+      body += ctx.mode === 'flat' ? `<path d="${p.d}" fill="currentColor" fill-opacity="${FO[t]}"/>` : `<path d="${p.d}" fill="url(#${pid}${t})"/>`;
+    }
+  }
+  return defs + body;
+}
+/* rubber: how hard the block met the paper. Now and then a quick tap only kisses the paper and leaves a speckled print; a long press fills, fattens and squeezes ink to the rim */
+const pressOf = s => !FX.rubber ? '' : s.kiss ? 'kiss' + (s.id % 3) : s.p >= .98 ? 'firm' : '';
+/* gouge chatter: ridges left in the cleared ground that catch ink on some impressions */
+function chatter(s, def, imp) {
+  if (!FX.rubber || !imp) return '';
+  const r = rngFor(3000 + s.id * 31 + imp * 7); if (r() > .4) return '';
+  const b = def.bbox, n = 3 + Math.floor(r() * 4), corner = Math.floor(r() * 4);
+  let d = '';
+  for (let i = 0; i < n; i++) {
+    const c = (corner + (i > 2 ? 2 : 0)) % 4, cx = c % 3 ? b[2] : b[0], cy = c < 2 ? b[1] : b[3];
+    const rad = 5 + (i % 3) * 1.7 + r() * .6, a0 = Math.atan2(-cy, -cx) - .45 + r() * .2, a1 = a0 + .5 + r() * .4;
+    d += `M${f2(cx + Math.cos(a0) * rad)} ${f2(cy + Math.sin(a0) * rad)}A${f2(rad)} ${f2(rad)} 0 0 1 ${f2(cx + Math.cos(a1) * rad)} ${f2(cy + Math.sin(a1) * rad)}`;
+  }
+  return `<path d="${d}" class="ln" stroke-width=".9" stroke-opacity=".5"/>`;
+}
+function stampMarkup(s, ctx, which) {
+  const def = STAMPS[s.kind], sc = def.mm / 100 * s.sc;
+  const T = `translate(${f2(s.x)} ${f2(s.y)}) rotate(${f2(s.rot)}) scale(${f4(sc)})`;
+  const ptr = `scale(${f4(1 / sc)}) rotate(${f2(-s.rot)}) translate(${f2(-s.x)} ${f2(-s.y)}) rotate(${scrAng(which, ctx.moire)})`;
+  const inner = partsMarkup(def, { mode: ctx.mode, pid: ctx.pfx + s.id, pitch: ctx.pitch, ptr }) + chatter(s, def, ctx.imp || 0);
+  const pr = pressOf(s), open = pr ? `<g filter="url(#${pr})">` : '', close = pr ? '</g>' : '';
+  /* a second strike almost on top of the first leaves a faint doubled edge */
+  const ghost = s.ghost ? `<g transform="translate(${f2(s.ghost[0])} ${f2(s.ghost[1])})" opacity=".3"><g transform="${T}">${partsMarkup(def, { mode: 'flat' })}</g></g>` : '';
+  if (!ctx.live) return `${ghost}${open}<g transform="${T}">${inner}</g>${close}`;
+  const b = def.bbox;
+  return `${ghost}${open}<g class="stamp" data-id="${s.id}" transform="${T}" tabindex="0" role="button" aria-label="${def.label} on Drum ${s.drum}. Enter swaps drum, Delete removes, arrow keys move."><g class="sq"><rect class="hit" x="${f2(b[0] - 3)}" y="${f2(b[1] - 3)}" width="${f2(b[2] - b[0] + 6)}" height="${f2(b[3] - b[1] + 6)}"/>${inner}</g></g>${close}`;
+}
+function regMark(x, y) { return `<g class="reg" aria-hidden="true"><circle cx="${x}" cy="${y}" r="2.1"/><path d="M${x - 3.5} ${y}H${x + 3.5}M${x} ${y - 3.5}V${y + 3.5}"/></g>`; }
+const CROP = '<path class="reg" d="M10 .8V7.2M.8 10H7.2M115 .8V7.2M117.8 10H124.2M10 160.8V167.2M.8 158H7.2M115 160.8V167.2M117.8 158H124.2"/>';
+function slugText(snap, which, live) {
+  if (which === 'A') return live ? `PROOF · NEXT № ${pad3(snap.serial)}` : `№ ${pad3(snap.serial)} · ${INKS[snap.inkA].name.toUpperCase()}`;
+  return live ? `${snap.lpi} LPI · DRIFT ${snap.drift.toFixed(2)} MM` : `${INKS[snap.inkB].name.toUpperCase()} · ${snap.lpi} LPI`;
+}
+function plateInner(snap, which, ctx) {
+  const pitch = pitchOf(snap.lpi);
+  const stamps = snap.stamps.filter(s => s.drum === which).map(s => stampMarkup(s, { ...ctx, pitch, moire: snap.moire, imp: ctx.live ? 0 : snap.serial }, which)).join('');
+  const slug = which === 'A'
+    ? `<text class="slug" x="12" y="165.1" aria-hidden="true">${slugText(snap, 'A', ctx.live)}</text>`
+    : `<text class="slug" x="113" y="165.1" text-anchor="end" aria-hidden="true">${slugText(snap, 'B', ctx.live)}</text>`;
+  return `${ctx.live ? '' : (which === 'A' ? CROP : '')}${regMark(120.6, 84)}${regMark(62.5, 163.6)}${slug}<g class="stamps">${stamps}</g>`;
+}
+const FURN = (() => {
+  let t = '';
+  for (let x = 20; x < 115; x += 10) if (x < 50 || x > 75) t += `M${x} 3.6V4.8`;
+  for (let y = 20; y < 158; y += 10) if (y < 73 || y > 95) t += `M3.6 ${y}H4.8`;
+  return `<svg class="furn" viewBox="0 0 125 168" aria-hidden="true">
+    <path class="fl" d="M10 .8V7.2M.8 10H7.2M115 .8V7.2M117.8 10H124.2M10 160.8V167.2M.8 158H7.2M115 160.8V167.2M117.8 158H124.2"/>
+    <path class="fl" d="M10 4.2H50.5M74.5 4.2H115M4.2 10V73M4.2 95V158${t}"/>
+    <text class="dim" x="62.5" y="4.95" text-anchor="middle">A6 · 105 mm</text>
+    <text class="dim" transform="translate(4.95 84) rotate(-90)" text-anchor="middle">148 mm</text>
+  </svg>`;
+})();
+function esc(t) { return t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+function setMask(el, img, size, pos, rep, composite) {
+  const st = el.style;
+  st.webkitMaskImage = img; st.maskImage = img;
+  st.webkitMaskSize = size; st.maskSize = size;
+  st.webkitMaskPosition = pos; st.maskPosition = pos;
+  st.webkitMaskRepeat = rep; st.maskRepeat = rep;
+  if (composite) { st.webkitMaskComposite = 'source-in'; st.maskComposite = 'intersect'; }
+}
+function driftVec(snap) { const a = snap.driftAng * Math.PI / 180; return [snap.drift * Math.cos(a), snap.drift * Math.sin(a)]; }
+function plateFX(el, which, snap) {
+  const fx = snap.fx;
+  let dx = 0, dy = 0, rot = 0;
+  if (which === 'B') { [dx, dy] = driftVec(snap); }
+  if (fx) {
+    if (which === 'A') { dx += fx.ja[0]; dy += fx.ja[1]; rot = fx.ra; } else { dx += fx.jb[0]; dy += fx.jb[1]; rot = fx.rb; }
+    el.style.opacity = which === 'A' ? fx.dA : fx.dB;
+    const g = which === 'A' ? fx.ga : fx.gb, grain = which === 'A' ? 'var(--grain-a)' : 'var(--grain-b)';
+    const st = fx.streak;
+    if (st.plate === which) {
+      const x0 = st.x, x1 = st.x + st.w, m1 = (1 - st.depth).toFixed(2), m2 = (1 - st.depth * .7).toFixed(2);
+      const grad = `linear-gradient(90deg, #000 ${f2(x0)}%, rgba(0,0,0,${m1}) ${f2(x0 + st.w * .4)}%, rgba(0,0,0,${m2}) ${f2(x0 + st.w * .62)}%, #000 ${f2(x1)}%)`;
+      setMask(el, `${grain}, ${grad}`, '112% auto, 100% 100%', `${f2(g[0])}% ${f2(g[1])}%, 0 0`, 'repeat, no-repeat', true);
+    } else setMask(el, grain, '112% auto', `${f2(g[0])}% ${f2(g[1])}%`, 'repeat', false);
+  }
+  el.style.transform = `translate(${f4(dx / SW * 100)}%, ${f4(dy / SH * 100)}%) rotate(${f2(rot)}deg)`;
+}
+function buildSheet(snap, o) {
+  const el = document.createElement('div');
+  el.className = 'sheet' + (o.master ? ' master' : '');
+  if (!o.live) { el.style.setProperty('--ink-a', inkVar(snap.inkA)); el.style.setProperty('--ink-b', inkVar(snap.inkB)); }
+  if (o.live) el.insertAdjacentHTML('beforeend', FURN);
+  const plates = o.master ? [o.master] : ['A', 'B'];
+  for (const w of plates) {
+    const pl = document.createElement('div');
+    pl.className = 'plate ' + (w === 'A' ? 'pa' : 'pb');
+    const a11y = o.live ? `role="group" aria-label="Drum ${w} stamps"` : 'aria-hidden="true"';
+    pl.innerHTML = `<svg viewBox="0 0 125 168" preserveAspectRatio="none" ${a11y}>${plateInner(snap, w, { pfx: o.pfx + w, mode: o.mode, live: o.live })}</svg>`;
+    if (snap.greetDrum === w) {
+      const g = document.createElement('div');
+      g.className = 'greet';
+      g.style.setProperty('--gfs', snap.gfs);
+      g.style.setProperty('--gw', snap.typeW + '%');
+      g.textContent = snap.greeting;
+      pl.append(g);
+    }
+    if (!o.master) plateFX(pl, w, snap);
+    else if (snap.fx) { const g = w === 'A' ? snap.fx.ga : snap.fx.gb; setMask(pl, w === 'A' ? 'var(--grain-a)' : 'var(--grain-b)', '112% auto', `${f2(g[0])}% ${f2(g[1])}%`, 'repeat', false); }
+    el.append(pl);
+  }
+  if (!o.live && !o.master) {
+    /* a double feed carries a faint ghost of the sheet before it */
+    if (snap.ghostOf) {
+      const gp = $('.pa', buildSheet(snap.ghostOf, { pfx: o.pfx + 'g', mode: 'flat', bare: true }));
+      gp.style.color = inkVar(snap.ghostOf.inkA); gp.style.opacity = '.13'; gp.style.transform = 'translate(-1.4%, 3.2%) rotate(-.6deg)';
+      el.prepend(gp);
+    }
+    /* the edition, pencilled in the top margin */
+    if (FX.edition && !o.bare && snap.ed != null) el.insertAdjacentHTML('beforeend', `<svg class="ed" viewBox="0 0 125 168" preserveAspectRatio="none" aria-hidden="true"><text x="62.5" y="6.7" text-anchor="middle" transform="rotate(-.5 62.5 6.7)">No. ${String(snap.serial).padStart(4, '0')} · ${edHex(snap.ed)} · Noël ${noelYear(snap.t)}</text></svg>`);
+    if (snap.misfeed) el.insertAdjacentHTML('beforeend', `<svg class="chop" viewBox="0 0 125 168" preserveAspectRatio="none" aria-hidden="true"><g transform="translate(99 19) rotate(-9)" filter="url(#chopRough)"><rect x="-16" y="-5.4" width="32" height="10.8" rx=".8" fill="none" stroke="currentColor" stroke-width="1.1"/><text x="0" y="3" text-anchor="middle" fill="currentColor" style="font: 900 8.2px Anybody, 'Arial Black', sans-serif; font-stretch: 112%; letter-spacing: .3px">REJECT</text></g></svg>`);
+  }
+  return el;
+}
+
+/* ---------- state ---------- */
+const mainR = rngFor(1);
+const state = {
+  inkA: 0, inkB: 1,
+  drift: .65, driftAng: Math.round(150 + mainR() * 80), lpi: 45,
+  typeW: 125, gfs: 11, greetDrum: 'A', greeting: 'Joy to the Inky World',
+  stamps: [], nextId: 1, nextDrum: 'B', serial: 4, busy: false, rot: -1.3
+};
+const J = a => (mainR() - .5) * 2 * a;
+[['spruce', 50, 67, -2, 1, 'A'], ['star', 51, 31, 8, 1, 'B'], ['house', 80, 93, 3, 1, 'B'],
+ ['snowflake', 25, 31, 0, 1.05, 'A'], ['snowflake', 95, 37, 12, .85, 'B'], ['snowflake', 101, 63, 4, .62, 'A'],
+ ['snowflake', 21, 63, 20, .7, 'B'], ['snowflake', 30, 99, 8, .55, 'A']].forEach(([kind, x, y, rot, sc, drum]) => {
+  state.stamps.push({ id: state.nextId++, kind, x: x + J(1.5), y: y + J(1.5), rot: rot + J(3), sc: sc * (1 + J(.04)), drum });
+});
+const placeR = rngFor(7);
+const tileR = rngFor(9);
+
+/* edition codes: a 16-bit bijection of the pull's seed, printed as four hex digits */
+const edCode = n => (Math.imul((n + 0x51) & 0xffff, 0x2F35) ^ 0x7F3A) & 0xffff;
+const edHex = n => edCode(n).toString(16).toUpperCase().padStart(4, '0');
+function edFromHex(h) {
+  if (!/^[0-9a-f]{4}$/i.test(h)) return null;
+  const v = parseInt(h, 16); for (let n = 0; n < 65536; n++) if (edCode(n) === v) return n;
+  return null;
+}
+const scrAng = (w, moire) => moire ? (w === 'A' ? 45 : 50) : ANG[w];
+function snapshot(serial, o = {}) {
+  const src = o.design || state, ed = o.ed ?? serial;
+  const r = rngFor(5000 + ed);
+  const snap = {
+    serial, ed, t: o.t || now(), moire: !!src.moire, misfeed: !!o.misfeed,
+    inkA: src.inkA, inkB: src.inkB, drift: src.drift, driftAng: src.driftAng, lpi: src.lpi,
+    typeW: src.typeW, gfs: src.gfs, greeting: src.greeting.trim(), greetDrum: src.greetDrum,
+    stamps: src.stamps.map(s => ({ ...s })),
+    fx: {
+      ja: [(r() - .5) * .3, (r() - .5) * .3], ra: (r() - .5) * .16,
+      jb: [(r() - .5) * .8, (r() - .5) * .8], rb: (r() - .5) * .5,
+      ga: [r() * 100, r() * 100], gb: [r() * 100, r() * 100],
+      streak: { plate: r() < .55 ? 'B' : 'A', x: 14 + r() * 66, w: 5 + r() * 10, depth: .26 + r() * .3 },
+      dA: +(.9 + r() * .08).toFixed(3), dB: +(.88 + r() * .1).toFixed(3),
+      tilt: +((r() - .5) * 3.4).toFixed(2), sd: +(5 + r() * 2.6).toFixed(2), sdl: -(r() * 6).toFixed(2)
+    }
+  };
+  /* a misfeed: the sheet goes in skewed, Drum B lands 4 mm off and the ink starves */
+  if (o.misfeed) {
+    const f = snap.fx; f.ra += 1.5; f.rb += 1.5; f.jb = [f.jb[0] + 4, f.jb[1] + 1.2]; f.dA *= .84; f.dB *= .8;
+    f.streak = { plate: 'B', x: 22, w: 26, depth: .72 };
+    snap.ghostOf = o.ghostOf || null;
+  }
+  return snap;
+}
+
+/* ---------- live sheet ---------- */
+const sheetWrap = $('#sheetWrap');
+sheetWrap.style.setProperty('--rot', state.rot + 'deg');
+let liveSheet, plateA, plateB, greetEl;
+function liveSnap() { return { ...state, fx: null }; }
+function buildLive() {
+  liveSheet = buildSheet(liveSnap(), { pfx: 'L', mode: 'screen', live: true });
+  liveSheet.id = 'liveSheet';
+  sheetWrap.append(liveSheet);
+  plateA = $('.pa', liveSheet); plateB = $('.pb', liveSheet);
+  greetEl = $('.greet', liveSheet);
+  greetEl.id = 'greeting';
+  greetEl.setAttribute('role', 'textbox');
+  greetEl.setAttribute('aria-label', 'Greeting, up to 40 characters');
+  greetEl.setAttribute('spellcheck', 'false');
+  greetEl.contentEditable = 'plaintext-only';
+  if (greetEl.contentEditable !== 'plaintext-only') greetEl.contentEditable = 'true';
+}
+function renderLive() {
+  const snap = liveSnap();
+  for (const [w, pl] of [['A', plateA], ['B', plateB]]) {
+    const pitch = pitchOf(state.lpi);
+    $('.stamps', pl).innerHTML = state.stamps.filter(s => s.drum === w).map(s => stampMarkup(s, { pfx: 'L' + w, mode: 'screen', live: true, pitch, moire: state.moire }, w)).join('');
+  }
+  updateSlugs(snap);
+}
+function updateSlugs(snap = liveSnap()) {
+  $('.slug', plateA).textContent = slugText(snap, 'A', true);
+  $('.slug', plateB).textContent = slugText(snap, 'B', true);
+}
+function updateDrift() { plateFX(plateB, 'B', liveSnap()); updateSlugs(); }
+function updateLPI() {
+  const p = pitchOf(state.lpi);
+  for (const pt of $$('pattern.ht', liveSheet)) {
+    const rf = +pt.dataset.rf;
+    pt.setAttribute('width', f4(p)); pt.setAttribute('height', f4(p));
+    const c = pt.firstElementChild; c.setAttribute('cx', f4(p / 2)); c.setAttribute('cy', f4(p / 2)); c.setAttribute('r', f4(p * rf));
+  }
+  updateSlugs();
+}
+function fitGreeting() {
+  const el = greetEl, sw = liveSheet.offsetWidth; if (!sw) return;
+  el.style.setProperty('--gw', state.typeW + '%');
+  const maxH = 36 / SW * sw;
+  const fits = () => el.scrollHeight <= maxH + .5 && el.scrollWidth <= el.clientWidth + 1;
+  let lo = 4, hi = 12.5;
+  el.style.setProperty('--gfs', hi);
+  if (!fits()) {
+    for (let i = 0; i < 9; i++) { const mid = (lo + hi) / 2; el.style.setProperty('--gfs', mid); if (fits()) lo = mid; else hi = mid; }
+    hi = lo; el.style.setProperty('--gfs', lo);
+  }
+  state.gfs = +hi.toFixed(3);
+}
+
+/* ---------- mapping between sheet mm and screen ---------- */
+function sheetFrame() {
+  const r = liveSheet.getBoundingClientRect(), k = liveSheet.offsetWidth / SW, a = state.rot * Math.PI / 180;
+  return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, k, c: Math.cos(a), s: Math.sin(a) };
+}
+function mm2screen(x, y, F = sheetFrame()) { const dx = (x - SW / 2) * F.k, dy = (y - SH / 2) * F.k; return [F.cx + dx * F.c - dy * F.s, F.cy + dx * F.s + dy * F.c]; }
+function screen2mm(px, py, F = sheetFrame()) { const dx = px - F.cx, dy = py - F.cy; return [(dx * F.c + dy * F.s) / F.k + SW / 2, (-dx * F.s + dy * F.c) / F.k + SH / 2]; }
+
+/* ---------- sound (off until asked) ---------- */
+let AC = null, soundOn = false, noiseBuf = null, brownBuf = null, OUT = null;
+function audio() {
+  if (!soundOn) return null;
+  try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+  if (AC.state === 'suspended') AC.resume();
+  if (!OUT) {
+    /* every voice goes through one compressor and a master at -24 dBFS */
+    const comp = AC.createDynamicsCompressor(), pre = AC.createGain(), master = AC.createGain();
+    comp.threshold.value = -8; comp.knee.value = 6; comp.ratio.value = 5; comp.attack.value = .003; comp.release.value = .2;
+    pre.gain.value = 1.6; master.gain.value = Math.pow(10, -24 / 20);
+    pre.connect(comp).connect(master).connect(AC.destination); OUT = pre;
+  }
+  if (!noiseBuf) { const len = AC.sampleRate * 1.2 | 0, r = rngFor(77); noiseBuf = AC.createBuffer(1, len, AC.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = r() * 2 - 1; }
+  if (!brownBuf) { const len = AC.sampleRate * 2 | 0, r = rngFor(79); brownBuf = AC.createBuffer(1, len, AC.sampleRate); const d = brownBuf.getChannelData(0); let b = 0; for (let i = 0; i < len; i++) { b = (b + .02 * (r() * 2 - 1)) / 1.02; d[i] = b * 3.5; } }
+  return AC;
+}
+const thunkR = rngFor(78);
+function sThunk(v = 1) {
+  const ac = audio(); if (!ac) return; const t = ac.currentTime + .01;
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(46, t + .13);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.42 * v, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + .2);
+  o.connect(g).connect(OUT); o.start(t); o.stop(t + .22);
+  const n = ac.createBufferSource(), f = ac.createBiquadFilter(), ng = ac.createGain();
+  n.buffer = noiseBuf; f.type = 'lowpass'; f.frequency.value = 1100;
+  ng.gain.setValueAtTime(.22 * v, t); ng.gain.exponentialRampToValueAtTime(.0001, t + .07);
+  n.connect(f).connect(ng).connect(OUT); n.start(t, thunkR() * .5, .09);
+}
+function sRoll(dur) {
+  const ac = audio(); if (!ac) return; const t = ac.currentTime + .01;
+  const n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();
+  n.buffer = noiseBuf; n.loop = true; f.type = 'bandpass'; f.frequency.value = 420; f.Q.value = .9;
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.16, t + .08); g.gain.setValueAtTime(.16, t + dur - .12); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  lfo.frequency.value = 19; lg.gain.value = .06; lfo.connect(lg).connect(g.gain);
+  n.connect(f).connect(g).connect(OUT); n.start(t); n.stop(t + dur + .05); lfo.start(t); lfo.stop(t + dur + .05);
+}
+function sClick() {
+  const ac = audio(); if (!ac) return; const t = ac.currentTime + .01;
+  const n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  n.buffer = noiseBuf; f.type = 'highpass'; f.frequency.value = 2400;
+  g.gain.setValueAtTime(.3, t); g.gain.exponentialRampToValueAtTime(.0001, t + .04);
+  n.connect(f).connect(g).connect(OUT); n.start(t, .2, .05);
+}
+/* the drum thrum: brown noise through a 180 Hz lowpass, wobbling at 2 Hz */
+function sThrum(dur, v = 1) {
+  const ac = audio(); if (!ac) return; const t = ac.currentTime + .01;
+  const n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();
+  n.buffer = brownBuf; n.loop = true; f.type = 'lowpass'; f.frequency.value = 180;
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.55 * v, t + .22); g.gain.setValueAtTime(.55 * v, t + Math.max(.25, dur - .3)); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  lfo.frequency.value = 2; lg.gain.value = .14 * v; lfo.connect(lg).connect(g.gain);
+  n.connect(f).connect(g).connect(OUT); n.start(t); n.stop(t + dur + .05); lfo.start(t); lfo.stop(t + dur + .05);
+}
+/* the sheet feeding: 160 ms of noise, bandpass sweeping 2500 to 900 Hz */
+function sFeed() {
+  const ac = audio(); if (!ac) return; const t = ac.currentTime + .01;
+  const n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  n.buffer = noiseBuf; f.type = 'bandpass'; f.Q.value = 1.1; f.frequency.setValueAtTime(2500, t); f.frequency.exponentialRampToValueAtTime(900, t + .16);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.32, t + .03); g.gain.exponentialRampToValueAtTime(.0001, t + .17);
+  n.connect(f).connect(g).connect(OUT); n.start(t, .4, .2);
+}
+/* the thermal head: a faint hiss */
+function sHiss(dur) {
+  const ac = audio(); if (!ac) return; const t = ac.currentTime + .01;
+  const n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  n.buffer = noiseBuf; n.loop = true; f.type = 'highpass'; f.frequency.value = 5200;
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.05, t + .08); g.gain.setValueAtTime(.05, t + dur - .1); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  n.connect(f).connect(g).connect(OUT); n.start(t); n.stop(t + dur + .05);
+}
+/* a plastic detent tick, at most 25 a second */
+let tickAt = 0;
+function sTick(k = 1) {
+  const ac = audio(); if (!ac) return; const nowT = performance.now(); if (nowT - tickAt < 40) return; tickAt = nowT;
+  const t = ac.currentTime + .005, n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  n.buffer = noiseBuf; n.playbackRate.value = 1 + (Math.random() - .5) * .08; f.type = 'bandpass'; f.frequency.value = 3400; f.Q.value = 2.2;
+  g.gain.setValueAtTime(.34 * k, t); g.gain.exponentialRampToValueAtTime(.0001, t + .018);
+  n.connect(f).connect(g).connect(OUT); n.start(t, .7, .03);
+}
+/* tissue paper: short grains of noise through a 2 to 6 kHz bandpass */
+function sCrinkle() {
+  const ac = audio(); if (!ac) return; const r = Math.random;
+  for (let i = 0; i < 11; i++) {
+    const t = ac.currentTime + .01 + r() * .26, d = .005 + r() * .015;
+    const n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    n.buffer = noiseBuf; f.type = 'bandpass'; f.frequency.value = 2000 + r() * 4000; f.Q.value = 1.4;
+    g.gain.setValueAtTime(.12 + r() * .16, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    n.connect(f).connect(g).connect(OUT); n.start(t, r() * 1, d + .01);
+  }
+}
+/* one woody note of O Tannenbaum per print, on the 1/8 grid at 60 BPM */
+const CAROL = [62, 67, 67, 67, 69, 71, 71, 71, 71, 69, 71, 72, 66, 69, 67, 74, 74, 71, 76, 74, 74, 72, 72, 72, 72, 69, 74, 72, 72, 71, 71];
+let carolT0 = -1;
+function sNote(i) {
+  const ac = audio(); if (!ac || !FX.carol) return;
+  const step = .5; if (carolT0 < 0) carolT0 = ac.currentTime;
+  const t = carolT0 + Math.ceil((ac.currentTime + .02 - carolT0) / step) * step;
+  const f = 440 * Math.pow(2, (CAROL[i % CAROL.length] - 69) / 12);
+  for (const [mul, amp, dec] of [[1, .34, .4], [4, .034, .16]]) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.value = f * mul;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(amp, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + dec);
+    o.connect(g).connect(OUT); o.start(t); o.stop(t + dec + .02);
+  }
+  const n = ac.createBufferSource(), hp = ac.createBiquadFilter(), ng = ac.createGain();
+  n.buffer = noiseBuf; hp.type = 'highpass'; hp.frequency.value = 1800;
+  ng.gain.setValueAtTime(.18, t); ng.gain.exponentialRampToValueAtTime(.0001, t + .002);
+  n.connect(hp).connect(ng).connect(OUT); n.start(t, .1, .01);
+}
+function setSound(on) {
+  soundOn = on; const b = $('#soundBtn'); b.setAttribute('aria-pressed', on); $('#soundState').textContent = on ? 'on' : 'off';
+}
+$('#soundBtn').addEventListener('click', () => {
+  setSound(!soundOn); store.set('sound', soundOn);
+  if (soundOn) sThunk(.6);
+});
+if (store.get('sound', false) === true) setSound(true);
+
+const statusEl = $('#status');
+let statusT = 0;
+function announce(t) { clearTimeout(statusT); statusEl.textContent = ''; statusT = setTimeout(() => { statusEl.textContent = t; }, 40); }
+
+/* ---------- drums ---------- */
+function spin(btn, turns, dur) {
+  if (reduced()) return null;
+  const ribs = $('.ribs', btn);
+  return ribs.animate([{ transform: 'translateY(0)' }, { transform: `translateY(${Math.min(25, turns) * 16}px)` }], { duration: dur, easing: 'cubic-bezier(.35,.1,.25,1)' });
+}
+/* sheets since the last ink change, and how far the fresh ink has come up (0 cold, 2 ready) */
+const drumRun = { A: { since: 0, up: 2 }, B: { since: 0, up: 2 } };
+function drumNote(w) {
+  const d = drumRun[w];
+  if (!FX.copy && !FX.cycle) return ` · screen ${ANG[w]}°`;
+  if (d.up < 2) return ' · ink coming up';
+  return d.since ? ` · ${d.since} since change` : ` · screen ${ANG[w]}°`;
+}
+function applyInks() {
+  root.style.setProperty('--ink-a', inkVar(state.inkA));
+  root.style.setProperty('--ink-b', inkVar(state.inkB));
+  for (const w of ['A', 'B']) {
+    const ink = INKS[w === 'A' ? state.inkA : state.inkB];
+    $(`#drum${w}Name`).textContent = ink.name;
+    $(`#drum${w}Meta`).innerHTML = `${ink.hex}<span class="sc">${drumNote(w)}</span> · <span class="v-fine">click</span><span class="v-touch">tap</span> to re-ink`;
+    $(`#drum${w}`).setAttribute('aria-label', `Drum ${w}: ${ink.name}. Change ink.`);
+  }
+  if (FX.cycle) $('#idleKey').hidden = drumRun.A.up >= 2 && drumRun.B.up >= 2;
+}
+function cycleDrum(w) {
+  if (state.busy) return;
+  const key = w === 'A' ? 'inkA' : 'inkB', other = w === 'A' ? state.inkB : state.inkA;
+  let i = state[key]; do { i = (i + 1) % INKS.length; } while (i === other);
+  const btn = $(`#drum${w}`);
+  spin(btn, 9, 520);
+  sRoll(.45);
+  hintDone('ink');
+  setTimeout(() => { state[key] = i; drumRun[w] = { since: 0, up: 0 }; applyInks(); announce(`Drum ${w} now carries ${INKS[i].name}. The first pulls come out pale until the ink comes up.`); }, reduced() ? 0 : 170);
+}
+/* idling: both drums turn for a second without paper, which brings fresh ink up to strength */
+let idling = false;
+$('#idleKey').addEventListener('click', e => {
+  if (state.busy || idling) return;
+  idling = true; const k = e.currentTarget; k.classList.add('down');
+  spin($('#drumA'), 16, 1000); spin($('#drumB'), 16, 1000); sThrum(1, .8);
+  setTimeout(() => {
+    idling = false; k.classList.remove('down');
+    for (const w of ['A', 'B']) drumRun[w].up = 2;
+    const f = document.activeElement === k; applyInks(); if (f) printBtn.focus();
+    announce('Drums idled. The ink is up to strength.');
+  }, reduced() ? 300 : 1000);
+});
+$('#drumA').addEventListener('click', () => cycleDrum('A'));
+$('#drumB').addEventListener('click', () => cycleDrum('B'));
+
+/* ---------- drawer ---------- */
+const tiles = $('#tiles');
+ORDER.forEach((kind, i) => {
+  const def = STAMPS[kind];
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'tile'; b.dataset.kind = kind;
+  b.setAttribute('aria-label', `Stamp a ${def.label.toLowerCase()} onto the card`);
+  const rot = ((tileR() - .5) * 10).toFixed(1);
+  b.innerHTML = `<svg viewBox="-56 -56 112 112" aria-hidden="true"><g transform="rotate(${rot})">${partsMarkup(def, { mode: 'screen', pid: 'tile' + i, pitch: 3.6, ptr: 'rotate(45)' })}</g></svg><span class="tile-name">${def.label}<i>${def.mm} mm</i></span>`;
+  b.style.setProperty('--tl', (((i * .618 + .3) % 1 - .5) * 3.6).toFixed(2) + 'deg');
+  pressable(b, (p, isPen) => placeStamp(kind, b, p, isPen));
+  tiles.append(b);
+});
+/* how long, or how hard, a stamp was pressed: pen pressure when there is one, otherwise the hold time */
+function pressable(b, act) {
+  let t0 = 0, pen = null, firmT = 0;
+  const lift = () => { clearTimeout(firmT); b.classList.remove('firm'); };
+  b.addEventListener('pointerdown', e => {
+    if (e.button) return; t0 = performance.now(); pen = e.pointerType === 'pen' && e.pressure > 0 ? e.pressure : null;
+    clearTimeout(firmT); if (FX.rubber) firmT = setTimeout(() => b.classList.add('firm'), 400);
+  });
+  b.addEventListener('pointermove', e => { if (pen !== null && e.pressure > pen) pen = e.pressure; });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) b.addEventListener(ev, lift);
+  b.addEventListener('click', e => {
+    const dt = t0 ? performance.now() - t0 : 0;
+    const isPen = pen !== null, p = !FX.rubber ? null : isPen ? clamp(pen, 0, 1) : e.detail && t0 ? clamp(dt / 400, 0, 1) : .7;
+    t0 = 0; pen = null; lift();
+    act(p, isPen);
+    b.classList.add('press'); setTimeout(() => b.classList.remove('press'), 130);
+  });
+}
+const nextEl = $('.drawer-next');
+let fullT = 0;
+function updateNext() {
+  clearTimeout(fullT); nextEl.classList.remove('full');
+  nextEl.innerHTML = 'Next stamp: <span class="chip" id="nextChip"></span><b id="nextDrum"></b>';
+  $('#nextDrum').textContent = 'Drum ' + state.nextDrum;
+  $('#nextChip').style.backgroundColor = state.nextDrum === 'A' ? 'var(--ink-a)' : 'var(--ink-b)';
+}
+function refuseTile(btn) {
+  if (btn && !reduced()) { btn.classList.remove('refuse'); void btn.offsetWidth; btn.classList.add('refuse'); btn.addEventListener('animationend', () => btn.classList.remove('refuse'), { once: true }); }
+  clearTimeout(fullT);
+  nextEl.classList.add('full'); nextEl.textContent = 'Card full · bin a stamp first';
+  fullT = setTimeout(updateNext, 2200);
+}
+function stampEl(id) { return liveSheet.querySelector(`.stamp[data-id="${id}"]`); }
+function bump() { if (!reduced()) sheetWrap.animate([{ translate: '0 0' }, { translate: '0 1.6px' }, { translate: '0 0' }], { duration: 200, easing: 'ease-out' }); }
+function animStamp(id, cls) {
+  if (reduced()) return;
+  const g = stampEl(id); if (!g) return;
+  const sq = $('.sq', g); sq.classList.remove(cls); void sq.getBoundingClientRect(); sq.classList.add(cls);
+  sq.addEventListener('animationend', () => sq.classList.remove(cls), { once: true });
+}
+const kissR = rngFor(13);
+function placeStamp(kind, btn, p = null, isPen = false) {
+  if (state.busy) return;
+  if (state.stamps.length >= 28) { refuseTile(btn); announce('The card is full. Drag a stamp off to make room.'); return; }
+  const def = STAMPS[kind], r = placeR;
+  const sc = .86 + r() * .28, k = def.mm / 100 * sc;
+  const hw = Math.min(40, (def.bbox[2] - def.bbox[0]) / 2 * k), hh = Math.min(50, (def.bbox[3] - def.bbox[1]) / 2 * k);
+  const rad = t => { const d = STAMPS[t.kind], q = d.mm / 100 * t.sc; return Math.max(d.bbox[2] - d.bbox[0], d.bbox[3] - d.bbox[1]) / 2 * q * .8; };
+  const me = Math.max(hw, hh) * .8;
+  let best = null, bestScore = -1e9;
+  for (let i = 0; i < 28; i++) {
+    const c = [clamp(14 + hw + r() * (97 - 2 * hw), 14, 111), clamp(16 + hh + r() * (100 - 2 * hh), 16, 116)];
+    let score = Math.min(1e9, 112 - (c[1] + hh * .6)) * 1.5;
+    for (const t of state.stamps) score = Math.min(score, Math.hypot(c[0] - t.x, c[1] - t.y) - rad(t) - me);
+    if (score > bestScore) { bestScore = score; best = c; }
+  }
+  const s = { id: state.nextId++, kind, x: best[0], y: best[1], rot: (r() - .5) * 26, sc, drum: state.nextDrum };
+  if (p != null) { s.p = +p.toFixed(2); if (isPen ? p < .25 : p < .375 && kissR() < .22) s.kiss = 1; }
+  hintDone('stamp');
+  state.nextDrum = state.nextDrum === 'A' ? 'B' : 'A';
+  state.stamps.push(s);
+  renderLive(); updateNext();
+  animStamp(s.id, 'thunk');
+  setTimeout(() => { bump(); sThunk(); }, reduced() ? 0 : 140);
+  const pr = pressOf(s);
+  announce(`${def.label} stamped on Drum ${s.drum}${pr.startsWith('kiss') ? ', a light kiss' : pr === 'firm' ? ', pressed hard' : ''}.`);
+}
+function swapDrum(s, focus) {
+  s.drum = s.drum === 'A' ? 'B' : 'A';
+  renderLive(); animStamp(s.id, 'reink'); sThunk(.45);
+  if (focus) stampEl(s.id)?.focus();
+  announce(`${STAMPS[s.kind].label} moved to Drum ${s.drum}.`);
+}
+function removeStamp(s) {
+  state.stamps = state.stamps.filter(t => t !== s);
+  renderLive();
+  announce(`${STAMPS[s.kind].label} binned.`);
+}
+
+/* ---------- drag on the card ---------- */
+let drag = null;
+const coarseMQ = matchMedia('(pointer: coarse)');
+/* a stamp under the pointer wins over the greeting type, unless the greeting is being edited */
+function stampAt(target, x, y) {
+  const g = target && target.closest && target.closest('.stamp');
+  if (g) return g;
+  if (!greetEl || document.activeElement === greetEl || !greetEl.contains(target)) return null;
+  for (const el of document.elementsFromPoint(x, y)) {
+    const st = el.closest && el.closest('.stamp');
+    if (st && liveSheet.contains(st)) return st;
+  }
+  return null;
+}
+function clearGreetSelection() {
+  const sel = getSelection();
+  if (sel && sel.rangeCount && greetEl.contains(sel.anchorNode)) sel.removeAllRanges();
+}
+function onDown(e) {
+  if (state.busy || (e.button !== undefined && e.button !== 0)) return;
+  const g = stampAt(e.target, e.clientX, e.clientY); if (!g) return;
+  const s = state.stamps.find(t => t.id === +g.dataset.id); if (!s) return;
+  e.preventDefault();
+  clearGreetSelection();
+  drag = { s, g, id: e.pointerId, x0: e.clientX, y0: e.clientY, moved: false, touch: e.pointerType === 'touch' };
+  try { liveSheet.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+}
+function startDrag() {
+  const { s } = drag, def = STAMPS[s.kind], F = sheetFrame();
+  const sc = def.mm / 100 * s.sc, size = 120 * sc * F.k;
+  const gh = document.createElement('div');
+  gh.className = 'ghost';
+  gh.style.width = gh.style.height = size + 'px';
+  gh.style.color = s.drum === 'A' ? 'var(--ink-a)' : 'var(--ink-b)';
+  gh.innerHTML = `<svg viewBox="-60 -60 120 120" aria-hidden="true"><g transform="rotate(${f2(s.rot)})">${partsMarkup(def, { mode: 'flat' })}</g></svg>`;
+  document.body.append(gh);
+  const tag = document.createElement('span'); tag.className = 'ghost-tag'; tag.textContent = 'Release to bin'; tag.hidden = true; document.body.append(tag);
+  drag.c0 = mm2screen(s.x, s.y, F); drag.size = size; drag.gh = gh; drag.tag = tag; drag.moved = true;
+  drag.g.style.opacity = '0';
+  clearGreetSelection();
+}
+function placeGhost(cx, cy, off) {
+  const { gh, size, tag } = drag;
+  gh.style.transform = `translate(${cx - size / 2}px, ${cy - size / 2}px) rotate(${state.rot + (off ? 9 : 0)}deg) scale(${off ? .94 : 1.07})`;
+  gh.classList.toggle('off', off);
+  tag.hidden = !off;
+  tag.style.left = '0'; tag.style.top = '0';
+  if (off) {
+    /* under a fingertip the tag goes above the touch point; it always stays on screen */
+    const above = drag.touch || coarseMQ.matches;
+    const tw = tag.offsetWidth || 120, th = tag.offsetHeight || 20;
+    let tx = above ? cx - tw / 2 : cx + size * .3, ty = above ? cy - Math.max(size * .62, 44) - th : cy + size * .35;
+    tx = clamp(tx, 8, innerWidth - tw - 8); ty = clamp(ty, 8, innerHeight - th - 8);
+    tag.style.transform = `translate(${f2(tx)}px, ${f2(ty)}px) rotate(-3deg)`;
+  }
+}
+function onMove(e) {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+  if (!drag.moved) { if (Math.hypot(dx, dy) < 6) return; startDrag(); }
+  const cx = drag.c0[0] + dx, cy = drag.c0[1] + dy;
+  const [mx, my] = screen2mm(cx, cy);
+  drag.at = [mx, my]; drag.off = mx < -3 || mx > SW + 3 || my < -3 || my > SH + 3;
+  placeGhost(cx, cy, drag.off);
+}
+function endDrag(e, cancel) {
+  if (!drag || (e && e.pointerId !== drag.id)) return;
+  const d = drag; drag = null;
+  try { liveSheet.releasePointerCapture(d.id); } catch (err) { /* ignore */ }
+  if (!d.moved) { if (!cancel) swapDrum(d.s, false); return; }
+  d.tag.remove();
+  if (cancel || !d.at) { d.gh.remove(); d.g.style.opacity = ''; return; }
+  if (d.off) {
+    const gh = d.gh;
+    if (reduced()) gh.remove();
+    else gh.animate([{ opacity: .45 }, { transform: gh.style.transform + ' translateY(90px) rotate(24deg)', opacity: 0 }], { duration: 380, easing: 'cubic-bezier(.5,0,.9,.6)' }).onfinish = () => gh.remove();
+    removeStamp(d.s);
+  } else {
+    d.s.x = clamp(d.at[0], 2, SW - 2); d.s.y = clamp(d.at[1], 2, SH - 2);
+    /* dropped almost exactly on an impression of the same block: one stamp, struck twice */
+    const twin = FX.rubber && state.stamps.find(t => t !== d.s && t.kind === d.s.kind && t.drum === d.s.drum && Math.hypot(t.x - d.s.x, t.y - d.s.y) < 2.6);
+    if (twin) {
+      const gx = clamp(d.s.x - twin.x, -.7, .7), gy = clamp(d.s.y - twin.y, -.7, .7);
+      twin.ghost = [Math.abs(gx) + Math.abs(gy) < .25 ? .35 : gx, Math.abs(gx) + Math.abs(gy) < .25 ? .25 : gy];
+      state.stamps = state.stamps.filter(t => t !== d.s);
+      d.gh.remove(); renderLive(); animStamp(twin.id, 'reink'); sThunk(.8);
+      announce(`${STAMPS[twin.kind].label} struck twice in the same place.`);
+      return;
+    }
+    d.gh.remove(); renderLive(); animStamp(d.s.id, 'reink'); sThunk(.7);
+  }
+}
+
+/* ---------- greeting ---------- */
+function bindGreeting() {
+  greetEl.addEventListener('input', () => {
+    let t = greetEl.textContent;
+    if (/\n/.test(t) || t.length > 40) {
+      t = t.replace(/\s*\n\s*/g, ' ').slice(0, 40); greetEl.textContent = t;
+      const sel = getSelection(), rg = document.createRange(); rg.selectNodeContents(greetEl); rg.collapse(false); sel.removeAllRanges(); sel.addRange(rg);
+    }
+    state.greeting = t; greetEl.toggleAttribute('data-empty', !t.trim()); fitGreeting();
+  });
+  greetEl.addEventListener('blur', clearGreetSelection);
+  greetEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); greetEl.blur(); } });
+  greetEl.addEventListener('paste', e => {
+    if (greetEl.contentEditable !== 'true') return;
+    e.preventDefault(); const t = (e.clipboardData.getData('text/plain') || '').replace(/\s+/g, ' ');
+    document.execCommand('insertText', false, t);
+  });
+}
+
+/* ---------- controls ---------- */
+const driftIn = $('#drift'), lpiIn = $('#lpi'), typeIn = $('#typeW');
+function valueTexts() {
+  driftIn.setAttribute('aria-valuetext', `${state.drift.toFixed(2)} millimetres`);
+  lpiIn.setAttribute('aria-valuetext', `${state.lpi} lines per inch`);
+  typeIn.setAttribute('aria-valuetext', `width ${state.typeW}`);
+}
+const driftText = v => v === 0 && FX.detents ? 'in register' : v.toFixed(2) + ' mm';
+driftIn.addEventListener('input', () => { state.drift = detent(driftIn, [0, 1], .12, .05, .08); $('#driftOut').textContent = driftText(state.drift); valueTexts(); updateDrift(); });
+lpiIn.addEventListener('input', () => {
+  state.lpi = Math.round(detent(lpiIn, [65, 85], 3, 1, 1.5));
+  /* hidden: pull the screen all the way down with Alt (or Shift) held and both screens swing to 45 degrees */
+  const m = FX.moire && state.lpi === +lpiIn.min && modHeld;
+  if (m !== !!state.moire) { state.moire = m; renderLive(); announce(m ? 'Both screens turned to 45 and 50 degrees. Where a tint from each drum overlaps, the dots beat into a moiré.' : 'Screens back at 15 and 75 degrees.'); }
+  $('#lpiOut').innerHTML = `${state.lpi} LPI <small>${m ? '45° · 50°' : pitchOf(state.lpi).toFixed(2) + ' mm'}</small>`; valueTexts(); updateLPI();
+});
+typeIn.addEventListener('input', () => { state.typeW = Math.round(detent(typeIn, [75, 100, 125], 4, 1, 2)); const o = $('#typeWOut'); o.textContent = state.typeW; if (FX.detents) o.style.fontStretch = state.typeW + '%'; valueTexts(); fitGreeting(); });
+$('#greetDrum').addEventListener('click', e => {
+  if (state.busy) return;
+  const btn = e.currentTarget;
+  state.greetDrum = state.greetDrum === 'A' ? 'B' : 'A';
+  (state.greetDrum === 'A' ? plateA : plateB).append(greetEl);
+  btn.dataset.on = state.greetDrum;
+  btn.setAttribute('aria-label', `Greeting on Drum ${state.greetDrum}. Move it to Drum ${state.greetDrum === 'A' ? 'B' : 'A'}.`);
+  $('#greetDrumTxt').textContent = 'Greeting on Drum ' + state.greetDrum;
+  announce('Greeting moved to Drum ' + state.greetDrum + '.');
+});
+
+/* ---------- mat + ruler ---------- */
+const mat = $('#mat'), matMarks = $('#matMarks'), rule = $('#rule');
+function drawMat() {
+  const k = liveSheet.offsetWidth / SW; if (!k) return;
+  const wmm = mat.clientWidth / k, hmm = mat.clientHeight / k;
+  matMarks.setAttribute('viewBox', `0 0 ${f2(wmm)} ${f2(hmm)}`);
+  let g1 = '', g5 = '', tk = '', num = '';
+  for (let x = 10; x < wmm; x += 10) (x % 50 ? (g1 += `M${x} 0V${f2(hmm)}`) : (g5 += `M${x} 0V${f2(hmm)}`));
+  for (let y = 10; y < hmm; y += 10) (y % 50 ? (g1 += `M0 ${y}H${f2(wmm)}`) : (g5 += `M0 ${y}H${f2(wmm)}`));
+  for (let x = 1; x < wmm; x++) tk += `M${x} 0V${x % 10 ? (x % 5 ? 1.1 : 2) : 3}`;
+  for (let y = 1; y < hmm; y++) tk += `M0 ${y}H${y % 10 ? (y % 5 ? 1.1 : 2) : 3}`;
+  for (let x = 10, n = 1; x < wmm - 3; x += 10, n++) num += `<text class="num" x="${x + .9}" y="5.6">${n}</text>`;
+  for (let y = 10, n = 1; y < hmm - 3; y += 10, n++) num += `<text class="num" x="3.6" y="${y - .9}">${n}</text>`;
+  const dl = Math.min(wmm, hmm);
+  matMarks.innerHTML = `<path class="g1" d="${g1}"/><path class="g5" d="${g5}"/><path class="tk" d="${tk}"/><path class="ang" d="M0 ${f2(hmm)}L${f2(dl)} ${f2(hmm - dl)}"/>${num}<text class="lbl" x="${f2(wmm - 4)}" y="${f2(hmm - 3.2)}" text-anchor="end">SELF-HEALING · 10 MM GRID · 45°</text>`;
+  /* steel rule to the right of the sheet when there is room */
+  const sheetRight = sheetWrap.offsetLeft / k + SW;
+  const room = wmm - sheetRight;
+  if (room > 66 && hmm > 160) {
+    const L = 150, Wd = 17, ly = Math.max(6, (hmm - L - 6) / 2);
+    let lx = Math.min(wmm - Wd - 11, sheetRight + 46);
+    /* keep the ruler clear of the tapes when the mat has the room */
+    const tapeR = Math.max(...$$('.t-hint, .t-greet', mat).map(t => (t.offsetLeft + t.offsetWidth) / k));
+    if (tapeR + 3 > lx) lx = Math.min(wmm - Wd - 4, tapeR + 3);
+    rule.style.display = 'block';
+    rule.style.left = lx * k + 'px'; rule.style.top = ly * k + 'px';
+    rule.style.width = Wd * k + 'px'; rule.style.height = (L + 6) * k + 'px';
+    rule.style.transform = 'rotate(1.6deg)';
+    rule.setAttribute('viewBox', `0 0 ${Wd} ${L + 6}`);
+    let t = '', n = '';
+    for (let i = 0; i <= L; i++) { const y = 3 + i; t += `M0 ${y}H${i % 10 ? (i % 5 ? 2 : 3.2) : 4.6}`; }
+    for (let i = 10; i < L; i += 10) n += `<text class="rn" x="5.4" y="${3 + i + .85}">${i / 10}</text>`;
+    rule.innerHTML = `<defs><linearGradient id="steelG" x1="0" x2="1"><stop offset="0" style="stop-color:var(--steel)"/><stop offset=".45" style="stop-color:var(--steel-hi)"/><stop offset=".6" style="stop-color:var(--steel)"/><stop offset="1" style="stop-color:var(--steel-lo)"/></linearGradient></defs><rect width="${Wd}" height="${L + 6}" rx=".6" fill="url(#steelG)"/><path class="rt" d="${t}"/>${n}<text class="rs" transform="translate(13.6 ${L / 2 + 3}) rotate(90)" text-anchor="middle">STAINLESS · 150 MM · 0.5 MM GRADUATION</text><circle cx="${Wd / 2 + 2}" cy="${L + 2}" r="1.3" style="fill:none;stroke:var(--steel-lo);stroke-width:.4"/>`;
+  } else rule.style.display = 'none';
+}
+
+/* ---------- drying line ---------- */
+const lineScroll = $('#lineScroll'), lineTrack = $('#lineTrack'), stringSvg = $('#string');
+const hungs = [];        /* { snap, el } in order */
+let slotW = 136, hw = 112, cap = 10, trackW = 1000, lead = 0, lineSmall = false;
+const STR_Y = 22;
+function sagY(x) { const t = x / trackW; return STR_Y + Math.min(30, trackW * .018) * 4 * t * (1 - t); }
+function layoutLine() {
+  const small = lineSmall = innerWidth < 600;
+  const vw = lineScroll.clientWidth || 360;
+  hw = small ? 96 : 134; slotW = small ? 108 : 168;
+  /* on a phone the line bleeds to the screen edges: the first print sits on the gutter and the
+     fourth is cut by the edge, which shows that the line scrolls sideways */
+  lead = small ? Math.max(0, 16 - (slotW - hw) / 2) : 0;
+  cap = Math.max(6, Math.floor(vw / slotW));
+  trackW = small ? Math.max(vw, lead + cap * slotW + 16) : Math.max(vw, cap * slotW);
+  const sw = small ? slotW : trackW / cap;
+  lineTrack.style.width = trackW + 'px';
+  lineTrack.style.setProperty('--track-h', (hw * SH / SW + 92) + 'px');
+  stringSvg.setAttribute('width', trackW); stringSvg.setAttribute('height', 70);
+  stringSvg.setAttribute('viewBox', `0 0 ${trackW} 70`);
+  let d = `M4 ${STR_Y}`;
+  for (let x = 20; x <= trackW - 4; x += 20) d += `L${f2(x)} ${f2(sagY(x))}`;
+  stringSvg.innerHTML = `<path class="cord" d="${d}L${trackW - 4} ${STR_Y}"/><circle class="nail" cx="4" cy="${STR_Y}" r="3.2"/><circle class="nail" cx="${trackW - 4}" cy="${STR_Y}" r="3.2"/>`;
+  hungs.forEach((h, i) => positionHung(h.el, i, sw));
+}
+function slotSize() { return lineSmall ? slotW : trackW / cap; }
+function positionHung(el, i, sw = slotSize()) {
+  const x = lead + (i + .5) * sw;
+  el.style.setProperty('--x', f2(x) + 'px');
+  el.style.setProperty('--y', f2(sagY(x) + 6) + 'px');
+  el.style.setProperty('--hw', hw + 'px');
+}
+const PEG = '<svg viewBox="0 0 12 34" aria-hidden="true"><rect class="pg" x="1" y="0" width="5" height="34" rx="1.2"/><rect class="pg2" x="6" y="0" width="5" height="34" rx="1.2"/><path class="sp" d="M1.5 14.5h9M1.5 17.5h9"/><circle class="sp" cx="6" cy="16" r="2.4"/></svg>';
+function makeHung(snap) {
+  const el = document.createElement('button');
+  el.type = 'button'; el.className = 'hung';
+  el.setAttribute('aria-label', `Print № ${pad3(snap.serial)}, ${INKS[snap.inkA].name} and ${INKS[snap.inkB].name}. Open large view.`);
+  el.style.setProperty('--tilt', snap.fx.tilt + 'deg');
+  el.style.setProperty('--sd', snap.fx.sd + 's');
+  el.style.setProperty('--sdl', snap.fx.sdl + 's');
+  const sw = document.createElement('span'); sw.className = 'hung-swing';
+  sw.innerHTML = `<span class="peg">${PEG}</span>`;
+  sw.append(buildSheet(snap, { pfx: 'H' + snap.serial, mode: 'flat' }));
+  sw.insertAdjacentHTML('beforeend', `<span class="hung-no">№ ${pad3(snap.serial)}</span>`);
+  el.append(sw);
+  if (FX.lens) bindLongPress(el);
+  el.addEventListener('click', () => openViewer(snap));
+  return el;
+}
+function hang(snap, landed) {
+  const el = makeHung(snap);
+  hungs.push({ snap, el });
+  positionHung(el, hungs.length - 1);
+  lineTrack.append(el);
+  if (!landed) el.classList.add('swaying');
+  return el;
+}
+
+/* ---------- mechanical counter ---------- */
+const pulledEl = $('#pulled');
+let odo = null;
+function setCounter(n, animate) {
+  const str = pad3(n);
+  if (!odo) {
+    pulledEl.innerHTML = `<span class="odo" aria-hidden="true">${[...str].map(() => `<span class="odo-c"><span class="odo-s">${[...'01234567890'].map(d => `<span>${d}</span>`).join('')}</span></span>`).join('')}</span><span class="sr"></span>`;
+    odo = $$('.odo-s', pulledEl); odo.forEach(e => { e.dataset.v = '0'; });
+  }
+  $('.sr', pulledEl).textContent = String(n);
+  const roll = animate && FX.cycle && !reduced();
+  [...str].forEach((ch, i) => {
+    const el = odo[i], prev = +el.dataset.v, d = +ch; if (prev === d) return;
+    el.dataset.v = String(d);
+    const idx = roll && prev === 9 && d === 0 ? 10 : d;
+    el.style.transition = roll ? '' : 'none';
+    el.style.transitionDelay = roll ? (str.length - 1 - i) * 70 + 'ms' : '';
+    el.style.transform = `translateY(${-idx * 1.5}em)`;
+    if (idx === 10) setTimeout(() => { el.style.transition = 'none'; el.style.transform = 'translateY(0)'; }, 640);
+  });
+}
+
+/* ---------- wet ink on the line ---------- */
+function addWet(el) {
+  const sheet = $('.sheet', el); if (!sheet) return;
+  const sheens = $$('.plate', sheet).map(pl => { const sh = document.createElement('span'); sh.className = 'sheen'; pl.append(sh); return sh; });
+  /* the sheen fades in quiet 4 s steps over about 40 s, so nothing re-rasterises every frame */
+  let k = 0; el.classList.add('wet'); el.style.setProperty('--wet', '1');
+  const tick = setInterval(() => {
+    k++; const v = Math.exp(-k * .45) * (1 - k / 10);
+    if (k >= 10 || !el.isConnected) { clearInterval(tick); sheens.forEach(sh => sh.remove()); el.classList.remove('wet'); el.classList.add('dry'); el.style.removeProperty('--wet'); return; }
+    el.style.setProperty('--wet', v.toFixed(3));
+  }, 4000);
+}
+const baseTitle = document.title;
+document.addEventListener('visibilitychange', () => { document.title = document.hidden ? `ink drying · ${hungs.length} on the line` : baseTitle; });
+
+/* ---------- the line in a draught ---------- */
+const lineSec = $('.line');
+let draughtT = 0;
+function armDraught() {
+  clearTimeout(draughtT);
+  if (!FX.draught) { lineSec.classList.add('draught'); return; }
+  lineSec.classList.remove('draught');
+  const left = 20000 - (performance.now() - lastInput);
+  draughtT = setTimeout(() => { if (performance.now() - lastInput >= 19900) lineSec.classList.add('draught'); else armDraught(); }, Math.max(200, left));
+}
+idleSubs.push(armDraught);
+let bounceRAF = 0;
+function cordPath(dip) { let d = `M4 ${STR_Y}`; for (let x = 20; x <= trackW - 4; x += 20) d += `L${f2(x)} ${f2(sagY(x) + (dip ? dip(x) : 0))}`; return d + `L${trackW - 4} ${STR_Y}`; }
+function pegBounce(target) {
+  if (reduced()) return;
+  const idx = hungs.findIndex(h => h.el === target); if (idx < 0) return;
+  const x0 = parseFloat(target.style.getPropertyValue('--x'));
+  /* neighbours swing in sympathy, the nearest most */
+  hungs.forEach((h, i) => {
+    const dI = Math.abs(i - idx); if (!dI || dI > 2) return;
+    const a = (dI === 1 ? 1.5 : .6) * (i < idx ? -1 : 1);
+    $('.hung-swing', h.el).animate([{ rotate: '0deg' }, { rotate: `${a}deg`, offset: .2 }, { rotate: `${f2(-a * .5)}deg`, offset: .45 }, { rotate: `${f2(a * .2)}deg`, offset: .7 }, { rotate: '0deg' }], { duration: 1700, delay: 70 * dI, easing: 'ease-in-out' });
+  });
+  /* the cord dips under the new peg and rings out */
+  const cord = $('.cord', stringSvg), t0 = performance.now(), near = hungs.filter(h => Math.abs(parseFloat(h.el.style.getPropertyValue('--x')) - x0) < 360);
+  cancelAnimationFrame(bounceRAF);
+  const step = tn => {
+    const t = (tn - t0) / 1000, env = Math.exp(-t / .4) * Math.cos(t * 2 * Math.PI / .52);
+    const dip = x => 5 * env * Math.exp(-(((x - x0) / 170) ** 2));
+    const end = t > 1.8 || document.hidden;
+    cord.setAttribute('d', cordPath(end ? null : dip));
+    /* only the prints near the new peg move; further out the dip is under a tenth of a pixel */
+    for (const h of near) h.el.style.translate = end ? '' : `0 ${f2(dip(parseFloat(h.el.style.getPropertyValue('--x'))))}px`;
+    if (!end) bounceRAF = requestAnimationFrame(step);
+  };
+  bounceRAF = requestAnimationFrame(step);
+}
+
+/* ---------- print run ---------- */
+const printBtn = $('#printBtn'), chip = $('#printChip');
+function wait(ms) { return new Promise(res => setTimeout(res, ms)); }
+const frame = () => new Promise(res => requestAnimationFrame(() => res()));
+let runLayer = null;
+function anim(el, kf, o) { const a = el.animate(kf, { fill: 'forwards', ...o }); return a.finished.catch(() => {}); }
+function docRect(el) { const r = el.getBoundingClientRect(); return { cx: r.left + r.width / 2 + scrollX, cy: r.top + r.height / 2 + scrollY, top: r.top + scrollY, bottom: r.bottom + scrollY, w: r.width, h: r.height }; }
+/* the machine cycle: masters, feed, two drums, the line */
+const pulls = new Map();                 /* serial -> snap, for set-off and re-pulls */
+const PALE = [.8, .92, 1];
+let sessionPrints = 0, misfeedQueued = false, misfeedDone = false, cycleTurning = false, lastSnap = null;
+const printMeta = $('#printMeta'), metaHTML = printMeta.innerHTML;
+function lcd(t) {
+  if (t == null) { printMeta.innerHTML = metaHTML; $('#nextNo').textContent = '№ ' + pad3(state.serial); }
+  else printMeta.textContent = t;
+}
+function thermalScan() {
+  sHiss(.5);
+  const th = document.createElement('div'); th.className = 'thermal'; th.innerHTML = '<i></i><i></i>';
+  const [a, b] = th.children; a.style.setProperty('--ink', 'var(--ink-a)'); b.style.setProperty('--ink', 'var(--ink-b)');
+  liveSheet.append(th);
+  const H = liveSheet.offsetHeight;
+  const kf = [{ transform: 'translateY(0)', opacity: 0 }, { opacity: 1, offset: .06 }, { opacity: 1, offset: .9 }, { transform: `translateY(${H}px)`, opacity: 0 }];
+  a.animate(kf, { duration: 340, easing: 'cubic-bezier(.45,.05,.55,.95)', fill: 'forwards' });
+  return b.animate(kf, { duration: 340, delay: 80, easing: 'cubic-bezier(.45,.05,.55,.95)', fill: 'forwards' }).finished.catch(() => {}).then(() => th.remove());
+}
+async function runPrint(o = {}) {
+  if (o instanceof Event) o = {};
+  if (state.busy) {
+    /* pressing again while the drum still turns, after a few pulls: once per session the feed misfires */
+    if (FX.misfeed && cycleTurning && sessionPrints >= 3 && !misfeedQueued && !misfeedDone) {
+      let seen = false; try { seen = sessionStorage.getItem('overprint.misfeed') === '1'; } catch (e) { /* ignore */ }
+      if (!seen) { misfeedQueued = misfeedDone = true; try { sessionStorage.setItem('overprint.misfeed', '1'); } catch (e) { /* ignore */ } }
+    }
+    return;
+  }
+  if (document.activeElement === greetEl) greetEl.blur();
+  state.busy = true; hideHint();
+  printBtn.classList.add('down'); printBtn.setAttribute('aria-disabled', 'true'); chip.classList.add('down');
+  const serial = state.serial;
+  const snap = snapshot(serial, { design: o.design, ed: o.ed, misfeed: o.misfeed, ghostOf: o.misfeed ? lastSnap : null });
+  /* fresh ink comes up over two pulls unless the drums were idled first */
+  if (FX.cycle) { snap.fx.dA = +(snap.fx.dA * PALE[drumRun.A.up]).toFixed(3); snap.fx.dB = +(snap.fx.dB * PALE[drumRun.B.up]).toFixed(3); snap.pale = drumRun.A.up < 2 || drumRun.B.up < 2; }
+  pulls.set(serial, snap);
+  const rm = reduced();
+
+  /* where the sheet is pulled: over the card if it is on screen, otherwise mid-screen */
+  const lr = liveSheet.getBoundingClientRect();
+  const vis = (Math.min(lr.bottom, innerHeight) - Math.max(lr.top, 0)) / lr.height;
+  let w = liveSheet.offsetWidth, cx, cy, rot = state.rot, overCard = vis > .6;
+  if (overCard) { cx = lr.left + lr.width / 2 + scrollX; cy = lr.top + lr.height / 2 + scrollY; }
+  else { w = Math.min(w, innerWidth - 48, (innerHeight - 120) * SW / SH); cx = innerWidth / 2 + scrollX; cy = innerHeight / 2 + scrollY; rot = 0; }
+  const h = w * SH / SW;
+
+  /* masters first: a hot hairline in each drum's ink scans down the proof */
+  if (FX.cycle) {
+    lcd(o.misfeed ? 'Double feed. Kept for the wall.' : 'Making masters…');
+    announce(o.misfeed ? 'The feed misfired.' : 'Making masters.');
+    if (!rm && overCard && !o.misfeed) await thermalScan(); else await wait(200);
+    lcd('Printing · Drum A, then Drum B');
+  }
+
+  const run = document.createElement('div');
+  run.className = 'run';
+  Object.assign(run.style, { left: (cx - w / 2) + 'px', top: (cy - h / 2) + 'px', width: w + 'px', height: h + 'px', transform: `rotate(${rot}deg)`, opacity: '.01' });
+  const sheet = buildSheet(snap, { pfx: 'R' + serial, mode: 'screen' });
+  run.append(sheet);
+  const wraps = [$('.pa', sheet), $('.pb', sheet)].map(pl => {
+    const wipe = document.createElement('div'), counter = document.createElement('div');
+    wipe.className = 'wipe'; counter.className = 'counter';
+    pl.replaceWith(wipe); wipe.append(counter); counter.append(pl);
+    pl.style.mixBlendMode = 'normal';
+    wipe.style.transform = 'translateY(-100%)'; counter.style.transform = 'translateY(100%)';
+    return { wipe, counter };
+  });
+  const rolls = ['A', 'B'].map(wd => { const r = document.createElement('div'); r.className = 'roller'; r.style.setProperty('--ink', wd === 'A' ? inkVar(snap.inkA) : inkVar(snap.inkB)); r.innerHTML = '<span class="cyl-body"><span class="ribs"></span></span>'; run.append(r); return r; });
+  if (!runLayer) { runLayer = document.createElement('div'); runLayer.className = 'run-layer'; document.body.append(runLayer); }
+  runLayer.style.height = document.documentElement.scrollHeight + 'px';
+  runLayer.append(run);
+  /* make room on the line */
+  if (hungs.length >= cap) {
+    const old = hungs.shift();
+    old.el.classList.add('falling');
+    if (rm) old.el.remove();
+    else old.el.animate([{ transform: 'translateX(-50%)', opacity: 1 }, { transform: 'translateX(-50%) translateY(70px) rotate(-14deg)', opacity: 0 }], { duration: 460, easing: 'cubic-bezier(.5,0,.9,.6)', fill: 'forwards' }).onfinish = () => old.el.remove();
+    hungs.forEach((hh, i) => positionHung(hh.el, i));
+  }
+  const target = hang(snap, true);
+  /* nearly transparent rather than hidden, so its first paint happens before it is revealed */
+  target.style.opacity = '.01'; target.style.pointerEvents = 'none';
+  /* let the fresh sheet rasterise once before the feed starts, so the fade is not swallowed by that first paint */
+  await frame(); await frame();
+  cycleTurning = true;
+  const passDur = FX.cycle ? 520 : 720;
+  if (FX.cycle) { sThrum(.26 + passDur * 2 / 1000 + .25); sFeed(); }
+
+  if (rm) {
+    wraps.forEach(w => { w.wipe.style.transform = w.counter.style.transform = 'none'; });
+    await anim(run, [{ opacity: 0 }, { opacity: 1 }], { duration: 200 });
+    await wait(500);
+  } else {
+    /* feed */
+    await anim(run, [{ opacity: 0, translate: '0 -5%' }, { opacity: 1, translate: '0 0' }], { duration: 260, easing: 'cubic-bezier(.2,.7,.3,1)' });
+    /* the fresh sheet now hides the proof completely; stop compositing the proof underneath */
+    if (overCard) liveSheet.style.visibility = 'hidden';
+    /* two passes */
+    const pass = async (wr, roller, drumBtn) => {
+      const dur = passDur, ease = 'cubic-bezier(.45,.05,.4,1)';
+      spin(drumBtn, 22, dur);
+      sRoll(dur / 1000);
+      roller.animate([{ opacity: 0 }, { opacity: 1, offset: .08 }, { opacity: 1, offset: .9 }, { opacity: 0 }], { duration: dur, fill: 'forwards' });
+      $('.ribs', roller).animate([{ transform: 'translateY(0)' }, { transform: 'translateY(96px)' }], { duration: dur, easing: ease });
+      anim(roller, [{ transform: 'translateY(-50%)' }, { transform: `translateY(${h}px) translateY(-50%)` }], { duration: dur, easing: ease });
+      anim(wr.counter, [{ transform: 'translateY(100%)' }, { transform: 'translateY(0)' }], { duration: dur, easing: ease });
+      await anim(wr.wipe, [{ transform: 'translateY(-100%)' }, { transform: 'translateY(0)' }], { duration: dur, easing: ease });
+    };
+    await pass(wraps[0], rolls[0], $('#drumA'));
+    await pass(wraps[1], rolls[1], $('#drumB'));
+  }
+  cycleTurning = false;
+  rolls.forEach(r => r.remove());
+  liveSheet.style.visibility = '';
+
+  const slotX = lead + (hungs.length - .5) * slotSize();
+  if (slotX - lineScroll.scrollLeft > lineScroll.clientWidth - hw || slotX < lineScroll.scrollLeft + hw) lineScroll.scrollLeft = slotX - lineScroll.clientWidth / 2;
+  const ts = docRect($('.sheet', target));
+  const vb = scrollY + innerHeight;
+  if (ts.bottom + 40 > vb || ts.top - 60 < scrollY) {
+    const top = Math.max(0, ts.bottom + 48 - innerHeight);
+    scrollTo({ top, behavior: rm ? 'auto' : 'smooth' });
+  }
+
+  if (rm) {
+    await anim(run, [{ opacity: 1 }, { opacity: 0 }], { duration: 200 });
+  } else {
+    const dx = ts.cx - cx, dy = ts.cy - cy, s = ts.w / w;
+    /* bounding box of the tilted mini print slightly exceeds its width; correct with the tilt */
+    const tilt = snap.fx.tilt, th = Math.abs(tilt) * Math.PI / 180;
+    const s2 = (ts.w / (Math.cos(th) + (SH / SW) * Math.sin(th))) / w;
+    await anim(run, [
+      { transform: `translate(0px,0px) rotate(${rot}deg) scale(1)` },
+      { transform: `translate(0px,-12px) rotate(${rot}deg) scale(1.025)`, offset: .16, easing: 'cubic-bezier(.4,0,.6,1)' },
+      { transform: `translate(${f2(dx * .45)}px,${f2(dy * .38 - 50)}px) rotate(${f2(rot - 5)}deg) scale(${f4((1 + s2) / 2)})`, offset: .55, easing: 'cubic-bezier(.3,.1,.4,1)' },
+      { transform: `translate(${f2(dx)}px,${f2(dy)}px) rotate(${tilt}deg) scale(${f4(s2 || s)})` }
+    ], { duration: 760 });
+  }
+  run.remove(); runLayer.style.height = '0';
+  target.style.opacity = ''; target.style.pointerEvents = '';
+  target.classList.add('landed');
+  sClick();
+  if (FX.carol) sNote(sessionPrints);
+  const swing = $('.hung-swing', target);
+  const done = () => { target.classList.remove('landed'); target.classList.add('swaying'); };
+  if (rm) done(); else swing.addEventListener('animationend', done, { once: true });
+  if (FX.wet) addWet(target);
+  if (FX.draught) pegBounce(target);
+
+  state.serial++;
+  setCounter(state.serial - 1, true);
+  $('#chipNo').textContent = '№ ' + pad3(state.serial);
+  if (FX.cycle) { for (const d of ['A', 'B']) { drumRun[d].since++; drumRun[d].up = Math.min(2, drumRun[d].up + 1); } applyInks(); lcd(null); }
+  else $('#nextNo').textContent = '№ ' + pad3(state.serial);
+  updateSlugs();
+  printBtn.classList.remove('down'); printBtn.removeAttribute('aria-disabled'); chip.classList.remove('down');
+  state.busy = false;
+  lastSnap = snap; sessionPrints++;
+  hintDone('print');
+  announce(`Print № ${pad3(serial)} is on the drying line${snap.pale ? ', a little pale while the fresh ink comes up' : ''}.`);
+  if (misfeedQueued) { misfeedQueued = false; setTimeout(() => runPrint({ misfeed: true }), rm ? 60 : 180); }
+}
+printBtn.addEventListener('click', runPrint);
+chip.addEventListener('click', runPrint);
+/* the pedal shows on narrow layouts whenever the real PRINT button is out of view */
+const narrowMQ = matchMedia('(max-width: 1180px)');
+let printInView = false, chipReady = false;
+function syncChip() {
+  const on = narrowMQ.matches && !printInView;
+  if (!chipReady) { chip.classList.add('instant'); chipReady = true; requestAnimationFrame(() => requestAnimationFrame(() => chip.classList.remove('instant'))); }
+  chip.classList.toggle('on', on);
+}
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver(es => { printInView = es[es.length - 1].isIntersecting; syncChip(); }, { threshold: .5 }).observe(printBtn);
+} else printInView = true;
+narrowMQ.addEventListener('change', syncChip);
+
+/* ---------- shared filters: rubber impressions, the REJECT chop, ink wicking into fibre under the lens ---------- */
+function buildDefs() {
+  const kiss = i => `<filter id="kiss${i}" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="1.7" numOctaves="2" seed="${7 + i * 13}" result="n"/><feComponentTransfer in="n" result="m"><feFuncA type="discrete" tableValues="0 0 1 1 1 1 1"/></feComponentTransfer><feComposite in="SourceGraphic" in2="m" operator="in"/></filter>`;
+  $('#fxDefs').innerHTML = kiss(0) + kiss(1) + kiss(2)
+    + '<filter id="firm" x="-8%" y="-8%" width="116%" height="116%" color-interpolation-filters="sRGB"><feMorphology in="SourceGraphic" operator="dilate" radius=".08" result="fat"/><feMorphology in="SourceAlpha" operator="erode" radius=".24" result="core"/><feComposite in="fat" in2="core" operator="out" result="ring"/><feColorMatrix in="ring" type="matrix" values=".7 0 0 0 0 0 .7 0 0 0 0 0 .7 0 0 0 0 0 .55 0" result="dark"/><feGaussianBlur in="dark" stdDeviation=".08" result="rim"/><feMerge><feMergeNode in="fat"/><feMergeNode in="rim"/></feMerge></filter>'
+    + '<filter id="chopRough" x="-20%" y="-30%" width="140%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale=".7" xChannelSelector="R" yChannelSelector="G" result="d"/><feComponentTransfer in="n" result="m"><feFuncA type="discrete" tableValues="0 1 1 1 1"/></feComponentTransfer><feComposite in="d" in2="m" operator="in"/></filter>'
+    + '<filter id="wick" filterUnits="userSpaceOnUse" x="0" y="0" width="125" height="168" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="6" numOctaves="2" seed="9" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale=".09" xChannelSelector="R" yChannelSelector="G" result="d"/><feMorphology in="d" operator="dilate" radius=".014"/></filter>';
+}
+
+/* ---------- the linen tester: a 6× folding magnifier ---------- */
+const lens = $('#lens'), tester = $('#tester');
+const LPXMM = 21.6;                       /* lens pixels per sheet millimetre, about 6× the card on a desktop */
+let L = null, lastPt = [innerWidth / 2, innerHeight / 2];
+addEventListener('pointermove', e => { lastPt = [e.clientX, e.clientY]; if (L && (L.mode === 'z' || L.mode === 'held')) lensMove(e.clientX, e.clientY); }, { passive: true });
+function lensSrcAt(x, y) {
+  for (const el of document.elementsFromPoint(x, y)) {
+    const sh = el.closest && el.closest('.sheet'); if (!sh || sh.closest('.lens')) continue;
+    if (sh === liveSheet) return { el: sh, live: true, rot: state.rot, snap: null };
+    const hg = sh.closest('.hung'); if (hg) { const h = hungs.find(q => q.el === hg); if (h) return { el: sh, rot: h.snap.fx.tilt, snap: h.snap }; }
+    if (viewer.open && vSnap && sh.closest('.front')) return { el: sh, rot: 0, snap: vSnap };
+  }
+  return null;
+}
+function frameOf(src) { const r = src.el.getBoundingClientRect(), a = src.rot * Math.PI / 180; return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, k: src.el.offsetWidth / SW, c: Math.cos(a), s: Math.sin(a) }; }
+function makeClone(src) {
+  let sh;
+  if (src.live) {
+    sh = liveSheet.cloneNode(true);
+    for (const e of [sh, ...$$('[id], [tabindex], [contenteditable], [role]', sh)]) { e.removeAttribute('id'); e.removeAttribute('tabindex'); e.removeAttribute('contenteditable'); e.removeAttribute('role'); }
+    sh.style.visibility = ''; $('.thermal', sh)?.remove();
+  } else sh = buildSheet(src.snap, { pfx: 'Z' + src.snap.serial, mode: 'screen' });
+  const wC = src.live ? liveSheet.offsetWidth : 450, z = LPXMM / (wC / SW);
+  sh.style.width = wC + 'px';
+  /* under the lens the ink grain and paper texture are drawn at their own resolution, not blown up */
+  for (const pl of $$('.plate', sh)) {
+    const two = /gradient/.test(pl.style.maskImage || pl.style.webkitMaskImage || ''), sz = `${f2(1024 / z)}px auto` + (two ? ', 100% 100%' : '');
+    pl.style.webkitMaskSize = sz; pl.style.maskSize = sz;
+  }
+  sh.style.backgroundSize = `${f2(480 / z)}px ${f2(480 / z)}px`;
+  sh.insertAdjacentHTML('afterbegin', '<svg class="micro" viewBox="0 0 125 168" preserveAspectRatio="none" aria-hidden="true"></svg>');
+  for (const g of $$('.stamps', sh)) g.setAttribute('filter', 'url(#wick)');
+  return sh;
+}
+/* paper fibres, generated per 4 mm cell so the same patch of paper always looks the same */
+function fibres(mx, my, R) {
+  const c0 = Math.floor((mx - R) / 4), c1 = Math.floor((mx + R) / 4), r0 = Math.floor((my - R) / 4), r1 = Math.floor((my + R) / 4);
+  const key = `${c0},${c1},${r0},${r1}`; if (L.cells === key) return; L.cells = key;
+  let dk = '', lt = '';
+  for (let cx = c0; cx <= c1; cx++) for (let cy = r0; cy <= r1; cy++) {
+    const r = rngFor(20000 + (cx & 255) * 977 + (cy & 255) * 7919);
+    for (let i = 0; i < 9; i++) {
+      const x = cx * 4 + r() * 4, y = cy * 4 + r() * 4, a = r() * Math.PI * 2, len = .25 + r() * .95, b = a + (r() - .5) * 1.4;
+      const seg = `M${f2(x)} ${f2(y)}Q${f2(x + Math.cos(b) * len * .5)} ${f2(y + Math.sin(b) * len * .5)} ${f2(x + Math.cos(a) * len)} ${f2(y + Math.sin(a) * len)}`;
+      if (r() < .58) dk += seg; else lt += seg;
+    }
+  }
+  $('.micro', L.clone).innerHTML = `<path d="${dk}" stroke="var(--ink-text)" stroke-opacity=".2" stroke-width=".03"/><path d="${lt}" stroke="var(--white)" stroke-opacity=".9" stroke-width=".05"/>`;
+}
+const ARROWS = ['→', '↘', '↓', '↙', '←', '↖', '↑', '↗'];
+function driftOf(src) {
+  if (src.live) return driftVec(liveSnap());
+  const s = src.snap, [dx, dy] = driftVec(s);
+  return [dx + s.fx.jb[0] - s.fx.ja[0], dy + s.fx.jb[1] - s.fx.ja[1]];
+}
+function drawReticle(src) {
+  const S = lens.offsetWidth || 150, c = S / 2, svg = $('.lens-ret', lens); if (!svg) return;
+  let d = `M${c - 16} ${c}H${c - 5}M${c + 5} ${c}H${c + 16}M${c} ${c - 16}V${c - 5}M${c} ${c + 5}V${c + 16}`;
+  const y = c + S * .3;
+  for (let i = -3; i <= 3; i++) { const x = c + i * LPXMM; d += `M${f2(x)} ${f2(y)}v${i ? 4 : 7}`; }
+  d += `M${f2(c - 3 * LPXMM)} ${f2(y)}H${f2(c + 3 * LPXMM)}`;
+  let label = '';
+  if (src) {
+    const [dx, dy] = driftOf(src), m = Math.hypot(dx, dy);
+    const t = m < .05 ? 'in register' : `Δ ${m.toFixed(2)} mm ${ARROWS[((Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) % 8) + 8) % 8]}`;
+    const tw = t.length * 5.9 + 10;
+    label = `<rect x="${f2(c - tw / 2)}" y="${f2(c - S * .36)}" width="${f2(tw)}" height="14" rx="7"/><text x="${c}" y="${f2(c - S * .36 + 10)}" text-anchor="middle">${t}</text>`;
+  }
+  svg.setAttribute('viewBox', `0 0 ${S} ${S}`);
+  svg.innerHTML = `<path d="${d}"/><text x="${f2(c + 3 * LPXMM + 3)}" y="${f2(y + 7)}" style="font-size:7px">mm</text>${label}`;
+}
+/* (x, y) is where the glass sits; (lx, ly) is the spot it shows: under a fingertip the glass rides above the finger */
+function lensMove(x, y, lx = x, ly = y) {
+  if (!L) return;
+  /* a glass riding above a finger stays on screen, even when the finger is near the top */
+  if (x !== lx || y !== ly) { const h = (lens.offsetWidth || 132) / 2 + 4; x = clamp(x, h, innerWidth - h); y = clamp(y, h, innerHeight - h); }
+  lens.style.translate = `${f2(x)}px ${f2(y)}px`;
+  x = lx; y = ly;
+  const src = lensSrcAt(x, y);
+  if (!src) {
+    if (L.src) { $('.lens-src', lens).innerHTML = ''; L.src = null; L.clone = null; drawReticle(null); }
+    lens.classList.add('empty');
+    const onMat = document.elementsFromPoint(x, y).some(e => e.classList && e.classList.contains('mat'));
+    lens.style.backgroundColor = onMat ? 'var(--mat)' : '';
+    return;
+  }
+  lens.classList.remove('empty'); lens.style.backgroundColor = '';
+  if (!L.src || L.src.el !== src.el) {
+    L.src = src; L.clone = makeClone(src); L.cells = '';
+    const box = $('.lens-src', lens); box.innerHTML = ''; box.append(L.clone);
+    drawReticle(src);
+  }
+  const F = frameOf(src), [mx, my] = screen2mm(x, y, F), kC = L.clone.offsetWidth / SW || 3.6, z = LPXMM / kC, S = lens.offsetWidth / 2;
+  $('.lens-src', lens).style.transform = `translate(${f2(S)}px, ${f2(S)}px) rotate(${f2(src.rot)}deg) scale(${f4(z)}) translate(${f2(-mx * kC)}px, ${f2(-my * kC)}px)`;
+  const R = S / LPXMM * 1.5 + 3;
+  fibres(mx, my, R);
+  const wk = $('#wick'); wk.setAttribute('x', f2(mx - R)); wk.setAttribute('y', f2(my - R)); wk.setAttribute('width', f2(R * 2)); wk.setAttribute('height', f2(R * 2));
+}
+function lensOpen(mode, x, y, lx = x, ly = y) {
+  if (!FX.lens) return;
+  if (L) lensClose(true);
+  L = { mode, src: null, clone: null, cells: '' };
+  (viewer.open ? viewer : document.body).append(lens);
+  lens.style.setProperty('--ls', (innerWidth < 420 ? 132 : 150) + 'px');
+  lens.innerHTML = '<div class="lens-src"></div><svg class="lens-ret" aria-hidden="true"></svg>';
+  lens.hidden = false;
+  drawReticle(null);
+  lensMove(x, y, lx, ly);
+  requestAnimationFrame(() => { if (L) lens.classList.add('on'); });
+  tester.setAttribute('aria-pressed', 'true');
+  if (mode !== 'kbd') tester.classList.add('lifted');
+}
+function lensClose(now) {
+  if (!L) return;
+  L = null; lens.classList.remove('on'); tester.classList.remove('lifted'); tester.setAttribute('aria-pressed', 'false');
+  const fin = () => { if (!L) { lens.hidden = true; lens.innerHTML = ''; } };
+  if (now || reduced()) fin(); else setTimeout(fin, 160);
+}
+/* drag the tester, or pick it up with a click and put it down with the next */
+let tDrag = null;
+const lift = touch => touch ? 96 : 0;
+tester.addEventListener('pointerdown', e => {
+  if (e.button) return; e.preventDefault();
+  if (L && L.mode === 'held') { lensClose(); return; }
+  tDrag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, moved: false, touch: e.pointerType !== 'mouse' };
+  try { tester.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+});
+tester.addEventListener('pointermove', e => {
+  if (!tDrag || e.pointerId !== tDrag.id) return;
+  if (!tDrag.moved) { if (Math.hypot(e.clientX - tDrag.x0, e.clientY - tDrag.y0) < 5) return; tDrag.moved = true; lensOpen('drag', e.clientX, e.clientY - lift(tDrag.touch), e.clientX, e.clientY); hintDone('lens'); }
+  lensMove(e.clientX, e.clientY - lift(tDrag.touch), e.clientX, e.clientY);
+});
+function testerUp(e) {
+  if (!tDrag || e.pointerId !== tDrag.id) return;
+  const d = tDrag; tDrag = null;
+  if (d.moved) { lensClose(); return; }
+  /* a click picks the tester up; a tap sets it down on the card until the next touch */
+  if (d.touch) lensOnCard(); else lensOpen('held', e.clientX, e.clientY);
+}
+/* on the part of the card that is in view, as near its middle as the screen allows; if too little of the card shows, bring it into view first */
+function lensOnCard() {
+  const ls = innerWidth < 420 ? 132 : 150, m = ls / 2 + 10, r = liveSheet.getBoundingClientRect();
+  const top = Math.max(r.top, 0), bot = Math.min(r.bottom, innerHeight);
+  const go = () => {
+    const F = sheetFrame(), [, cy] = mm2screen(SW / 2, SH * .42, F), q = liveSheet.getBoundingClientRect();
+    const y = clamp(cy, Math.max(q.top, 0) + m, Math.min(q.bottom, innerHeight) - m), x = clamp(q.left + q.width / 2, m, innerWidth - m);
+    const mm = screen2mm(x, y, F);
+    lensOpen('kbd', x, y); if (L) L.mm = [clamp(mm[0], 0, SW), clamp(mm[1], 0, SH)];
+  };
+  if (bot - top >= ls + 24) { go(); return; }
+  const want = r.top + r.height * .42 - innerHeight / 2;
+  scrollBy({ top: want, behavior: reduced() ? 'auto' : 'smooth' });
+  let idle = 0, cap = 0;
+  const stop = () => { clearTimeout(idle); clearTimeout(cap); removeEventListener('scroll', on); removeEventListener('pointerdown', stop, true); };
+  const fin = () => { stop(); go(); };
+  const on = () => { clearTimeout(idle); idle = setTimeout(fin, 120); };
+  /* a new touch while the page travels means the visitor has moved on */
+  addEventListener('scroll', on, { passive: true }); addEventListener('pointerdown', stop, true);
+  idle = setTimeout(fin, 180); cap = setTimeout(fin, 1200);
+}
+tester.addEventListener('pointerup', testerUp);
+tester.addEventListener('pointercancel', e => { if (tDrag && e.pointerId === tDrag.id) { tDrag = null; lensClose(); } });
+tester.addEventListener('click', e => {
+  if (e.detail) return;
+  /* keyboard: Enter opens the lens over the card; arrows move it; Enter or Escape folds it away */
+  if (L) { lensClose(); return; }
+  lensOnCard();
+});
+tester.addEventListener('keydown', e => {
+  if (!L || L.mode !== 'kbd') return;
+  const st = e.shiftKey ? 10 : 3, mv = { ArrowLeft: [-st, 0], ArrowRight: [st, 0], ArrowUp: [0, -st], ArrowDown: [0, st] }[e.key];
+  if (mv) { e.preventDefault(); L.mm = [clamp(L.mm[0] + mv[0], 0, SW), clamp(L.mm[1] + mv[1], 0, SH)]; const [sx, sy] = mm2screen(L.mm[0], L.mm[1]); lensMove(sx, sy); }
+  else if (e.key === 'Escape') { e.preventDefault(); lensClose(); }
+});
+tester.addEventListener('blur', () => { if (L && L.mode === 'kbd') lensClose(); });
+/* while the lens is held, the next press anywhere puts it down */
+addEventListener('pointerdown', e => {
+  if (!L || (L.mode !== 'held' && L.mode !== 'kbd') || e.target === tester || tester.contains(e.target)) return;
+  e.preventDefault(); e.stopPropagation(); lensClose(); swallowClick();
+}, true);
+/* the press that puts the lens down is spent: its click (or long-press menu) reaches nothing underneath */
+function swallowClick() {
+  let t = 0;
+  const kill = ev => { ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation(); };
+  const end = () => { clearTimeout(t); removeEventListener('click', onClick, true); removeEventListener('contextmenu', kill, true); removeEventListener('pointerup', onUp, true); removeEventListener('pointercancel', onUp, true); };
+  const onClick = ev => { kill(ev); end(); };
+  const onUp = () => { clearTimeout(t); t = setTimeout(end, 450); };
+  addEventListener('click', onClick, true); addEventListener('contextmenu', kill, true);
+  addEventListener('pointerup', onUp, true); addEventListener('pointercancel', onUp, true);
+  t = setTimeout(end, 5000);
+}
+/* hold Z to look anywhere */
+const typing = t => t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+addEventListener('keydown', e => {
+  if ((e.key === 'z' || e.key === 'Z') && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey && !typing(e.target) && !L) { lensOpen('z', lastPt[0], lastPt[1]); hintDone('lens'); }
+  else if (e.key === 'Escape' && L && (L.mode === 'z' || L.mode === 'held')) lensClose();
+});
+addEventListener('keyup', e => { if ((e.key === 'z' || e.key === 'Z') && L && L.mode === 'z') lensClose(); });
+addEventListener('blur', () => { if (L && L.mode !== 'kbd') lensClose(true); });
+/* long-press a print on the line to look at it */
+function bindLongPress(el) {
+  let t = 0, p0 = null, used = false;
+  el.addEventListener('pointerdown', e => {
+    if (e.button || !FX.lens) return; used = false; p0 = { x: e.clientX, y: e.clientY, id: e.pointerId, touch: e.pointerType !== 'mouse' };
+    clearTimeout(t); t = setTimeout(() => { if (!p0) return; used = true; try { el.setPointerCapture(p0.id); } catch (err) { /* ignore */ } lensOpen('press', p0.x, p0.y - lift(p0.touch), p0.x, p0.y); hintDone('lens'); }, 450);
+  });
+  el.addEventListener('pointermove', e => {
+    if (!p0 || e.pointerId !== p0.id) return;
+    if (L && L.mode === 'press') { lensMove(e.clientX, e.clientY - lift(p0.touch), e.clientX, e.clientY); return; }
+    if (Math.hypot(e.clientX - p0.x, e.clientY - p0.y) > 8) { clearTimeout(t); p0 = null; }
+  });
+  const end = () => { clearTimeout(t); p0 = null; if (L && L.mode === 'press') lensClose(); };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  el.addEventListener('touchmove', e => { if (L && L.mode === 'press') e.preventDefault(); }, { passive: false });
+  el.addEventListener('contextmenu', e => { if (used || (L && L.mode === 'press')) e.preventDefault(); });
+  el.addEventListener('click', e => { if (used) { e.preventDefault(); e.stopImmediatePropagation(); used = false; } }, true);
+}
+
+/* ---------- the Advent drawer: one hand-cut stamp a day from 1 December ---------- */
+const spiky = (cx, cy, rx, ry, rot, n = 18) => ell(0, 0, rx, ry, n).map(([x, y], i) => { const m = i % 2 ? .8 : 1.04, a = rot * Math.PI / 180; const X = x * m, Y = y * (i % 2 ? .86 : 1.08); return [cx + X * Math.cos(a) - Y * Math.sin(a), cy + X * Math.sin(a) + Y * Math.cos(a)]; });
+const flame = (cx, cy, w, h) => [[cx, cy - h], [cx + w * .55, cy - h * .3], [cx + w * .5, cy + h * .1], [cx, cy + h * .3], [cx - w * .5, cy + h * .1], [cx - w * .55, cy - h * .3]];
+const ADVENT = [
+  ['holly', 'Holly', 18, () => [S(spiky(-15, 8, 28, 12, -28)), T2(spiky(17, 8, 28, 12, 28)), LnC([[-35, 20], [-2, 0]], 1.6), S(ell(0, -12, 7, 7, 14)), S(ell(-10, -21, 6, 6, 14)), S(ell(9, -23, 6.5, 6.5, 14))]],
+  ['cone', 'Pine cone', 16, () => { const p = [S(rect(-3, -44, 3, -30)), S(ell(0, 4, 22, 36, 40))]; for (let y = -22, k = 0; y < 34; y += 9, k++) for (const x of k % 2 ? [-12, 0, 12] : [-6, 6]) p.push(LnC([[x - 5.5, y - 3], [x, y + 2], [x + 5.5, y - 3]], 2.2)); return p; }],
+  ['robin', 'Robin', 18, () => [S([[22, 2], [48, -14], [50, -5], [28, 14]]), S(ell(2, 8, 30, 24, 36)), S(ell(-20, -14, 14, 14, 24)), T2(ell(-14, 7, 15, 16, 24)), S([[-32, -17], [-43, -13], [-32, -10]]), C(ell(-23, -17, 2.4, 2.4, 10)), LnC([[4, -2], [16, 5], [26, 3]], 2.2), Ln([[-4, 30], [-6, 42]], 2.4), Ln([[8, 30], [8, 42]], 2.4)]],
+  ['sledge', 'Sledge', 20, () => [S(rect(-34, -6, 26, 4)), S(rect(-34, -24, -27, -6)), Ln([[-26, 4], [-26, 18]], 3.5), Ln([[16, 4], [16, 18]], 3.5), Ln([[-44, 18], [30, 18], [40, 13], [43, 4], [39, 0]], 4), LnC([[-30, -1], [22, -1]], 1.5)]],
+  ['gift', 'Gift', 16, () => [T2(rect(-28, -10, 28, 36)), S(rect(-32, -21, 32, -9)), S(rect(-5, -10, 5, 36)), C(rect(-4, -21, 4, -9)), Ln(ell(-10, -29, 9, 6, 16, -18), 2.6, true), Ln(ell(10, -29, 9, 6, 16, 18), 2.6, true)]],
+  ['boot', 'St Nicholas boot', 18, () => [S([[-14, -30], [10, -30], [10, 12], [32, 18], [38, 34], [-14, 34]]), T2(rect(-18, -42, 14, -28)), LnC([[-6, -24], [4, -20], [-6, -16], [4, -12], [-6, -8], [4, -4]], 1.8), C(ell(-1, -36, 3, 3, 10))]],
+  ['cane', 'Candy cane', 16, () => { const a = []; for (let i = 0; i <= 10; i++) { const t = i / 10 * Math.PI; a.push([-12 + 12 * Math.cos(t), -20 - 12 * Math.sin(t)]); } const p = [Ln([[0, 44], ...a, [-24, -12]], 11)]; for (const y of [34, 20, 6, -8]) p.push(LnC([[-5, y + 4], [5, y - 4]], 3)); p.push(LnC([[-17, -36], [-10, -28]], 3), LnC([[-26, -24], [-20, -18]], 3)); return p; }],
+  ['heart', 'Woven heart', 16, () => { const h = []; for (let i = 0; i < 36; i++) { const t = i / 36 * Math.PI * 2; h.push([2.4 * 16 * Math.pow(Math.sin(t), 3), -2.4 * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) + 4]); } const p = [S(h)]; for (const o of [-24, -8, 8, 24]) { p.push(LnC([[o - 14, -14], [o + 18, 18]], 2)); } return p; }],
+  ['mistletoe', 'Mistletoe', 16, () => [Ln([[0, -40], [0, -8], [-14, 14]], 2.6), Ln([[0, -8], [14, 14]], 2.6), S(ell(-22, 20, 18, 8, 24, 35)), T2(ell(22, 20, 18, 8, 24, -35)), Ln(ell(-4, 0, 5, 5, 12), 2.2, true), Ln(ell(6, 4, 5, 5, 12), 2.2, true), Ln(ell(0, 10, 5, 5, 12), 2.2, true)]],
+  ['stocking', 'Stocking', 18, () => [S([[-18, -30], [12, -30], [12, 8], [30, 18], [34, 30], [24, 40], [0, 36], [-18, 20]]), T2(rect(-22, -44, 16, -30)), LnC([[-10, 0], [6, 0]], 2), LnC([[-10, 8], [6, 8]], 2), C(ell(-6, -37, 2.6, 2.6, 10))]],
+  ['gingerbread', 'Gingerbread', 18, () => [S(ell(0, -30, 12, 12, 24)), S([[-14, -19], [14, -19], [16, 14], [-16, 14]]), S(ell(-22, -11, 12, 6, 16, -20)), S(ell(22, -11, 12, 6, 16, 20)), S(ell(-9, 26, 7, 15, 16, 10)), S(ell(9, 26, 7, 15, 16, -10)), C(ell(-4, -33, 1.8, 1.8, 8)), C(ell(4, -33, 1.8, 1.8, 8)), LnC([[-5, -26], [0, -24], [5, -26]], 1.5), C(ell(0, -8, 2.4, 2.4, 10)), C(ell(0, 2, 2.4, 2.4, 10)), LnC([[-30, -12], [-26, -8], [-22, -12]], 1.4), LnC([[22, -12], [26, -8], [30, -12]], 1.4)]],
+  ['moon', 'Crescent moon', 16, () => { const st = []; for (let i = 0; i < 10; i++) { const a = (-90 + i * 36) * Math.PI / 180, r = i % 2 ? 2.6 : 7; st.push([24 + Math.cos(a) * r, -26 + Math.sin(a) * r]); } return [S(ell(-4, 4, 34, 34, 40)), C(ell(12, -6, 28, 28, 40)), S(st)]; }],
+  ['lucia', 'Lucia crown', 20, () => { const p = [T2(ell(0, 26, 40, 9, 30))]; [[-26, 6], [-13, 0], [0, -4], [13, 0], [26, 6]].forEach(([x, top]) => { p.push(S(rect(x - 3, top, x + 3, 24)), S(flame(x, top - 9, 7, 9))); }); p.push(S(rect(-38, 20, 38, 27)), LnC([[-30, 23.5], [-20, 23.5]], 1.4), LnC([[-6, 23.5], [6, 23.5]], 1.4), LnC([[20, 23.5], [30, 23.5]], 1.4)); return p; }],
+  ['lantern', 'Lantern', 16, () => [Ln(ell(0, -39, 6, 6, 14), 2.6, true), S([[-13, -32], [13, -32], [21, -20], [-21, -20]]), T1(rect(-16, -20, 16, 28)), Ln([[-17, -20], [-17, 28], [17, 28], [17, -20]], 3.2), S(flame(0, 6, 10, 14)), S(rect(-22, 28, 22, 36))]],
+  ['snowman', 'Snowman', 18, () => [S(ell(0, 22, 22, 20, 36)), S(ell(0, -12, 15, 14, 30)), S(rect(-11, -42, 11, -25)), S(rect(-18, -28, 18, -24)), C(ell(-5, -15, 2, 2, 8)), C(ell(5, -15, 2, 2, 8)), LnC([[0, -10], [9, -8]], 2), C(ell(0, 14, 2.4, 2.4, 10)), C(ell(0, 25, 2.4, 2.4, 10)), T2(rect(-15, -3, 15, 3)), Ln([[-20, 8], [-40, -4]], 2.4), Ln([[20, 8], [40, -4]], 2.4)]],
+  ['church', 'Church', 18, () => [S(rect(-28, -4, 18, 36)), S([[-32, -2], [-6, -24], [20, -2]]), S(rect(12, -30, 28, 36)), S([[10, -30], [20, -50], [30, -30]]), Ln([[20, -50], [20, -59]], 2), Ln([[16, -55], [24, -55]], 2), C([[-10, 36], [-10, 22], [-6, 17], [-2, 22], [-2, 36]]), C(ell(20, -14, 3, 5, 12)), C(rect(-22, 6, -16, 14)), T2(rect(-34, 36, 34, 40))]],
+  ['angel', 'Angel', 18, () => [T2(ell(-18, -6, 14, 22, 24, -30)), T2(ell(18, -6, 14, 22, 24, 30)), S([[0, -20], [22, 38], [-22, 38]]), S(ell(0, -29, 9, 9, 20)), Ln(ell(0, -43, 10, 3.5, 20), 2.2, true), LnC([[-9, 6], [0, 2], [9, 6]], 2)]],
+  ['drum', 'Drum', 16, () => [T1(rect(-28, -16, 28, 24)), S(rect(-31, -21, 31, -14)), S(rect(-31, 22, 31, 29)), Ln([[-28, -14], [-14, 22], [0, -14], [14, 22], [28, -14]], 2.4), Ln([[-32, -42], [-8, -24]], 3), Ln([[34, -44], [10, -24]], 3), S(ell(-33, -43, 3.6, 3.6, 10)), S(ell(35, -45, 3.6, 3.6, 10))]],
+  ['wreath', 'Wreath', 18, () => { const p = [Ln(ell(0, -4, 30, 30, 36), 12, true)]; for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2 + .2; p.push(LnC([[Math.cos(a) * 26, -4 + Math.sin(a) * 26], [Math.cos(a + .22) * 33, -4 + Math.sin(a + .22) * 33]], 1.8)); } p.push(T2(ell(0, 22, 12, 6, 16)), S([[0, 26], [-15, 18], [-15, 34]]), S([[0, 26], [15, 18], [15, 34]]), Ln([[-4, 28], [-10, 44]], 2.6), Ln([[4, 28], [10, 44]], 2.6)); return p; }],
+  ['sheep', 'Sheep', 18, () => [S(ell(-14, 0, 14, 12, 20)), S(ell(0, -6, 16, 14, 20)), S(ell(14, 0, 14, 12, 20)), S(ell(0, 8, 20, 12, 20)), T2(ell(-30, -6, 8, 10, 16, -20)), C(ell(-32, -8, 1.6, 1.6, 8)), Ln([[-12, 18], [-12, 32]], 4), Ln([[10, 18], [10, 32]], 4), LnC([[-6, -4], [-2, -8], [2, -4], [6, -8]], 1.4)]],
+  ['sprig', 'Fir sprig', 18, () => { const p = [Ln([[-34, 34], [0, 0], [28, -32]], 3)]; for (let t = .08; t < 1; t += .085) { const x = -34 + 62 * t, y = 34 - 66 * t; p.push(Ln([[x, y], [x - 12, y - 6]], 2), Ln([[x, y], [x + 7, y + 11]], 2)); } return p; }],
+  ['goat', 'Yule goat', 20, () => [Ln([[-24, -2], [18, -2]], 9), Ln([[16, -2], [24, -22]], 7), S([[20, -27], [37, -22], [35, -15], [22, -16]]), Ln([[21, -27], [13, -40], [2, -42]], 3.2), Ln([[25, -27], [22, -42], [12, -49]], 3), Ln([[-20, 2], [-23, 30]], 4), Ln([[-12, 2], [-10, 30]], 4), Ln([[8, 2], [6, 30]], 4), Ln([[14, 2], [18, 30]], 4), Ln([[-25, -3], [-34, -12]], 3), LnC([[-14, -6.5], [-14, 2.5]], 2.2), LnC([[-3, -6.5], [-3, 2.5]], 2.2), LnC([[8, -6.5], [8, 2.5]], 2.2)]],
+  ['skate', 'Ice skate', 18, () => [S([[-26, -34], [-6, -34], [-4, -6], [24, 4], [28, 18], [-28, 18]]), T2(rect(-28, -42, -4, -32)), LnC([[-20, -26], [-10, -22], [-20, -18], [-10, -14], [-20, -10], [-8, -6]], 1.6), Ln([[-20, 18], [-20, 28]], 3), Ln([[18, 18], [18, 28]], 3), Ln([[-32, 28], [30, 28], [37, 21]], 3.4)]],
+  ['star8', 'Star of Bethlehem', 20, () => { const L8 = [30, 17, 34, 17, 46, 17, 34, 17], p = []; for (let i = 0; i < 16; i++) { const a = (-90 + i * 22.5) * Math.PI / 180, r = i % 2 ? 8 : L8[i / 2]; p.push([Math.cos(a) * r, -6 + Math.sin(a) * r]); } return [T2(ell(0, -6, 21, 21, 30)), S(p), C(ell(0, -6, 2.6, 2.6, 10))]; }]
+];
+ADVENT.forEach(([key, label, mm, f], i) => cookStamp(key, { label, mm, f, day: i + 1 }, rngFor(400 + i)));
+const advent = $('#adventRow');
+let previewOpened = '';
+function buildAdvent() {
+  if (!FX.advent) return;
+  const S = season(), n = S.k === 'advent' || S.k === 'eve' ? S.n : S.k === 'day' || S.k === 'twelve' ? 24 : 0;
+  advent.classList.remove('pre', 'more-l', 'more-r');
+  if (S.k === 'out') { advent.hidden = true; advent.innerHTML = ''; return; }
+  advent.hidden = false;
+  /* before Advent: a pencilled note on the drawer's label line, which takes no room */
+  if (!n) { advent.classList.add('pre'); advent.innerHTML = '<span class="pencil">stocking the drawer</span>'; return; }
+  const today = S.k === 'advent' || S.k === 'eve' ? n : 0, key = `${noelYear(S.d)}-${today}`;
+  const opened = isPreview() ? previewOpened : store.get('advent', '');
+  advent.innerHTML = '';
+  for (let d = n; d >= 1; d--) {
+    const [kind, label] = ADVENT[d - 1], def = STAMPS[kind], wrapped = d === today && opened !== key;
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'atile'; b.dataset.kind = kind;
+    b.style.setProperty('--tl', (((d * .618) % 1 - .5) * 3.6).toFixed(2) + 'deg');
+    const say = () => b.setAttribute('aria-label', `${label}, Advent ${d}. Stamp it onto the card.`);
+    b.innerHTML = `<svg viewBox="-56 -56 112 112" aria-hidden="true">${partsMarkup(def, { mode: 'screen', pid: 'adv' + d, pitch: 3.6, ptr: 'rotate(45)' })}</svg>`;
+    if (wrapped) {
+      b.insertAdjacentHTML('beforeend', `<span class="tissue"><svg viewBox="0 0 38 40" preserveAspectRatio="none" aria-hidden="true"><path d="M1 9L37 15M3 31L35 22M20 0L17 40M8 0L13 40"/></svg><b>${d} XII</b></span>`);
+      b.setAttribute('aria-label', `A stamp wrapped in tissue, pencilled ${d} December. Unwrap it.`);
+    } else say();
+    pressable(b, (p, isPen) => {
+      const t = $('.tissue', b);
+      if (t) {
+        /* the first touch only unfolds the tissue */
+        if (isPreview()) previewOpened = key; else store.set('advent', key);
+        t.classList.add('open'); sCrinkle(); say();
+        setTimeout(() => t.remove(), 320);
+        announce(`Unwrapped: ${label}, the stamp for ${d} December.`);
+        return;
+      }
+      placeStamp(kind, b, p, isPen);
+    });
+    advent.append(b);
+  }
+  advent.scrollLeft = 0; adventEdges();
+}
+/* the strip shows its hidden ends with a paper fade; a plain mouse wheel scrolls it sideways until it reaches an end */
+function adventEdges() {
+  const max = advent.scrollWidth - advent.clientWidth;
+  advent.classList.toggle('more-l', !advent.classList.contains('pre') && max > 1 && advent.scrollLeft > 1);
+  advent.classList.toggle('more-r', !advent.classList.contains('pre') && max > 1 && advent.scrollLeft < max - 1);
+}
+advent.addEventListener('scroll', adventEdges, { passive: true });
+advent.addEventListener('wheel', e => {
+  const max = advent.scrollWidth - advent.clientWidth, dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? advent.clientWidth : 1);
+  if (max <= 1 || e.ctrlKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return;
+  if ((dy < 0 && advent.scrollLeft <= 0) || (dy > 0 && advent.scrollLeft >= max - 1)) return;
+  e.preventDefault(); advent.scrollLeft = clamp(advent.scrollLeft + dy, 0, max);
+}, { passive: false });
+
+/* ---------- window light that keeps the hour ---------- */
+function applyLight() {
+  if (!FX.light) return;
+  const d = now(), h = d.getHours() + d.getMinutes() / 60, m = d.getMonth();
+  const dawn = [8.1, 7.5, 6.6, 6.2, 5.4, 5, 5.2, 5.8, 6.6, 7.4, 7.6, 8.2][m], dusk = [16.6, 17.4, 18.3, 19.8, 20.6, 21.3, 21.2, 20.4, 19.4, 18.3, 16.9, 16.3][m];
+  let pool, mat, shx;
+  if (h >= dawn && h < dusk) {
+    const t = (h - dawn) / (dusk - dawn), x = 8 + t * 84, warm = Math.abs(t - .5) * 2;
+    pool = `radial-gradient(ellipse 62% 70% at ${f2(x)}% 22%, rgba(255, ${Math.round(252 - warm * 16)}, ${Math.round(240 - warm * 44)}, ${f2(.34 - warm * .06)}), transparent 72%)`;
+    mat = `radial-gradient(ellipse 90% 80% at ${f2(x)}% 0%, rgba(255, 250, 235, .07), transparent 70%)`;
+    shx = (.5 - t) * 6;
+  } else {
+    /* after dusk the desk lamp, from the upper right */
+    pool = 'radial-gradient(ellipse 44% 56% at 88% 4%, rgba(255, 222, 168, .26), transparent 72%)';
+    mat = 'radial-gradient(ellipse 70% 70% at 100% 0%, rgba(255, 226, 170, .06), transparent 70%)';
+    shx = -3;
+  }
+  root.style.setProperty('--light-pool', pool);
+  root.style.setProperty('--light-mat', mat);
+  root.style.setProperty('--shx', f2(shx) + 'px');
+}
+
+/* ---------- detents you can feel while dragging ---------- */
+const dragging = new WeakSet();
+for (const el of [driftIn, lpiIn, typeIn]) {
+  el.addEventListener('pointerdown', () => dragging.add(el));
+  for (const ev of ['pointerup', 'pointercancel', 'change']) el.addEventListener(ev, () => dragging.delete(el));
+}
+function detent(el, snaps, w, step, cap) {
+  const raw = +el.value; if (!FX.detents || !dragging.has(el)) return raw;
+  let v = raw; for (const s of snaps) v += (s - raw) * .6 * Math.exp(-(((raw - s) / w) ** 2));
+  v = Math.round(v / step) * step;
+  /* the pulled value, not the raw one: once the pull has moved the thumb, the browser reports no further input until the pointer passes it */
+  for (const s of snaps) if (Math.abs(v - s) <= cap + 1e-9) v = s;
+  v = +clamp(v, +el.min, +el.max).toFixed(2);
+  if (v !== raw) el.value = v;
+  if (v !== el._last) { sTick(snaps.includes(v) ? 1 : .3); el._last = v; }
+  return v;
+}
+let modHeld = false;
+const trackMod = e => { modHeld = !!(e.altKey || e.shiftKey); };
+for (const ev of ['keydown', 'keyup', 'pointerdown', 'pointermove']) addEventListener(ev, trackMod, { passive: true, capture: true });
+
+/* ---------- the back of a print ---------- */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const fmtT = d => `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()} · ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+function backOf(s, pw) {
+  const b = document.createElement('div'); b.className = 'sheet back face'; b.style.width = pw + 'px';
+  /* set-off: the sheet below it in the tray left a mirrored trace of its wet ink */
+  const prev = pulls.get(s.serial - 1);
+  if (prev && FX.wet) { const so = document.createElement('div'); so.className = 'setoff'; so.append(buildSheet(prev, { pfx: 'S' + s.serial, mode: 'flat', bare: true })); b.append(so); }
+  const [dx, dy] = driftVec(s), tot = Math.hypot(dx + s.fx.jb[0] - s.fx.ja[0], dy + s.fx.jb[1] - s.fx.ja[1]);
+  b.insertAdjacentHTML('beforeend', `<div class="ticket"><h3><span>Job ticket</span><span>№ ${pad3(s.serial)}</span></h3><dl>
+    <dt>Edition</dt><dd>${edHex(s.ed)}</dd>
+    <dt>Drum A</dt><dd>${INKS[s.inkA].name} · ${scrAng('A', s.moire)}°</dd>
+    <dt>Drum B</dt><dd>${INKS[s.inkB].name} · ${scrAng('B', s.moire)}°</dd>
+    <dt>Drift</dt><dd>${tot.toFixed(2)} mm</dd>
+    <dt>Screen</dt><dd>${s.lpi} LPI</dd>
+    <dt>Type</dt><dd>width ${s.typeW}</dd>
+    <dt>Pulled</dt><dd>${fmtT(s.t)}</dd>
+    <dt>Season</dt><dd>${seasonLine(s.t)}</dd></dl>
+    ${s.misfeed ? '<p class="wall">Kept for the wall</p>' : ''}
+    <label for="ticketSeed">Re-pull <input id="ticketSeed" type="text" value="${edHex(s.ed)}" maxlength="4" spellcheck="false" autocomplete="off" aria-describedby="ticketHelp"></label>
+    <span class="sr" id="ticketHelp">Four hex digits. Enter pulls this sheet again from that edition code.</span></div>
+    <p class="imprint">Pulled on a two-drum machine · edition of one</p>`);
+  const inp = $('#ticketSeed', b);
+  inp.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const n = edFromHex(inp.value.trim());
+    if (n == null) { announce('Use four hex digits, like 7F3A.'); inp.select(); return; }
+    const design = vSnap; viewer.close();
+    runPrint({ design, ed: n });
+  });
+  return b;
+}
+let turned = false;
+function flip() {
+  if (!FX.edition || !viewer.open) return;
+  if (mastersOn) { mastersOn = false; mastersBtn.textContent = 'Show masters'; renderViewer(); }
+  turned = !turned;
+  const c = $('.card3d', stage); if (c) { void c.offsetWidth; c.classList.toggle('turned', turned); }
+  $('#flipBtn').setAttribute('aria-pressed', turned); $('#flipBtn').textContent = turned ? 'Turn back' : 'Turn over';
+  sFeed();
+  announce(turned ? 'The back of the print, with its job ticket.' : 'The front of the print.');
+}
+
+/* ---------- pencil marginalia: one hint, on the mat, beside the linen tester ---------- */
+const hintEl = document.createElement('span');
+hintEl.className = 'hint pencil'; hintEl.setAttribute('aria-hidden', 'true');
+hintEl.innerHTML = '<svg viewBox="0 0 30 22"><path d="M27 17C19 17 10 13 7 3M7 3l-1.8 4.4M7 3l3.8 2.6"/></svg><span>drag the lens</span>';
+let hintT = 0, hintOn = false;
+const hintState = () => store.get('hint.lens', { shown: 0, used: 0 });
+function hintDone(id) {
+  if (id !== 'lens') return;
+  const h = hintState(); if (h.used < 2) { h.used++; store.set('hint.lens', h); }
+  hideHint();
+}
+function hideHint() {
+  clearTimeout(hintT);
+  if (hintOn) { hintOn = false; hintEl.classList.add('out'); setTimeout(() => { if (!hintOn) hintEl.remove(); }, 220); }
+}
+function armHint() {
+  clearTimeout(hintT);
+  if (!FX.hints || !FX.lens || hintOn || hintShownThisVisit || !sessionPrints) return;
+  const h = hintState(); if (h.used >= 2 || h.shown >= 3) return;
+  hintT = setTimeout(() => {
+    const r = mat.getBoundingClientRect();
+    if (L || state.busy || innerWidth < 700 || r.bottom < 60 || r.bottom > innerHeight) return;
+    hintShownThisVisit = true; hintOn = true;
+    const hs = hintState(); hs.shown++; store.set('hint.lens', hs);
+    hintEl.classList.remove('on', 'out'); mat.append(hintEl);
+    requestAnimationFrame(() => requestAnimationFrame(() => hintEl.classList.add('on')));
+    announce('Hint: drag the linen tester over a print to look at it at six times.');
+    hintT = setTimeout(hideHint, 9000);
+  }, 4000);
+}
+let hintShownThisVisit = false;
+idleSubs.push(() => { if (!hintOn) armHint(); });
+for (const ev of ['pointerdown', 'keydown']) addEventListener(ev, () => { if (hintOn) hideHint(); }, { passive: true, capture: true });
+
+/* ---------- viewer ---------- */
+const viewer = $('#viewer'), stage = $('#viewerStage'), mastersBtn = $('#mastersBtn');
+let vSnap = null, mastersOn = false;
+function renderViewer() {
+  const s = vSnap; stage.innerHTML = '';
+  const vh = innerHeight, vw = Math.min(innerWidth, 1040);
+  stage.style.gap = '';
+  /* the stage keeps the print's height in both modes, so toggling the masters does not move the dialog */
+  const pw = Math.max(220, Math.min((vh - 230) * SW / SH, vw - 80, 560));
+  stage.style.minHeight = '';
+  if (!mastersOn) {
+    const sh = buildSheet(s, { pfx: 'V' + s.serial, mode: 'screen' }); sh.style.width = pw + 'px';
+    if (FX.edition) {
+      const card = document.createElement('div'), inn = document.createElement('div');
+      card.className = 'card3d' + (turned ? ' turned' : ''); card.style.width = pw + 'px'; inn.className = 'card3d-in';
+      sh.classList.add('face', 'front');
+      inn.append(sh, backOf(s, pw)); card.append(inn); stage.append(card);
+      card.addEventListener('dblclick', e => { if (!e.target.closest('input')) flip(); });
+    } else stage.append(sh);
+  } else {
+    const inner = Math.min(innerWidth - 32, 1040) - 40, gap = inner < 500 ? 14 : 28;
+    stage.style.gap = gap + 'px';
+    const w = Math.max(120, Math.floor(Math.min((vh - 260) * SW / SH, (inner - gap) / 2 - 2, 420)));
+    /* when the masters are nearly as tall as the print, hold the print's height so the text below stays put */
+    if (w > pw * .7) stage.style.minHeight = Math.round(pw * SH / SW + 30) + 'px';
+    for (const p of ['A', 'B']) {
+      const fig = document.createElement('figure');
+      const sh = buildSheet(s, { pfx: 'M' + p + s.serial, mode: 'screen', master: p }); sh.style.width = w + 'px';
+      const ink = INKS[p === 'A' ? s.inkA : s.inkB];
+      fig.append(sh); fig.style.width = w + 'px';
+      fig.insertAdjacentHTML('beforeend', `<figcaption><b>Master ${p}</b> · screen ${ANG[p]}°<br>${ink.name}</figcaption>`);
+      stage.append(fig);
+    }
+  }
+  const [dx, dy] = driftVec(s), jx = s.fx.jb[0] - s.fx.ja[0], jy = s.fx.jb[1] - s.fx.ja[1];
+  const total = Math.hypot(dx + jx, dy + jy);
+  $('#viewerSpec').innerHTML = mastersOn
+    ? `Each drum carries its own stencil master: a film that a thermal head perforates with tiny holes. Ink only passes where the film is open, so each master holds one colour of the card. Solid areas are open film; tints are a screen of dots at ${s.lpi} lines per inch.`
+    : `<b>Drum A</b> ${INKS[s.inkA].name} ${INKS[s.inkA].hex} at 15° · <b>Drum B</b> ${INKS[s.inkB].name} ${INKS[s.inkB].hex} at 75° · <b>Registration</b> ${total.toFixed(2)} mm off (set to ${s.drift.toFixed(2)} mm) · <b>Screen</b> ${s.lpi} LPI, ${pitchOf(s.lpi).toFixed(2)} mm dot pitch · <b>Starved band</b> on Drum ${s.fx.streak.plate} at ${Math.round(s.fx.streak.x * 1.25)} mm · <b>Type</b> width ${s.typeW}`;
+}
+function openViewer(snap) {
+  vSnap = snap; mastersOn = false; turned = false;
+  $('#flipBtn').setAttribute('aria-pressed', 'false'); $('#flipBtn').textContent = 'Turn over'; $('#flipBtn').hidden = !FX.edition;
+  mastersBtn.textContent = 'Show masters';
+  $('#viewerTitle').textContent = '№ ' + pad3(snap.serial);
+  renderViewer();
+  if (typeof viewer.showModal === 'function') viewer.showModal(); else viewer.setAttribute('open', '');
+}
+$('#flipBtn').addEventListener('click', flip);
+addEventListener('keydown', e => { if (viewer.open && (e.key === 'f' || e.key === 'F') && !e.repeat && !typing(e.target) && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); flip(); } });
+viewer.addEventListener('close', () => { if (L) lensClose(true); });
+mastersBtn.addEventListener('click', () => {
+  if (turned) { turned = false; $('#flipBtn').setAttribute('aria-pressed', 'false'); $('#flipBtn').textContent = 'Turn over'; }
+  mastersOn = !mastersOn;
+  mastersBtn.textContent = mastersOn ? 'Show print' : 'Show masters';
+  renderViewer();
+});
+let vT = 0;
+addEventListener('resize', () => { if (!viewer.open || !vSnap) return; cancelAnimationFrame(vT); vT = requestAnimationFrame(renderViewer); });
+$('#closeViewer').addEventListener('click', () => viewer.close());
+viewer.addEventListener('click', e => { if (e.target === viewer) { const r = viewer.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) viewer.close(); } });
+
+/* ---------- init ---------- */
+buildDefs();
+buildLive();
+applyInks();
+renderLive();
+updateNext();
+bindGreeting();
+updateLPI();
+$('#lpiOut').innerHTML = `${state.lpi} LPI <small>${pitchOf(state.lpi).toFixed(2)} mm</small>`;
+liveSheet.addEventListener('pointerdown', onDown);
+/* SVG shapes do not always honour touch-action, so claim touches that start on a stamp */
+liveSheet.addEventListener('touchstart', e => { const t = e.touches[0]; if (t && !state.busy && stampAt(e.target, t.clientX, t.clientY)) e.preventDefault(); }, { passive: false });
+/* stop the press on a stamp from focusing or selecting the greeting underneath */
+liveSheet.addEventListener('mousedown', e => { if (drag) e.preventDefault(); });
+liveSheet.addEventListener('touchmove', e => { if (drag) e.preventDefault(); }, { passive: false });
+liveSheet.addEventListener('pointermove', onMove);
+liveSheet.addEventListener('pointerup', e => endDrag(e, false));
+liveSheet.addEventListener('pointercancel', e => endDrag(e, true));
+liveSheet.addEventListener('lostpointercapture', e => { if (drag && e.pointerId === drag.id) endDrag(e, !drag.at); });
+liveSheet.addEventListener('keydown', e => {
+  const g = e.target.closest && e.target.closest('.stamp'); if (!g || state.busy) return;
+  const s = state.stamps.find(t => t.id === +g.dataset.id); if (!s) return;
+  const step = e.shiftKey ? 6 : 2;
+  const mv = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); swapDrum(s, true); }
+  else if (e.key === 'Delete' || e.key === 'Backspace') {
+    e.preventDefault();
+    const i = $$('.stamp', liveSheet).indexOf(g);
+    removeStamp(s);
+    const left = $$('.stamp', liveSheet);
+    (left[i] || left[i - 1] || $('.tile', tiles)).focus();
+  }
+  else if (mv) { e.preventDefault(); s.x = clamp(s.x + mv[0], 2, SW - 2); s.y = clamp(s.y + mv[1], 2, SH - 2); renderLive(); stampEl(s.id)?.focus(); }
+});
+
+/* pre-hung prints from earlier in the day */
+(() => {
+  const r = rngFor(3);
+  const pairs = [[2, 8], [5, 7], [6, 4], [3, 2], [0, 7], [2, 1], [6, 1], [5, 3]];
+  const picks = [];
+  while (picks.length < 4) { const p = pairs[Math.floor(r() * pairs.length)]; if (!picks.includes(p)) picks.push(p); }
+  const keep = { inkA: state.inkA, inkB: state.inkB, drift: state.drift, lpi: state.lpi, stamps: state.stamps };
+  picks.forEach(([a, b], i) => {
+    state.inkA = a; state.inkB = b; state.drift = i === 0 ? 1.5 : +(.3 + r() * .9).toFixed(2); state.lpi = 40 + Math.round(r() * 30);
+    /* earlier pulls from the same stamps, nudged and re-inked by hand between runs */
+    state.stamps = keep.stamps.map(t => ({ ...t, x: t.x + (r() - .5) * 7, y: t.y + (r() - .5) * 6, rot: t.rot + (r() - .5) * 14, drum: r() < .3 ? (t.drum === 'A' ? 'B' : 'A') : t.drum }));
+    const sn = snapshot(i + 1, { t: new Date(now().getTime() - (picks.length - i) * 41 * 60000) });
+    pulls.set(sn.serial, sn); lastSnap = sn;
+    hang(sn, false);
+  });
+  Object.assign(state, keep);
+  state.serial = picks.length + 1;
+  setCounter(picks.length, false);
+  $('#nextNo').textContent = $('#chipNo').textContent = '№ ' + pad3(state.serial);
+  updateSlugs();
+})();
+valueTexts();
+layoutLine();
+drawMat();
+fitGreeting();
+if (FX.detents) $('#typeWOut').style.fontStretch = state.typeW + '%';
+applyLight(); setInterval(applyLight, 60000);
+buildAdvent();
+armDraught(); armHint();
+/* the tester lives on the mat, or in the drawer on a phone */
+const phoneMQ = matchMedia('(max-width: 699px)');
+/* on a phone it takes the drawer's first compartment, on the left, where the floating PRINT pedal never covers it */
+const placeTester = () => { const home = phoneMQ.matches ? tiles : mat; if (tester.parentNode !== home) { if (L) lensClose(true); if (home === tiles) tiles.prepend(tester); else mat.append(tester); } };
+placeTester(); phoneMQ.addEventListener('change', placeTester);
+if (!FX.lens) tester.hidden = true;
+addEventListener('hashchange', () => { readHash(); applyLight(); buildAdvent(); });
+
+let rzT = 0;
+const ro = new ResizeObserver(() => { cancelAnimationFrame(rzT); rzT = requestAnimationFrame(() => { drawMat(); layoutLine(); fitGreeting(); if (FX.advent) adventEdges(); }); });
+ro.observe(mat); ro.observe(lineScroll); ro.observe(advent);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitGreeting(); drawMat(); });
+})();
+</script>

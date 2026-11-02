@@ -1,0 +1,2936 @@
+<title>The Midnight Glasshouse</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&amp;family=Jost:wght@300;400;500&amp;display=swap">
+<style>
+/* Layout: one velvet-dark atelier. The WebGL glass stage fills the page with a fir bough across the top; a numbered I-IV workbench column sits on the right (a swipeable pager under the stage on phones). */
+:root {
+  color-scheme: dark;
+  --velvet: #14070c;
+  --velvet-2: #220d15;
+  --velvet-3: #2e121b;
+  --ember: #f34200;
+  --pine: #2f5b3c;
+  --gold: #d9b36c;
+  --gold-hi: #f1d79f;
+  --gold-lo: #9c7438;
+  --silver: #c9ccd6;
+  --violet: #4c0ee0;
+  --text: #f3e7e2;
+  --text-dim: color-mix(in srgb, var(--text) 70%, var(--velvet));
+  --text-faint: color-mix(in srgb, var(--text) 57%, var(--velvet));
+  --line: color-mix(in srgb, var(--gold) 26%, transparent);
+  --line-strong: color-mix(in srgb, var(--gold) 55%, transparent);
+  --glass-oxblood: #6b0f1f;
+  --glass-vermilion: #f34200;
+  --glass-pine: #2f6b45;
+  --glass-violet: #4c0ee0;
+  --glass-mercury: #c9ccd6;
+  --paint-gold: #e2bd73;
+  --paint-snow: #f6f2ee;
+  --paint-vermilion: #f34200;
+  --fir: #10281b;
+  --fir-under: #4a7466;
+  --wood: #2a1810;
+  --serif: "Bodoni Moda", "Bodoni 72", Didot, "Bodoni MT", Georgia, serif;
+  --sans: "Jost", Futura, "Century Gothic", "Avenir Next", system-ui, sans-serif;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --ease-heavy: cubic-bezier(.55, 0, .15, 1);
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--velvet);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 300;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.app {
+  position: relative;
+  height: 100vh;
+  height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(380px, 38vw, 600px);
+  isolation: isolate;
+}
+
+/* ---------- stage ---------- */
+.stage {
+  position: absolute; inset: 0; z-index: 0; overflow: hidden;
+  background:
+    radial-gradient(60% 70% at 30% 58%, var(--velvet-2) 0%, var(--velvet) 70%),
+    var(--velvet);
+  touch-action: none;
+}
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#bokeh { z-index: 0; }
+.vignette {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(85% 90% at 32% 52%, transparent 45%, rgba(8, 2, 5, .62) 100%);
+}
+#gl { z-index: 2; cursor: grab; outline: none; }
+#gl:focus-visible { outline: 1.5px solid var(--gold-hi); outline-offset: -10px; }
+#gl.is-grabbing { cursor: grabbing; }
+#gl.is-paint { cursor: none; }
+#gl.is-hot { cursor: not-allowed; }
+#gl.is-ring { cursor: pointer; }
+.grain {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: .09; mix-blend-mode: soft-light;
+  background-size: 180px 180px;
+}
+.scrim {
+  position: absolute; z-index: 3; pointer-events: none; top: 0; bottom: 0; right: 0;
+  width: calc(clamp(380px, 38vw, 600px) + var(--gutter-r) + 160px);
+  background: linear-gradient(90deg, rgba(20, 7, 12, 0) 0, rgba(20, 7, 12, .7) 150px, rgba(20, 7, 12, .86) 100%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, .2) 0, rgba(0, 0, 0, .55) 10%, #000 24%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, .2) 0, rgba(0, 0, 0, .55) 10%, #000 24%);
+}
+.stage-ui {
+  position: absolute; z-index: 4; pointer-events: none;
+  left: calc(var(--gutter-l) + clamp(8px, 2vw, 32px));
+  bottom: clamp(20px, 4vh, 40px);
+  max-width: 40ch;
+}
+.readout { opacity: 0; transform: translateY(6px); transition: opacity .6s var(--ease), transform .6s var(--ease); margin-bottom: 14px; }
+.readout.on { opacity: 1; transform: translateX(var(--shift, 0px)); }
+/* while the glass is carried to the glory hole, the caption steps aside for the punty */
+.stage-ui .tag, .stage-ui .hint, .stage-ui .seed { transition: opacity .35s var(--ease); }
+.stage-ui.carried .tag, .stage-ui.carried .hint, .stage-ui.carried .seed { opacity: 0; }
+.readout .temp { font-family: var(--serif); font-style: italic; font-variation-settings: "opsz" 72; font-size: 40px; line-height: 1; color: #ffcf9e; text-shadow: 0 0 18px rgba(243, 66, 0, .55); font-variant-numeric: tabular-nums lining-nums; transition: color 1.2s var(--ease), text-shadow 1.2s var(--ease); }
+/* below the Draper point the numerals lose their glow but keep counting */
+.readout.cool .temp { color: var(--text-dim); text-shadow: none; }
+.readout .temp span { font-size: .5em; margin-left: .2em; color: var(--text-dim); text-shadow: none; }
+.readout p { margin: 6px 0 0; font: 500 10.5px/1.4 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--text-faint); text-wrap: balance; }
+.tag { margin: 0; font: 500 10.5px/1.6 var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+.tag span { white-space: nowrap; }
+.tag b { white-space: nowrap; font: italic 400 17px/1 var(--serif); font-variation-settings: "opsz" 24; letter-spacing: 0; text-transform: none; color: var(--gold-hi); margin-right: .55em; }
+.tag i { font-style: normal; color: var(--text-faint); padding: 0 .5em; }
+.hint { margin: 8px 0 0; font: 400 14px/1.45 var(--sans); color: var(--text-faint); }
+.hint span { transition: color .3s var(--ease); }
+.hint span.is-on { color: var(--text); }
+.hint .keys { display: none; }
+.stage.kbd .hint .keys { display: inline; color: var(--gold-hi); }
+.stage.kbd .hint .ptr { display: none; }
+
+.ring {
+  --d: 22px; --bc: var(--paint-gold);
+  position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none; box-sizing: border-box;
+  width: var(--d); height: var(--d); margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.75px rgba(10, 3, 6, .55), inset 0 0 0 1.75px rgba(10, 3, 6, .4);
+  opacity: 0; transition: opacity .2s var(--ease), width .25s var(--ease), height .25s var(--ease), margin .25s var(--ease);
+}
+/* the ring is the brush: its full arc is the paint still on the bristles */
+.ring svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke: var(--bc); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.ring .trk { opacity: .3; }
+.ring .ld { stroke-dasharray: 100 100; transition: stroke-dashoffset .15s linear; }
+.ring::after { content: ""; position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; border-radius: 50%; background: var(--bc); }
+.ring::before { content: ""; position: absolute; inset: -7px; border-radius: 50%; border: 1.5px solid transparent; opacity: 0; transition: opacity .3s; }
+.ring.on { opacity: 1; }
+.ring.spin::before { border-top-color: var(--bc); border-right-color: color-mix(in srgb, var(--bc) 40%, transparent); opacity: .9; animation: turn .9s linear infinite; }
+@keyframes turn { to { transform: rotate(360deg); } }
+.hot-tip {
+  position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none;
+  padding: 7px 12px 6px; border-radius: 999px; white-space: nowrap;
+  font: 500 10px/1 var(--sans); letter-spacing: .18em; text-transform: uppercase;
+  color: #ffd9b8; background: rgba(60, 14, 8, .82); border: 1px solid rgba(243, 66, 0, .45);
+  opacity: 0; transition: opacity .25s;
+}
+.hot-tip.on { opacity: 1; }
+/* the tool tip names the hot-shop tools and reads a hung bauble's tag */
+.hot-tip.tool { color: var(--gold-hi); background: rgba(20, 7, 12, .84); border-color: var(--line-strong); transition: opacity .2s; white-space: normal; max-width: calc(100% - 16px); box-sizing: border-box; text-align: center; line-height: 1.35; padding-block: 6px 5px; }
+/* a long tag breaks only between its parts, never inside one */
+.hot-tip.tool .nw { white-space: nowrap; }
+.chalk {
+  position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none; margin: 0; white-space: nowrap;
+  font: italic 400 19px/1 var(--serif); font-variation-settings: "opsz" 24; letter-spacing: .01em;
+  color: rgba(243, 231, 226, .8); text-shadow: 0 0 1px rgba(243, 231, 226, .45), 0 1px 14px rgba(20, 7, 12, .95);
+  opacity: 0; transition: opacity .5s var(--ease);
+}
+.chalk.on { opacity: 1; }
+/* the loader: a gather on the punty, drawn where the live glass will appear */
+.kiln { position: absolute; z-index: 2; left: 0; top: 0; width: 0; height: 0; pointer-events: none; opacity: 0; transition: opacity .25s linear; --r: 120px; }
+.kiln.on { opacity: 1; }
+.kiln.off { opacity: 0; }
+.kiln::before {
+  /* a teardrop: a square with one sharp corner, turned to point down and drawn out */
+  content: ""; position: absolute; left: calc(var(--r) * -.86); top: calc(var(--r) * -.96); width: calc(var(--r) * 1.72); height: calc(var(--r) * 1.72);
+  border-radius: 50% 50% 0 50%; transform: scaleY(1.2) rotate(45deg);
+  /* lit like the live glass at working heat: the low body brightest, the shoulder and rim running cooler */
+  background: radial-gradient(85% 85% at 66% 66%, #fff0c2 0, #ffbe5c 20%, #ff8a2a 40%, #e2531a 60%, #a3300e 80%, rgba(80, 16, 6, .8) 100%);
+  box-shadow: 0 0 calc(var(--r) * .6) calc(var(--r) * .04) rgba(243, 80, 10, .28);
+}
+.kiln::after { content: ""; position: absolute; left: -2px; top: calc(var(--r) * 1.36); width: 4px; height: 100vh; background: linear-gradient(180deg, #ffd59a 0, #7e8089 6%, #4a4c55 60%); }
+.nogl { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4; max-width: 30ch; text-align: center; color: var(--text-dim); font-size: 15px; line-height: 1.5; }
+
+/* ---------- workbench ---------- */
+.bench {
+  grid-column: 2; position: relative; z-index: 6; min-height: 0; height: 100%; box-sizing: border-box;
+  overflow-y: auto; overflow-x: hidden; scrollbar-width: none;
+  padding-block: clamp(56px, 11vh, 110px) clamp(10px, 1.6vh, 20px);
+  padding-left: clamp(8px, 1.6vw, 28px); padding-right: clamp(0px, 1.1vw, 18px);
+  display: flex; flex-direction: column; gap: clamp(16px, 3.2vh, 32px);
+}
+.bench::-webkit-scrollbar { display: none; }
+/* when the column still does not fit after compacting, show that it scrolls */
+.bench.fit-1 #step2 .cap, .bench.fit-1 #step4 .cap, .bench.fit-2 .cap { display: none; }
+.bench.fit-3 .history { display: none; }
+.bench.scrolls { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.bench.scrolls::-webkit-scrollbar { display: block; width: 5px; }
+.bench.scrolls::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 3px; }
+.head { position: relative; }
+.over-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: clamp(10px, 1.8vh, 18px); }
+.over { margin: 0; font: 500 10.5px/1.3 var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--gold); }
+.over i { font-style: normal; color: var(--text-faint); padding: 0 .45em; }
+.over.tight #season { display: block; }
+.over.tight #season i { display: none; }
+.title {
+  margin: 0; font-family: var(--serif); font-style: italic; font-weight: 400;
+  font-variation-settings: "opsz" 96; font-optical-sizing: auto;
+  font-size: clamp(46px, 4.7vw, 82px); line-height: .9; letter-spacing: -.012em;
+}
+.title .t1 { display: block; font-size: .5em; line-height: 1.1; color: var(--text-dim); letter-spacing: 0; margin-bottom: .04em; }
+.title .t2 { display: block; background: linear-gradient(180deg, #fbf1ec 10%, #e9cdbf 70%, #c9a28c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: .08em; }
+.history { margin: clamp(10px, 1.8vh, 18px) 0 0; max-width: 44ch; font: 300 15px/1.5 var(--sans); color: var(--text-dim); }
+.history b { font-weight: 500; color: var(--text); }
+
+.sound {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px 0 10px;
+  border-radius: 999px; border: 1px solid var(--line); background: rgba(243, 231, 226, .03); cursor: pointer;
+  font: 500 10px/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--text-dim);
+  transition: border-color .3s, color .3s, box-shadow .6s var(--ease), background .3s;
+}
+.sound svg { width: 16px; height: 16px; }
+.sound .w { opacity: 0; transition: opacity .3s; }
+.sound[aria-pressed="true"] { color: var(--gold-hi); border-color: var(--line-strong); }
+.sound[aria-pressed="true"] .w { opacity: 1; }
+.sound[aria-pressed="true"] .x { opacity: 0; }
+.sound.nudge { box-shadow: 0 0 0 4px rgba(217, 179, 108, .16), 0 0 26px rgba(217, 179, 108, .35); border-color: var(--gold); color: var(--gold-hi); }
+.sound:hover { border-color: var(--line-strong); color: var(--text); }
+
+.tabs { display: none; }
+.steps { list-style: none; margin: 0; padding: 0; position: relative; display: flex; flex-direction: column; gap: clamp(12px, 2.3vh, 24px); }
+.steps::before { content: ""; position: absolute; left: 16.5px; top: 20px; bottom: 30px; width: 1px; background: linear-gradient(180deg, var(--line-strong), var(--line) 75%, transparent); }
+.step { display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 18px; position: relative; }
+.step-head { grid-column: 1 / -1; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; column-gap: 18px; align-items: center; }
+.num {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; position: relative; z-index: 1;
+  font: italic 400 15px/1 var(--serif); font-variation-settings: "opsz" 20; color: var(--gold);
+  background: var(--velvet); border: 1px solid var(--line-strong);
+  transition: background .6s var(--ease), color .6s var(--ease), border-color .6s var(--ease), box-shadow .6s var(--ease);
+}
+.step.is-active .num {
+  color: #fff4ea; border-color: transparent;
+  background: radial-gradient(circle at 34% 28%, #ffd2b0 0, #ff7a3d 18%, var(--ember) 38%, #6b0f1f 92%);
+  box-shadow: 0 0 0 4px var(--velvet), 0 0 24px rgba(243, 66, 0, .38);
+}
+.step h2 { margin: 0; font-family: var(--serif); font-style: italic; font-weight: 400; font-variation-settings: "opsz" 48; font-size: clamp(24px, 2.1vw, 30px); line-height: 1; }
+.val { font: 500 10px/1.2 var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--gold); text-align: right; white-space: nowrap; }
+.step-body { grid-column: 2; min-width: 0; }
+.cap { margin: 4px 0 11px; font: 400 13.5px/1.45 var(--sans); color: var(--text-faint); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.row + .row { margin-top: 10px; }
+.sep { width: 4px; height: 4px; border-radius: 50%; background: var(--line-strong); margin: 0 4px; }
+.sep.is-wrapped { display: none; }
+
+/* glass swatches: tiny baubles */
+.sw {
+  --c: #888; position: relative; width: 38px; height: 38px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; margin-top: 4px;
+  background:
+    radial-gradient(circle at 32% 27%, rgba(255, 255, 255, .95) 0 2px, rgba(255, 255, 255, .38) 4px, transparent 9px),
+    radial-gradient(70% 45% at 50% 100%, color-mix(in srgb, var(--c), #ffcf9a 30%) 0, transparent 70%),
+    radial-gradient(circle at 42% 36%, color-mix(in srgb, var(--c), white 22%) 0, var(--c) 40%, color-mix(in srgb, var(--c), black 76%) 100%);
+  box-shadow: inset 0 -4px 8px rgba(0, 0, 0, .3), 0 9px 16px -7px rgba(0, 0, 0, .9);
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.sw::before { content: ""; position: absolute; left: 50%; top: -5px; width: 10px; height: 7px; transform: translateX(-50%); border-radius: 5px 5px 2px 2px; background: linear-gradient(90deg, #7d5b28, #f4dca6 45%, #a57b3a); }
+.sw:hover { transform: translateY(-2px); }
+.sw[aria-pressed="true"] { box-shadow: inset 0 -4px 8px rgba(0, 0, 0, .3), 0 0 0 3px var(--velvet), 0 0 0 4.5px var(--gold); }
+
+/* paint pots */
+.pot {
+  position: relative; width: 34px; height: 34px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 8px 14px -7px rgba(0, 0, 0, .9);
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.pot:hover { transform: translateY(-2px); }
+.pot[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--velvet), 0 0 0 4.5px var(--gold); }
+.pot.gold { background: radial-gradient(circle at 30% 26%, #fff3c8 0 2px, transparent 7px), conic-gradient(from 210deg, #8a6428, #f6dfa4, #b98c45, #fbe8b8, #8f6a2e, #e7c57f, #8a6428); }
+.pot.snow { background: radial-gradient(circle at 30% 30%, #fff 0, #f6f2ee 45%, #cfc8c4 100%); }
+.pot.snow::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.9) 0 .8px, transparent 1.4px) 0 0 / 5px 5px; opacity: .7; }
+.pot.verm { background: radial-gradient(circle at 32% 27%, rgba(255, 230, 210, .9) 0 2px, transparent 7px), radial-gradient(circle at 45% 40%, #ff6a2c 0, var(--ember) 45%, #8c2400 100%); }
+
+.pill {
+  appearance: none; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 15px;
+  border-radius: 999px; border: 1px solid var(--line); background: rgba(243, 231, 226, .03); cursor: pointer;
+  font: 500 10.5px/1 var(--sans); letter-spacing: .17em; text-transform: uppercase; color: var(--text-dim); white-space: nowrap;
+  transition: color .35s var(--ease), background .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease), transform .35s var(--ease);
+}
+.pill svg { width: 15px; height: 15px; flex: 0 0 auto; }
+.pill:hover { color: var(--text); border-color: var(--line-strong); }
+.pill:active { transform: scale(.97); }
+.pill[aria-pressed="true"] {
+  color: #2a1406; border-color: transparent;
+  background: linear-gradient(180deg, #f6e1ae 0%, #d9b36c 55%, #b48a48 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 6px 18px -6px rgba(217, 179, 108, .5);
+}
+.pill.ghost { border-style: dashed; }
+.pill.icon { width: 34px; padding: 0; justify-content: center; }
+.pill.icon svg { width: 18px; height: 18px; }
+#finishRow.has-lustre { gap: 7px; }
+/* if the earned bead would push the shapes onto a new line, the row gives up its separator, then a little padding */
+.row.snug-1, .row.snug-2 { gap: 8px; }
+.row.snug-1 > .sep, .row.snug-2 > .sep { display: none; }
+.row.snug-2 #finishRow { gap: 6px; }
+.row.snug-2 #finishRow .pill:not(.icon) { padding: 0 11px; letter-spacing: .14em; }
+.pill.lustre i { width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, .7) 0 1.3px, transparent 4px), radial-gradient(circle at 50% 50%, transparent 45%, rgba(20, 7, 12, .45) 100%), conic-gradient(from 210deg, #4a3790, #34598a, #3a7468, #a68a52, #774a68, #4a3790); box-shadow: inset 0 -2px 3px rgba(0, 0, 0, .35); }
+.pill[disabled], .hang[disabled] { opacity: .45; cursor: default; }
+
+.hang {
+  appearance: none; position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 12px; height: 46px; padding: 0 24px 0 18px; cursor: pointer;
+  border-radius: 999px; border: 0;
+  font: 500 11px/1 var(--sans); letter-spacing: .2em; text-transform: uppercase; color: #fff3ea;
+  background: rgba(243, 66, 0, .07);
+  box-shadow: inset 0 0 0 1px rgba(243, 66, 0, .5), 0 12px 28px -12px rgba(243, 66, 0, .7);
+  transition: transform .4s var(--ease), box-shadow .6s var(--ease), color .6s var(--ease), opacity .4s;
+}
+/* the lit ember face fades in once the bauble on the lathe has been worked */
+.hang::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: radial-gradient(120% 140% at 30% 10%, #ff8a4c 0, var(--ember) 32%, #8f1a14 78%, #5a0d16 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 190, .45), inset 0 -8px 18px rgba(60, 0, 10, .35);
+  transition: opacity .6s var(--ease);
+}
+.hang.is-quiet { color: #ffc6a3; box-shadow: inset 0 0 0 1px rgba(243, 66, 0, .55); }
+.hang.is-quiet::before { opacity: 0; }
+.hang svg { width: 18px; height: 22px; }
+.hang:hover:not([disabled]) { transform: translateY(-2px); box-shadow: inset 0 0 0 1px rgba(243, 66, 0, .5), 0 18px 32px -12px rgba(243, 66, 0, .8); }
+.hang.is-quiet:hover:not([disabled]) { color: #ffe1cc; box-shadow: inset 0 0 0 1px rgba(243, 66, 0, .85), 0 14px 28px -16px rgba(243, 66, 0, .6); }
+.slots { display: inline-flex; gap: 7px; align-items: center; margin-left: 6px; }
+.slots i { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--line-strong); transition: background .6s var(--ease), border-color .6s; }
+.slots i.full { border-color: transparent; box-shadow: inset 0 -2px 3px rgba(0, 0, 0, .35), inset 1px 1px 1px rgba(255, 255, 255, .35); }
+.slots i.flying { border-color: var(--gold); }
+
+.foot { display: none; }
+.seed { margin: 6px 0 0; font: 300 11px/1.4 var(--sans); letter-spacing: .04em; color: color-mix(in srgb, var(--text) 30%, var(--velvet)); }
+.colophon { margin: 0; font: 400 11.5px/1.5 var(--sans); color: var(--text-faint); letter-spacing: .02em; overflow-wrap: anywhere; }
+.colophon b { font-weight: 500; letter-spacing: .14em; text-transform: uppercase; font-size: 10px; color: var(--text-faint); margin-right: .6em; }
+
+:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 3px; }
+.sw:focus-visible, .pot:focus-visible { outline: 2px dashed var(--text); outline-offset: 7px; }
+
+/* ---------- large screens: the small type grows with the title ---------- */
+@media (min-width: 1680px) and (min-height: 880px) {
+  .over { font-size: 11.5px; }
+  .val { font-size: 11px; }
+  .history { font-size: 16.5px; }
+  .cap { font-size: 14.5px; }
+  .pill { height: 38px; padding: 0 17px; font-size: 11.5px; }
+  .pill.icon { width: 38px; }
+  .sw { width: 42px; height: 42px; }
+  .pot { width: 38px; height: 38px; }
+  .hang { height: 50px; font-size: 12px; }
+  .sound { height: 38px; font-size: 11px; }
+  .tag { font-size: 11.5px; }
+  .tag b { font-size: 19px; }
+  .hint { font-size: 15px; }
+}
+
+/* ---------- two columns on shorter screens ---------- */
+@media (min-width: 761px) and (max-height: 870px) {
+  .bench { padding-top: 34px; gap: 14px; }
+  .title { font-size: clamp(40px, 4.1vw, 66px); }
+  .steps { gap: 10px; }
+  .history { font-size: 14px; }
+  /* the over-line sits level with the fir here, so darken the bough behind it */
+  .scrim { -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, .8) 0, #000 22%); mask-image: linear-gradient(180deg, rgba(0, 0, 0, .8) 0, #000 22%); }
+}
+@media (min-width: 761px) and (max-height: 760px) {
+  .cap { display: none; }
+}
+
+/* ---------- stacked: stage on top, workbench below (phones, portrait tablets) ---------- */
+@media (max-width: 760px) and (min-height: 561px), (max-width: 960px) and (orientation: portrait) {
+  .app { display: flex; flex-direction: column; }
+  .stage { position: relative; inset: auto; flex: 1 1 auto; min-height: 46vh; min-height: 46dvh; margin-left: calc(-1 * var(--gutter-l)); margin-right: calc(-1 * var(--gutter-r)); }
+  .vignette { background: radial-gradient(90% 80% at 50% 55%, transparent 50%, rgba(8, 2, 5, .6) 100%); }
+  .scrim { left: 0; right: 0; top: auto; width: auto; height: 22%; background: linear-gradient(180deg, rgba(20, 7, 12, 0), var(--velvet)); -webkit-mask-image: none; mask-image: none; }
+  .stage-ui { left: var(--gutter-l); right: var(--gutter-r); bottom: 12px; max-width: none; }
+  .readout { position: absolute; right: 0; bottom: 26px; margin: 0; text-align: right; max-width: 46%; transition: opacity .6s var(--ease), transform .6s var(--ease), bottom .5s var(--ease); }
+  .stage-ui.fresh .readout { bottom: 48px; }
+  .readout .temp { font-size: 30px; }
+  .readout p { font-size: 9.5px; letter-spacing: .14em; }
+  /* a one-line touch hint until the glass is first touched */
+  .hint { font-size: 12.5px; line-height: 1.4; margin-top: 5px; max-height: 2.9em; overflow: hidden; transition: max-height .5s var(--ease), opacity .4s, margin .5s var(--ease); }
+  .stage-ui:not(.fresh) .hint { max-height: 0; opacity: 0; margin-top: 0; }
+  .tag { font-size: 9.5px; letter-spacing: .16em; color: var(--text-dim); }
+  .tag b { font-size: 15px; }
+  .bench { flex: 0 0 auto; min-height: 0; height: auto; overflow: hidden; padding-block: 10px 0; padding-inline: 0; gap: 10px; }
+  .foot { display: block; padding-bottom: 10px; }
+  .seed { display: none; }
+}
+@media (max-width: 760px) and (min-height: 561px) and (max-height: 760px), (max-width: 960px) and (orientation: portrait) and (max-height: 760px) {
+  .history { display: none; }
+}
+
+/* ---------- pager: the workbench shows one step at a time (stacked, and short landscape screens) ---------- */
+@media (max-width: 760px) and (min-height: 561px), (max-width: 960px) and (orientation: portrait), (max-height: 560px) {
+  .over-row { margin-bottom: 4px; }
+  .over { font-size: 9.5px; letter-spacing: .2em; }
+  .title { font-size: clamp(30px, 5.2vw, 44px); line-height: 1; }
+  .title .t1, .title .t2 { display: inline; font-size: 1em; color: var(--text); }
+  .title .t1 { margin-right: .22em; }
+  .history { font-size: 13px; line-height: 1.4; margin-top: 6px; max-width: none; }
+  .sound { height: 30px; padding: 0 11px 0 9px; }
+  .tabs { display: flex; gap: 6px; }
+  .tab {
+    flex: 1 1 0; min-width: 0; height: 36px; border-radius: 999px; border: 1px solid var(--line); background: transparent; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 6px;
+    font: 500 9.5px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--text-faint);
+    transition: color .35s, border-color .35s, background .35s;
+  }
+  .tab em { font: italic 400 14px/1 var(--serif); letter-spacing: 0; text-transform: none; color: var(--gold); }
+  .tab[aria-current="true"] { color: var(--text); border-color: var(--line-strong); background: rgba(217, 179, 108, .1); }
+  .steps { flex: 1 1 auto; min-height: 0; flex-direction: row; gap: 0; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .steps::-webkit-scrollbar { display: none; }
+  .steps::before { display: none; }
+  .step { flex: 0 0 100%; display: block; scroll-snap-align: start; scroll-snap-stop: always; padding: 0 6px; box-sizing: border-box; clip-path: inset(-14px 0 -30px 0); }
+  .step-head { display: block; }
+  .step-head .num, .step-head h2 { display: none; }
+  /* the value floats beside the caption, so the caption wraps round it at any width */
+  .step-head .val { float: right; margin: 1px 0 4px 14px; }
+  .cap { margin: 0 0 10px; font-size: 12.5px; min-height: 2.9em; }
+  .step-body > .row { clear: both; }
+  .row { gap: 8px; }
+  .row + .row { margin-top: 9px; }
+  #step2 .step-body > .row { flex-direction: column; align-items: flex-start; gap: 9px; }
+  #step2 .sep { display: none; }
+  .pill { padding: 0 11px; height: 32px; letter-spacing: .12em; font-size: 10px; }
+  .pill.icon { width: 32px; }
+  .sep { margin: 0 1px; }
+}
+
+/* ---------- short landscape (phones on their side): two columns, tabbed bench ---------- */
+@media (max-height: 560px) and (orientation: landscape) {
+  .bench { padding-block: 14px 8px; gap: 8px; overflow: hidden; }
+  .title { font-size: 28px; }
+  .history { display: none; }
+  .cap { display: block; }
+  .hint, .seed { display: none; }
+  .stage-ui { bottom: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  .kiln { transition-duration: .25s !important; }
+}
+</style>
+
+<main class="app" id="app">
+  <section class="stage" id="stage" aria-label="Glassblower's stage">
+    <canvas id="bokeh" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <canvas id="gl" tabindex="0" role="application" aria-roledescription="glass lathe" aria-label="A glass bauble turning on the lathe below a fir branch. Drag on the glass to paint it, drag beside it to turn it, click a hanging bauble to ring it, drag the punty rod to the furnace at the left edge to reheat the glass. With the keyboard, the arrow keys turn the glass, Enter rings the baubles on the branch and holding G carries the glass to the glory hole."></canvas>
+    <div class="kiln" id="kiln" aria-hidden="true"></div>
+    <div class="grain" id="grain" aria-hidden="true"></div>
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="stage-ui fresh" id="stageUi">
+      <div class="readout" id="readout" aria-hidden="true">
+        <div class="temp"><b id="tempVal">1100</b><span>&deg;C</span></div>
+        <p id="tempNote">Glass temperature</p>
+      </div>
+      <div>
+        <p class="tag" id="tag">No. 3</p>
+        <p class="hint" id="hint"><span class="ptr" id="hintPaint">Drag on the glass to paint.</span> <span class="ptr" id="hintTurn">Drag beside it to turn it.</span><span class="keys">Arrow keys turn the glass. Enter rings the branch.</span></p>
+        <p class="seed" id="seedStage">Seed f342004c</p>
+      </div>
+    </div>
+    <div class="ring" id="ring" aria-hidden="true"><svg><circle class="trk" cx="50%" cy="50%" r="50%"/><circle class="ld" id="ringLoad" cx="50%" cy="50%" r="50%" pathLength="100"/></svg></div>
+    <div class="hot-tip" id="hotTip" aria-hidden="true">Too hot to paint</div>
+    <div class="hot-tip tool" id="toolTip" aria-hidden="true"></div>
+    <p class="chalk" id="chalk" aria-hidden="true"></p>
+  </section>
+
+  <aside class="bench" id="bench" aria-label="Workbench">
+    <header class="head">
+      <div class="over-row">
+        <p class="over" id="over"><span class="over-a">Lauscha method<i>&middot;</i></span>Lot <span id="lot">F342</span><span id="season"></span></p>
+        <button class="sound" id="sound" type="button" aria-pressed="false" aria-label="Sound">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path class="w" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/><path class="x" d="M16 10l4 4m0-4l-4 4"/></svg>
+          <span id="soundLabel">Sound off</span>
+        </button>
+      </div>
+      <h1 class="title"><span class="t1">The Midnight</span><span class="t2">Glasshouse</span></h1>
+      <p class="history">Glass baubles were first blown in <b>Lauscha, Thuringia</b>, around 1847. Blow one here, then hang it on the fir.</p>
+    </header>
+
+    <nav class="tabs" id="tabs" aria-label="Steps">
+      <button class="tab" type="button" id="tab-1" data-go="0" aria-current="true"><em>I</em>Gather</button>
+      <button class="tab" type="button" id="tab-2" data-go="1" aria-current="false"><em>II</em>Silver</button>
+      <button class="tab" type="button" id="tab-3" data-go="2" aria-current="false"><em>III</em>Paint</button>
+      <button class="tab" type="button" id="tab-4" data-go="3" aria-current="false"><em>IV</em>Hang</button>
+    </nav>
+
+    <ol class="steps" id="steps">
+      <li class="step is-active" id="step1">
+        <div class="step-head"><span class="num" aria-hidden="true">I</span><h2>Gather</h2><span class="val" id="valGlass">Oxblood</span></div>
+        <div class="step-body">
+          <p class="cap">Molten glass works at about 1000&nbsp;&deg;C. Pick a colour and watch it cool.</p>
+          <div class="row" role="group" aria-label="Glass colour" id="glassRow">
+            <button class="sw" type="button" id="glass-oxblood" data-glass="0" style="--c: var(--glass-oxblood)" aria-label="Oxblood" aria-pressed="false"></button>
+            <button class="sw" type="button" id="glass-vermilion" data-glass="1" style="--c: var(--glass-vermilion)" aria-label="Vermilion" aria-pressed="false"></button>
+            <button class="sw" type="button" id="glass-pine" data-glass="2" style="--c: var(--glass-pine)" aria-label="Pine" aria-pressed="false"></button>
+            <button class="sw" type="button" id="glass-violet" data-glass="3" style="--c: var(--glass-violet)" aria-label="Midnight Violet" aria-pressed="false"></button>
+            <button class="sw" type="button" id="glass-mercury" data-glass="4" style="--c: var(--glass-mercury)" aria-label="Clear Mercury" aria-pressed="false"></button>
+          </div>
+        </div>
+      </li>
+      <li class="step" id="step2">
+        <div class="step-head"><span class="num" aria-hidden="true">II</span><h2>Silver</h2><span class="val" id="valSilver">Mirror</span></div>
+        <div class="step-body">
+          <p class="cap">Silver nitrate swirled inside turns the wall to mirror.</p>
+          <div class="row">
+            <div class="row" role="group" aria-label="Finish" id="finishRow">
+              <button class="pill" type="button" id="finish-mirror" data-finish="0" aria-pressed="false">Mirror</button>
+              <button class="pill" type="button" id="finish-satin" data-finish="1" aria-pressed="false">Satin</button>
+              <button class="pill" type="button" id="finish-frosted" data-finish="2" aria-pressed="false">Frosted</button>
+              <button class="pill icon lustre" type="button" id="finish-lustre" data-finish="3" aria-pressed="false" aria-label="Lustre" title="Lustre, fumed in the glory hole" hidden><i aria-hidden="true"></i></button>
+            </div>
+            <span class="sep" aria-hidden="true"></span>
+            <div class="row" role="group" aria-label="Shape" id="shapeRow">
+              <button class="pill icon" type="button" id="shape-round" data-shape="0" aria-pressed="false" aria-label="Round" title="Round, rolled on the marver"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="10.2" y="2.5" width="3.6" height="3" rx="1"/><circle cx="12" cy="13.5" r="7.6"/></svg></button>
+              <button class="pill icon" type="button" id="shape-teardrop" data-shape="1" aria-pressed="false" aria-label="Teardrop" title="Teardrop, drawn out with jacks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true"><rect x="10.2" y="1.5" width="3.6" height="3" rx="1"/><path d="M12 4.6c3.9 0 6.4 2.7 6.4 6.2 0 4.2-3.6 7.2-6.4 11.7-2.8-4.5-6.4-7.5-6.4-11.7 0-3.5 2.5-6.2 6.4-6.2z"/></svg></button>
+              <button class="pill icon" type="button" id="shape-onion" data-shape="2" aria-pressed="false" aria-label="Onion" title="Onion, pinched with jacks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true"><rect x="10.2" y="1.5" width="3.6" height="3" rx="1"/><path d="M12 4.6c.6 3.4 7.8 5.4 7.8 10.4 0 3.6-3.4 6.2-7.8 6.2s-7.8-2.6-7.8-6.2c0-5 7.2-7 7.8-10.4z"/></svg></button>
+              <button class="pill icon" type="button" id="shape-finial" data-shape="3" aria-pressed="false" aria-label="Finial" title="Finial, blown from Christmas Eve to Twelfth Night" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true"><rect x="10.4" y="1" width="3.2" height="2.6" rx=".9"/><circle cx="12" cy="8.6" r="4.9"/><path d="M12 13.5v1.2"/><ellipse cx="12" cy="16" rx="1.6" ry="1.4"/><path d="M11 17.3 12 23l1-5.7"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="step" id="step3">
+        <div class="step-head"><span class="num" aria-hidden="true">III</span><h2>Paint</h2><span class="val" id="valPaint">Gold leaf</span></div>
+        <div class="step-body">
+          <p class="cap" id="paintCap">Drag on the glass. Hold Shift or press Spin to turn a dab into a ring.</p>
+          <div class="row">
+            <div class="row" role="group" aria-label="Brush" id="brushRow">
+              <button class="pot gold" type="button" id="brush-gold" data-brush="0" aria-label="Gold leaf" aria-pressed="false"></button>
+              <button class="pot snow" type="button" id="brush-snow" data-brush="1" aria-label="Snow white" aria-pressed="false"></button>
+              <button class="pot verm" type="button" id="brush-vermilion" data-brush="2" aria-label="Vermilion" aria-pressed="false"></button>
+            </div>
+            <span class="sep" aria-hidden="true"></span>
+            <button class="pill" type="button" id="spin" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><ellipse cx="12" cy="12" rx="8.5" ry="3.6"/><path d="M17.5 6.2l2.2 2.6-3.3.6"/></svg>Spin</button>
+          </div>
+          <div class="row" role="group" aria-label="Patterns">
+            <button class="pill" type="button" id="pat-ribbon" data-pattern="0">Ribbon</button>
+            <button class="pill" type="button" id="pat-dots" data-pattern="1">Dots</button>
+            <button class="pill" type="button" id="pat-sprigs" data-pattern="2">Fir sprigs</button>
+            <button class="pill ghost" type="button" id="clear">Clear paint</button>
+          </div>
+        </div>
+      </li>
+      <li class="step" id="step4">
+        <div class="step-head"><span class="num" aria-hidden="true">IV</span><h2>Hang</h2><span class="val" id="valHang">2 of 7</span></div>
+        <div class="step-body">
+          <p class="cap">Crimp on the cap, hook the wire, hang it on the fir.</p>
+          <div class="row">
+            <button class="hang is-quiet" type="button" id="hang"><svg viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M9 21V7.5a3.2 3.2 0 1 1 6.4 0v1.4"/><circle cx="9" cy="21" r="0.1"/></svg><span id="hangLabel">Hang it on the fir</span></button>
+            <span class="slots" id="slots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <footer class="foot">
+      <p class="colophon"><b>Seed</b><span id="seedLine">f342004c 0ee0459d 555b9136 0d075fe7</span></p>
+    </footer>
+    <p class="vh" id="live" aria-live="polite"></p>
+  </aside>
+</main>
+
+<script>
+/* the furnace is the loader: while three.js arrives, a gather glows where the live glass will appear (shown only if loading takes over 400 ms) */
+(function kiln() {
+  const k = document.getElementById('kiln'), st = document.getElementById('stage');
+  if (!k || !st) return;
+  try {
+    const r = st.getBoundingClientRect();
+    const stack = matchMedia('(max-width: 760px) and (min-height: 561px), (max-width: 960px) and (orientation: portrait)').matches;
+    const fx1 = stack ? r.width : Math.max(200, document.getElementById('bench').getBoundingClientRect().left - r.left - 8);
+    const ppu = stack ? Math.min(fx1 * .23, r.height * .19) : Math.min(fx1, r.height) * .188;
+    k.style.left = (fx1 / 2) + 'px'; k.style.top = (r.height * (stack ? .6 : .585)) + 'px'; k.style.setProperty('--r', ppu + 'px');
+  } catch (e) { return; }
+  const ro = document.getElementById('readout'), tv = document.getElementById('tempVal');
+  let raf = 0, t0 = 0;
+  // the readout rolls down from 1 120 and settles at the working heat the live glass starts from
+  const tick = (now) => { if (!t0) t0 = now; tv.textContent = String(Math.round(1107 + 13 * Math.exp(-(now - t0) / 1400))); raf = requestAnimationFrame(tick); };
+  const timer = setTimeout(() => { k.classList.add('on'); ro.classList.add('on'); raf = requestAnimationFrame(tick); }, 400);
+  k._stop = () => { clearTimeout(timer); cancelAnimationFrame(raf); };
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* ================= seed + helpers ================= */
+const SEED = 'f342004c0ee0459d555b91360d075fe7b3bad234945c8ba5a46c42da7fc6847f';
+const TAU = Math.PI * 2;
+const $ = (s) => document.querySelector(s);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const easeInOut = (t) => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+const easeOutBack = (t, s = 1.4) => 1 + (s + 1) * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2);
+const mod1 = (u) => ((u % 1) + 1) % 1;
+const damp = (cur, target, tau, dt) => cur + (target - cur) * (1 - Math.exp(-dt / tau));
+
+function sfc32(a, b, c, d) {
+  return () => {
+    a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0;
+    let t = (a + b) | 0; a = b ^ (b >>> 9); b = (c + (c << 3)) | 0; c = (c << 21) | (c >>> 11);
+    d = (d + 1) | 0; t = (t + d) | 0; c = (c + t) | 0;
+    return (t >>> 0) / 4294967296;
+  };
+}
+const SW = [0, 8, 16, 24].map((i) => parseInt(SEED.slice(i, i + 8), 16)); // first 16 bytes
+function rng(salt) {
+  let h = 2166136261 >>> 0;
+  for (const ch of salt) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  const r = sfc32(SW[0] ^ h, SW[1], SW[2] ^ ((h << 7) >>> 0), SW[3]);
+  for (let i = 0; i < 18; i++) r();
+  return r;
+}
+function shuffle(arr, R) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (R() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+const rootCss = getComputedStyle(document.documentElement);
+const tok = (n, fb) => (rootCss.getPropertyValue(n).trim() || fb);
+
+/* ================= detail flags: any one can be switched off without side effects ================= */
+const FX = {
+  kiln: true, blackbody: true, stillHot: true, shimmer: true, gloryHole: true, lustre: true, sag: true,
+  silvering: true, flaws: true, bristles: true, springRing: true, loadArc: true,
+  hangPhysics: true, needles: true, sympathy: true, chime: true, furnaceSound: true, branchSweep: true,
+  glint: true, caustics: true, memory: true, tags: true, finial: true, seasonStamp: true, hints: true, tabTitle: true, pickle: true,
+};
+
+/* ================= storage: small conveniences only, the page works without it ================= */
+const store = {
+  get(k) { try { const v = localStorage.getItem('glasshouse.' + k); return v == null ? null : JSON.parse(v); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem('glasshouse.' + k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+};
+
+/* ================= season clock: local time only; #advent, #christmas-eve and #christmas-day preview it ================= */
+const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const PREVIEW = { '#advent': [11, 6, 19, 0], '#christmas-eve': [11, 24, 21, 30], '#christmas-day': [11, 25, 10, 0] };
+function seasonNow() {
+  const d = new Date(), p = PREVIEW[location.hash];
+  if (!p) return d;
+  return new Date(d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear(), p[0], p[1], p[2], p[3]);
+}
+// each state changes at most two things here: the stamp on the over-line and whether the finial can be blown
+function season(d) {
+  const y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
+  const a4 = 25 - (new Date(y, 11, 25).getDay() || 7), a1 = new Date(y, 11, a4 - 21);
+  if (m === 0 && day <= 6) return { key: 'twelve', finial: true, stamp: 'Day ' + ROMAN[day + 6] + ' of XII' };
+  if (m === 0) return { key: 'away', finial: false, stamp: '' };
+  if (m === 11 && day === 24 && d.getHours() >= 18) return { key: 'eve', finial: true, stamp: 'Heiligabend' };
+  if (m === 11 && day === 25) return { key: 'day', finial: true, stamp: 'Christmas Day' };
+  if (m === 11 && day >= 26) return { key: 'twelve', finial: true, stamp: 'Day ' + ROMAN[day - 25] + ' of XII' };
+  if (d >= a1) { const n = Math.min(4, 1 + Math.floor((d - a1) / 6048e5)); return { key: 'advent', finial: false, stamp: 'Advent ' + ROMAN[n] }; }
+  return { key: m >= 10 ? 'pre' : 'out', finial: false, stamp: '' };
+}
+let SEASON = season(seasonNow());
+const dayLabel = (iso) => { const p = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return p ? (+p[3]) + ' ' + MONTHS[+p[2] - 1] : ''; };
+const todayIso = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+
+const stage = $('#stage'), glCanvas = $('#gl'), bokehCanvas = $('#bokeh'), bench = $('#bench');
+const ring = $('#ring'), hotTip = $('#hotTip'), readout = $('#readout'), tempVal = $('#tempVal'), tempNote = $('#tempNote'), stageUi = $('#stageUi');
+// these two lists match the stacked and pager media queries in the stylesheet
+const MQ_STACK = matchMedia('(max-width: 760px) and (min-height: 561px), (max-width: 960px) and (orientation: portrait)');
+const MQ_PAGER = matchMedia('(max-width: 760px) and (min-height: 561px), (max-width: 960px) and (orientation: portrait), (max-height: 560px)');
+const coarse = matchMedia('(pointer: coarse)').matches;
+const live = $('#live');
+let reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+try { matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => { reduced = e.matches; }); } catch (e) {}
+
+$('#lot').textContent = SEED.slice(0, 4).toUpperCase();
+$('#seedLine').textContent = SEED.match(/.{8}/g).slice(0, 4).join(' ') + ' … ' + SEED.slice(-8);
+$('#seedStage').textContent = 'Seed ' + SEED.slice(0, 16) + ' \u2026 ' + SEED.slice(-8);
+
+/* ================= catalogue ================= */
+const GLASS = [
+  { name: 'Oxblood', hex: tok('--glass-oxblood', '#6b0f1f'), metal: .9, gain: [1.75, 1.6, 1.7], pitch: .94, lustre: 1 },
+  { name: 'Vermilion', hex: tok('--glass-vermilion', '#f34200'), metal: .52, gain: [1, 1.75, 1], pitch: 1.0, lustre: .24 },   // less metal and more green, so it renders vermilion rather than crimson
+  { name: 'Pine', hex: tok('--glass-pine', '#2f6b45'), metal: .9, gain: [2.1, 2.1, 2.1], pitch: .97, lustre: 1 },
+  { name: 'Midnight Violet', hex: tok('--glass-violet', '#4c0ee0'), metal: .88, gain: [1.45, 1.45, 1.45], pitch: 1.04, lustre: .9 },
+  { name: 'Clear Mercury', hex: tok('--glass-mercury', '#c9ccd6'), metal: 1, gain: [1.08, 1.22, 1.48], pitch: 1.1, lustre: .45 },
+];
+const FINISH = [
+  { name: 'Mirror', rough: .05, ccr: .03 },
+  { name: 'Satin', rough: .35, ccr: .3 },
+  { name: 'Frosted', rough: .7, ccr: .62 },
+  { name: 'Lustre', rough: .08, ccr: .05, irid: 1 },   // fumed in the glory hole; only offered once earned
+];
+const SHAPES = ['Round', 'Teardrop', 'Onion', 'Finial', 'Pickle'];
+const BRUSH = [
+  { name: 'Gold leaf', hex: tok('--paint-gold', '#e2bd73'), rough: .2, metal: 1, cc: .25, alpha: .95, kind: 'leaf' },
+  { name: 'Snow white', hex: tok('--paint-snow', '#f6f2ee'), rough: .62, metal: 0, cc: .12, alpha: .85, kind: 'snow' },
+  { name: 'Vermilion', hex: tok('--paint-vermilion', '#f34200'), rough: .3, metal: 0, cc: 1, alpha: .92, kind: 'enamel' },
+];
+const PATTERNS = ['Ribbon', 'Dots', 'Fir sprigs'];
+const MAX_HUNG = 7;
+const HUNG_LOD = [48, 2];   // hung baubles render at about 70px: 48 steps round, every 2nd profile point
+
+/* ================= WebGL bootstrap ================= */
+if (typeof THREE === 'undefined') { noGL(); return; }
+THREE.ColorManagement.legacyMode = false;
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas: glCanvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+} catch (e) { noGL(); return; }
+function noGL() {
+  const k = $('#kiln'); if (k) { if (k._stop) k._stop(); k.remove(); } readout.classList.remove('on');
+  const p = document.createElement('p'); p.className = 'nogl';
+  p.textContent = 'This glasshouse needs WebGL to blow its glass. Try a browser with hardware acceleration turned on.';
+  stage.appendChild(p);
+}
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.06;
+renderer.setClearColor(0x000000, 0);
+glCanvas.addEventListener('webglcontextlost', (e) => e.preventDefault());
+const ANISO = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 80);
+const CAM_D = 9;
+camera.position.set(0, 0, CAM_D);
+
+/* ---------- procedural workshop, baked to PMREM ---------- */
+(function bakeEnvironment() {
+  const s = new THREE.Scene();
+  const basic = (r, g, b) => new THREE.MeshBasicMaterial({ color: new THREE.Color(r, g, b), side: THREE.DoubleSide });
+  const add = (geo, mat, x, y, z, rx = 0, ry = 0, rz = 0, parent = s) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); parent.add(m); return m; };
+  const room = new THREE.Mesh(new THREE.BoxGeometry(28, 15, 28), new THREE.MeshBasicMaterial({ color: new THREE.Color(.05, .019, .017), side: THREE.BackSide }));
+  room.position.y = 2.5; s.add(room);
+  add(new THREE.PlaneGeometry(28, 28), basic(.15, .062, .034), 0, -4.6, 0, -Math.PI / 2);         // warm boards
+  add(new THREE.PlaneGeometry(28, 6), basic(.02, .008, .008), 0, 9.6, 0, Math.PI / 2);            // dark beams
+  add(new THREE.PlaneGeometry(20, 4.5), basic(.16, .075, .04), 0, -.6, 13.85, 0, Math.PI);         // lamplit wall behind the viewer
+  add(new THREE.PlaneGeometry(26, 1.6), basic(.3, .12, .06), 0, -3.1, 13.6, 0, Math.PI);          // bench edge
+  // the classic one: a bright mullioned window over the viewer's shoulder
+  (function () {
+    const g = new THREE.Group(), m = basic(20, 16, 11.5), w = 4.6, h = 5.8, bar = .3;
+    const pw = (w - bar) / 2, ph = (h - bar * 2) / 3;
+    for (let c = 0; c < 2; c++) for (let r = 0; r < 3; r++) add(new THREE.PlaneGeometry(pw, ph), m, -w / 2 + pw / 2 + c * (pw + bar), -h / 2 + ph / 2 + r * (ph + bar), 0, 0, 0, 0, g);
+    g.position.set(-4.6, 4.4, 10.5); g.rotation.y = Math.PI; g.lookAt(0, 0, 0); s.add(g);
+  })();
+  function arched(x, y, z, ry, sc, col) {
+    const g = new THREE.Group(); const mat = basic(...col);
+    const w = 2.6 * sc, h = 3.4 * sc, bar = .13 * sc, pw = (w - bar * 3) / 2, ph = (h - bar * 4) / 3;
+    for (let c = 0; c < 2; c++) for (let r = 0; r < 3; r++) add(new THREE.PlaneGeometry(pw, ph), mat, -w / 2 + bar + pw / 2 + c * (pw + bar), -h / 2 + bar + ph / 2 + r * (ph + bar), 0, 0, 0, 0, g);
+    add(new THREE.CircleGeometry(w / 2 - bar * 1.5, 40, 0, Math.PI / 2), mat, bar / 2, h / 2 - bar / 2, 0, 0, 0, 0, g);
+    add(new THREE.CircleGeometry(w / 2 - bar * 1.5, 40, Math.PI / 2, Math.PI / 2), mat, -bar / 2, h / 2 - bar / 2, 0, 0, 0, 0, g);
+    g.position.set(x, y, z); g.rotation.y = ry; s.add(g);
+  }
+  arched(13.6, 2.2, -4.2, -Math.PI / 2, 1.45, [9, 5.2, 2.3]);
+  arched(13.6, 2.2, 3.8, -Math.PI / 2, 1.45, [7.4, 4.1, 1.8]);
+  arched(-3.6, 3.2, -13.8, 0, 1.45, [1, 1.3, 2.4]);       // moonlit window behind
+  add(new THREE.PlaneGeometry(1.3, 10), basic(2.6, 3, 4.4), -9.5, 2.2, -10.5, 0, Math.PI / 4); // cool rim strip
+  add(new THREE.PlaneGeometry(.7, 7), basic(1.5, 1.7, 2.5), 9.5, 4, -11, 0, -Math.PI / 4);
+  add(new THREE.CircleGeometry(1.3, 48), basic(40, 13, 2.6), -13.8, -1.7, 2.6, 0, Math.PI / 2);    // glory hole
+  add(new THREE.RingGeometry(1.3, 2.9, 48), basic(2.6, .7, .12), -13.82, -1.7, 2.6, 0, Math.PI / 2);
+  const wreath = basic(30, 15, 5);                                                                // advent wreath of candles overhead
+  for (let i = 0; i < 4; i++) { const a = i / 4 * TAU + .4; add(new THREE.SphereGeometry(.2, 12, 8), wreath, 1.2 + 2.2 * Math.cos(a), 8.6, 1 + 2.2 * Math.sin(a)); }
+  add(new THREE.TorusGeometry(2.2, .32, 8, 40), basic(.05, .14, .07), 1.2, 8.1, 1, Math.PI / 2);
+  add(new THREE.PlaneGeometry(3.2, 6.6), basic(.3, .13, .055), 5, -.6, 13.85, 0, Math.PI);         // doorway
+  add(new THREE.SphereGeometry(.34, 16, 12), basic(22, 11, 4.4), 2.6, 1.9, 13.2);                 // lantern
+  const R = rng('candles'); const cand = basic(30, 14, 5);
+  for (let i = 0; i < 13; i++) add(new THREE.SphereGeometry(.08 + R() * .06, 10, 8), cand, -7 + R() * 14, -.6 + R() * 2.2, 10.5 + R() * 3);
+  const pm = new THREE.PMREMGenerator(renderer);
+  scene.environment = pm.fromScene(s, 0).texture;
+  pm.dispose();
+  s.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
+})();
+
+/* ================= profiles (lathe) ================= */
+const NP = 128, SEG = 96;
+function resample(pts) {
+  const cum = [0];
+  for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  const L = cum[cum.length - 1], r = new Float32Array(NP + 1), y = new Float32Array(NP + 1);
+  let k = 0;
+  for (let j = 0; j <= NP; j++) {
+    const s = L * j / NP;
+    while (k < pts.length - 2 && cum[k + 1] < s) k++;
+    const t = clamp((s - cum[k]) / ((cum[k + 1] - cum[k]) || 1), 0, 1);
+    r[j] = lerp(pts[k][0], pts[k + 1][0], t); y[j] = lerp(pts[k][1], pts[k + 1][1], t);
+  }
+  r[0] = 0;
+  return { r, y, L };
+}
+const NECK = [[.17, .993], [.153, 1.02], [.15, 1.06], [.15, 1.1]];
+function makeProfile(shape) {
+  const pts = [];
+  if (shape === 0) {
+    const a1 = Math.asin(.98);
+    for (let i = 0; i <= 400; i++) { const a = -Math.PI / 2 + (a1 + Math.PI / 2) * i / 400; pts.push([Math.cos(a), Math.sin(a)]); }
+  } else if (shape === 1) {
+    const R = .86, yc = .98 - Math.sqrt(R * R - .04), yb = -1.58;
+    for (let i = 0; i <= 300; i++) { const s = i / 300, y = yb + (yc - yb) * s; pts.push([R * Math.pow(Math.sin(s * Math.PI / 2), 1.65), y]); }
+    for (let i = 1; i <= 220; i++) { const y = yc + (.98 - yc) * i / 220; pts.push([Math.sqrt(Math.max(0, R * R - (y - yc) * (y - yc))), y]); }
+  } else if (shape === 3) {
+    // finial: a drawn spike and a bead below a smaller ball (from Christmas Eve to Twelfth Night)
+    const sc = .82, a0 = -Math.acos(.05 / sc), a1 = Math.asin(.98);
+    pts.push([0, -1.78]);
+    for (let i = 1; i <= 90; i++) { const t = i / 90, y = -1.78 + t * .72; pts.push([.046 * Math.pow(t, 1.6), y]); }
+    for (let i = 1; i <= 70; i++) { const t = i / 70, y = -1.06 + t * .3; pts.push([.046 + .095 * Math.sin(Math.PI * t) - .004 * t, y]); }
+    for (let i = 1; i <= 12; i++) pts.push([.042 + .008 * i / 12, -.76 + .13 * i / 12]);
+    for (let i = 0; i <= 300; i++) { const a = a0 + (a1 - a0) * i / 300; pts.push([sc * Math.cos(a), sc * Math.sin(a) + .19]); }
+  } else if (shape === 4) {
+    // a gherkin: long, round-ended; its bend and warts are added in the vertex shader
+    for (let i = 0; i <= 120; i++) { const a = -Math.PI / 2 + Math.PI / 2 * i / 120; pts.push([.5 * Math.cos(a), -1.08 + .5 * Math.sin(a)]); }
+    for (let i = 1; i <= 160; i++) { const t = i / 160, y = -1.08 + t * 1.5; pts.push([.5 - .03 * t * t, y]); }
+    for (let i = 1; i <= 160; i++) { const t = i / 160, y = .42 + t * .57; pts.push([.17 + .3 * Math.cos(t * Math.PI / 2) ** 1.4, y]); }
+  } else {
+    const yb = -1.1, ym = -.18, rm = 1.05;
+    for (let i = 0; i <= 260; i++) { const s = i / 260, y = yb + (ym - yb) * s; pts.push([rm * Math.pow(Math.sin(s * Math.PI / 2), .72), y]); }
+    for (let i = 1; i <= 300; i++) { const s = i / 300, y = ym + (.98 - ym) * s; const g = Math.pow((Math.cos(Math.PI * Math.pow(s, .82)) + 1) / 2, 1.25); pts.push([.2 + (rm - .2) * g, y]); }
+  }
+  for (const p of NECK) pts.push(p);
+  return resample(pts);
+}
+const PROFILES = [makeProfile(0), makeProfile(1), makeProfile(2), makeProfile(3), makeProfile(4)];
+const cloneProf = (p) => ({ r: p.r.slice(), y: p.y.slice(), L: p.L });
+function rAt(p, v) { const f = clamp(v, 0, 1) * NP; const i = Math.min(NP - 1, f | 0); const t = f - i; return p.r[i] * (1 - t) + p.r[i + 1] * t; }
+function eqV(p) { let best = 0, bi = 0; for (let j = 0; j <= NP; j++) if (p.r[j] > best) { best = p.r[j]; bi = j; } return bi / NP; }
+
+// seg: steps around; st: use every st-th profile point (hung baubles are small, so they get a coarser mesh)
+function makeLathe(prof, seg = SEG, st = 1) {
+  const np = NP / st, nv = (seg + 1) * (np + 1);
+  const g = new THREE.BufferGeometry();
+  g.userData.lod = [seg, st];
+  const uv = new Float32Array(nv * 2), idx = [];
+  for (let i = 0; i <= seg; i++) for (let j = 0; j <= np; j++) { const k = i * (np + 1) + j; uv[k * 2] = i / seg; uv[k * 2 + 1] = j / np; }
+  for (let i = 0; i < seg; i++) for (let j = 0; j < np; j++) { const a = i * (np + 1) + j, b = a + np + 1; idx.push(a, b, a + 1, b, b + 1, a + 1); }
+  g.setIndex(idx);
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(nv * 3), 3));
+  g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nv * 3), 3));
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  writeLathe(g, prof);
+  return g;
+}
+const _nr = new Float32Array(NP + 1), _ny = new Float32Array(NP + 1);
+function writeLathe(g, p) {
+  for (let j = 0; j <= NP; j++) {
+    const a = Math.max(0, j - 1), b = Math.min(NP, j + 1);
+    let tr = p.r[b] - p.r[a], ty = p.y[b] - p.y[a];
+    if (j === 0) { tr = 1; ty = 0; }
+    const l = Math.hypot(tr, ty) || 1; _nr[j] = ty / l; _ny[j] = -tr / l;
+  }
+  const pos = g.attributes.position.array, nor = g.attributes.normal.array;
+  const [seg, st] = g.userData.lod, np = NP / st;
+  for (let i = 0; i <= seg; i++) {
+    const ph = i / seg * TAU, s = Math.sin(ph), c = Math.cos(ph);
+    for (let j = 0; j <= np; j++) {
+      const k = (i * (np + 1) + j) * 3, J = j * st;
+      pos[k] = p.r[J] * s; pos[k + 1] = p.y[J]; pos[k + 2] = p.r[J] * c;
+      nor[k] = _nr[J] * s; nor[k + 1] = _ny[J]; nor[k + 2] = _nr[J] * c;
+    }
+  }
+  g.attributes.position.needsUpdate = true; g.attributes.normal.needsUpdate = true;
+  g.computeBoundingSphere();
+}
+
+/* ================= paint system ================= */
+const PW = 1024, PH = 512;
+function makePaint(w, h) {
+  const cc = document.createElement('canvas'); cc.width = w; cc.height = h;
+  const cm = document.createElement('canvas'); cm.width = w; cm.height = h;
+  const tc = new THREE.CanvasTexture(cc), tm = new THREE.CanvasTexture(cm);
+  for (const t of [tc, tm]) { t.premultiplyAlpha = true; t.wrapS = THREE.RepeatWrapping; t.anisotropy = ANISO; }
+  tc.encoding = THREE.sRGBEncoding;
+  return { cc, cm, xc: cc.getContext('2d'), xm: cm.getContext('2d'), tc, tm, w, h, dirty: false, inked: false };
+}
+function clearPaintCanvas(P) { for (const x of [P.xc, P.xm]) { x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; x.clearRect(0, 0, P.w, P.h); } P.dirty = true; P.inked = false; }
+function copyPaint(src, dst) {
+  for (const [s, d] of [[src.cc, dst.xc], [src.cm, dst.xm]]) { d.setTransform(1, 0, 0, 1, 0, 0); d.globalAlpha = 1; d.clearRect(0, 0, dst.w, dst.h); d.drawImage(s, 0, 0, dst.w, dst.h); }
+  dst.dirty = true; dst.inked = src.inked;
+}
+
+// brush stamps: a colour stamp and a material stamp sharing one alpha mask
+const hexRgb = (h) => { const n = parseInt(h.replace('#', ''), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+(function makeStamps() {
+  const S = 96, R = rng('stamps');
+  const vn = (() => { const g = new Float32Array(17 * 17).map(() => R()); return (x, y) => { x = clamp(x, 0, 15.999); y = clamp(y, 0, 15.999); const i = x | 0, j = y | 0, fx = x - i, fy = y - j, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy); const a = g[j * 17 + i], b = g[j * 17 + i + 1], c = g[(j + 1) * 17 + i], d = g[(j + 1) * 17 + i + 1]; return lerp(lerp(a, b, sx), lerp(c, d, sx), sy); }; })();
+  for (const br of BRUSH) {
+    br.stamps = [];
+    const rgb = hexRgb(br.hex);
+    for (let v = 0; v < 4; v++) {
+      const c1 = document.createElement('canvas'), c2 = document.createElement('canvas'); c1.width = c2.width = c1.height = c2.height = S;
+      const x1 = c1.getContext('2d'), x2 = c2.getContext('2d'); const d1 = x1.createImageData(S, S), d2 = x2.createImageData(S, S);
+      const ph = [R() * TAU, R() * TAU, R() * TAU], ox = R() * 6, oy = R() * 6;
+      for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) {
+        const x = (px + .5) / S * 2 - 1, y = (py + .5) / S * 2 - 1, d = Math.hypot(x, y), th = Math.atan2(y, x);
+        const n = vn(ox + (x + 1) * 3.5, oy + (y + 1) * 3.5);
+        let a, tone = 1, rough = br.rough;
+        if (br.kind === 'leaf') {
+          const edge = .8 + .07 * Math.sin(th * 3 + ph[0]) + .05 * Math.sin(th * 7 + ph[1]) + .03 * Math.sin(th * 13 + ph[2]);
+          a = smooth(edge, edge - .07, d);
+          const crack = Math.abs(Math.sin((x * 1.7 + y * .9) * 6 + n * 5));
+          a *= crack < .08 ? .45 : 1;
+          tone = .84 + .26 * n; rough = clamp(br.rough + (n - .5) * .22, .06, .5);
+        } else if (br.kind === 'snow') {
+          a = smooth(1, .62, d) * (.78 + .22 * n);
+          const sp = vn(ox * 2 + (x + 1) * 7.5, oy * 2 + (y + 1) * 7.5);
+          if (sp > .78) { a = Math.min(1, a * 1.25); tone = 1.03; rough = .3; }
+        } else {
+          a = smooth(1, .84, d); tone = .96 + .06 * (1 - d);
+        }
+        const k = (py * S + px) * 4, A = Math.round(clamp(a, 0, 1) * 255);
+        d1.data[k] = clamp(rgb[0] * tone, 0, 255); d1.data[k + 1] = clamp(rgb[1] * tone, 0, 255); d1.data[k + 2] = clamp(rgb[2] * tone, 0, 255); d1.data[k + 3] = A;
+        d2.data[k] = rough * 255; d2.data[k + 1] = br.metal * 255; d2.data[k + 2] = br.cc * 255; d2.data[k + 3] = A;
+      }
+      x1.putImageData(d1, 0, 0); x2.putImageData(d2, 0, 0);
+      br.stamps.push([c1, c2]);
+    }
+  }
+})();
+
+const paintR = rng('brushwork');
+function dab(P, prof, u, v, rad, bi, rot, aMul, stamp) {
+  const br = BRUSH[bi];
+  const r = Math.max(rAt(prof, v), .004);
+  const rx = Math.min(P.w * .6, rad / (TAU * r) * P.w), ry = rad / prof.L * P.h;
+  const x = mod1(u) * P.w, y = (1 - v) * P.h;
+  const st = stamp || br.stamps[(paintR() * 4) | 0];
+  const a = br.alpha * (aMul == null ? 1 : aMul);
+  for (let w = -1; w <= 1; w++) {
+    const xx = x + w * P.w;
+    if (xx + rx < 0 || xx - rx > P.w) continue;
+    for (let q = 0; q < 2; q++) {
+      const ctx = q ? P.xm : P.xc;
+      ctx.globalAlpha = a; ctx.setTransform(1, 0, 0, 1, xx, y); ctx.scale(rx, ry); ctx.rotate(rot);
+      ctx.drawImage(st[q], -1, -1, 2, 2);
+    }
+  }
+  P.dirty = true; P.inked = true;
+}
+function flushDabs(P, prof, list) { for (const d of list) dab(P, prof, d.u, d.v, d.rad, d.b, d.rot, d.a); }
+
+/* ---------- a brush with twelve bristles: striated stamps at four levels of paint load, made on first use ---------- */
+const BR_LEVELS = [0, .42, .66, .84];
+const LOAD_LEN = { leaf: 7, snow: 4.6, enamel: 6 };   // surface units of stroke before the load falls to a third
+function bristleStamps(bi) {
+  const br = BRUSH[bi];
+  if (br.bristle) return br.bristle;
+  const S = 64, R = rng('bristles-' + bi), rgb = hexRgb(br.hex);
+  br.bristle = [];
+  for (let lay = 0; lay < 2; lay++) {
+    const hairs = [];
+    for (let i = 0; i < 12; i++) hairs.push({ y: -.84 + 1.68 * (i + .5) / 12 + (R() - .5) * .07, w: .055 + R() * .05, wet: .36 + R() * .64, tone: .84 + R() * .26, ph: R() * 40, fr: 2 + R() * 3 });
+    const set = [];
+    for (const d of BR_LEVELS) {
+      const c1 = document.createElement('canvas'), c2 = document.createElement('canvas'); c1.width = c2.width = c1.height = c2.height = S;
+      const x1 = c1.getContext('2d'), x2 = c2.getContext('2d'), d1 = x1.createImageData(S, S), d2 = x2.createImageData(S, S);
+      for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) {
+        const x = (px + .5) / S * 2 - 1, y = (py + .5) / S * 2 - 1;
+        const disc = smooth(1, .74, Math.hypot(x * 1.12, y));
+        let cov = 0, tone = 0, ws = 0;
+        for (const h of hairs) {
+          const g = Math.exp(-Math.pow((y - h.y) / h.w, 2));
+          const live = clamp((h.wet - d) / (1 - d + .001) * 1.7, 0, 1);
+          const skip = d > 0 ? smooth(d * .55, d * .55 + .3, .5 + .5 * Math.sin(x * h.fr + h.ph) * Math.sin(x * h.fr * 2.3 + h.ph * 1.7)) : 1;
+          cov += g * live * skip; tone += g * h.tone; ws += g;
+        }
+        cov = Math.min(1, cov * 1.2); tone = ws > 1e-3 ? tone / ws : 1;
+        let a = d === 0 ? disc * (.82 + .18 * cov) : disc * cov * (1 - d * .3);
+        let rough = br.rough + (tone - 1) * .3, tn = .9 + .14 * (tone - .84) / .26;
+        if (br.kind === 'leaf') { rough = clamp(br.rough + (1 - cov) * .25, .08, .55); tn = .82 + .3 * cov * (tone - .7); }
+        else if (br.kind === 'snow') tn = .94 + .08 * cov;
+        const k = (py * S + px) * 4, A = Math.round(clamp(a, 0, 1) * 255);
+        d1.data[k] = clamp(rgb[0] * tn, 0, 255); d1.data[k + 1] = clamp(rgb[1] * tn, 0, 255); d1.data[k + 2] = clamp(rgb[2] * tn, 0, 255); d1.data[k + 3] = A;
+        d2.data[k] = clamp(rough, 0, 1) * 255; d2.data[k + 1] = br.metal * 255; d2.data[k + 2] = br.cc * 255; d2.data[k + 3] = A;
+      }
+      x1.putImageData(d1, 0, 0); x2.putImageData(d2, 0, 0);
+      set.push([c1, c2]);
+    }
+    br.bristle.push(set);
+  }
+  return br.bristle;
+}
+
+/* ---------- seeded pattern presets (lists of dabs in surface units) ---------- */
+// opt.bold: the opening bauble's larger sprig band, dropped below the window reflections (opt.drop, in surface units)
+function patternDabs(kind, R, prof, b1, b2, b3, opt = {}) {
+  const out = [], L = prof.L, vEq = eqV(prof);
+  const D = (u, v, rad, b, a) => out.push({ u: mod1(u), v: clamp(v, .02, .965), rad, b, rot: R() * TAU, a: a == null ? 1 : a });
+  const ringLine = (v, rad, b, a) => { const C = TAU * Math.max(rAt(prof, v), .05); const n = Math.ceil(C / Math.max(rad * .42, .0045)); for (let i = 0; i < n; i++) D(i / n, v, rad, b, a); };
+  if (kind === 0) { // ribbon
+    const v0 = clamp(vEq + (R() - .5) * .1, .3, .7), k = [2, 3, 3, 4][(R() * 4) | 0], amp = .08 + R() * .1, wid = .075 + R() * .03, ph = R() * TAU;
+    const C = TAU * rAt(prof, v0), cen = (u) => v0 + amp / L * Math.sin(TAU * k * u + ph);
+    let n = Math.ceil(C * 1.5 / (wid * .3));
+    for (let i = 0; i < n; i++) { const u = i / n; D(u, cen(u), wid, b1); }
+    const er = .013; n = Math.ceil(C * 1.6 / (er * .45));
+    for (const s of [-1, 1]) for (let i = 0; i < n; i++) { const u = i / n; D(u, cen(u) + s * (wid + .05) / L, er, b2); }
+    for (let j = 0; j < 2 * k; j++) { const u = (Math.PI / 2 + j * Math.PI - ph) / (TAU * k); const sg = j % 2 ? -1 : 1; D(u, cen(u) + sg * (wid + .13) / L, .036, b3); }
+    ringLine(clamp(v0 + .5 / L, 0, .9), .011, b2, .9);
+    ringLine(clamp(v0 - .5 / L, .08, 1), .011, b2, .9);
+  } else if (kind === 1) { // dots
+    const big = .062 + R() * .025, off = R();
+    const rings = [[0, big, b1, .38 + R() * .14], [.34, big * .5, b2, .2], [-.34, big * .5, b2, .2], [.6, .022, b3, .12], [-.6, .022, b3, .12]];
+    rings.forEach(([dv, rad, b, gap], ri) => {
+      const v = vEq + dv / L; if (v < .06 || v > .93) return;
+      const C = TAU * rAt(prof, v), n = Math.max(5, Math.round(C / gap));
+      for (let i = 0; i < n; i++) D((i + off + (ri % 2) * .5) / n, v, rad, b);
+    });
+    ringLine(vEq + .19 / L, .011, b2, .9); ringLine(vEq - .19 / L, .011, b2, .9);
+  } else { // fir sprigs
+    const k = opt.bold ? 1.5 : 1;
+    const m = opt.bold ? 4 + ((R() * 2) | 0) : 5 + ((R() * 3) | 0), v0 = clamp(vEq + (R() - .5) * .05 - (opt.drop || 0) / L, .25, .7), r0 = rAt(prof, v0);
+    out.v0 = v0; out.band = .42 * k;
+    const toUV = (u0, x, y) => [u0 + x / (TAU * r0), v0 + y / L];
+    const stroke = (u0, x0, y0, x1, y1, rad, b) => { const len = Math.hypot(x1 - x0, y1 - y0), n = Math.max(2, Math.ceil(len / Math.max(rad * .45, .004))); for (let i = 0; i <= n; i++) { const t = i / n; const [u, v] = toUV(u0, lerp(x0, x1, t), lerp(y0, y1, t)); D(u, v, rad * (1 - .35 * t * (len > .1 * k ? 0 : 1)), b); } };
+    for (let s = 0; s < m; s++) {
+      const u0 = (s + .2 * (R() - .5)) / m, tilt = (R() - .5) * .5 + .18, ca = Math.cos(tilt), sa = Math.sin(tilt);
+      const rot = (x, y) => [x * ca - y * sa, x * sa + y * ca];
+      const P = (t) => { const x = lerp(-.27, .27, t) * k, y = (.07 * Math.sin(t * Math.PI) - .02) * k; return rot(x, y); };
+      let prev = P(0);
+      for (let i = 1; i <= 26; i++) { const p = P(i / 26); stroke(u0, prev[0], prev[1], p[0], p[1], .012 * k, b1); prev = p; }
+      for (let i = 1; i <= 14; i++) {
+        const t = i / 15, p = P(t), q = P(Math.min(1, t + .02)); const tx = q[0] - p[0], ty = q[1] - p[1], tl = Math.hypot(tx, ty) || 1;
+        const len = .085 * k * (1 - .45 * Math.abs(t - .45));
+        for (const sd of [-1, 1]) { const ang = sd * 1.0; const dx = (tx * Math.cos(ang) - ty * Math.sin(ang)) / tl, dy = (tx * Math.sin(ang) + ty * Math.cos(ang)) / tl; stroke(u0, p[0], p[1], p[0] + dx * len, p[1] + dy * len, .0085 * k, b1); }
+      }
+      const c = P(.38);
+      for (const [dx, dy] of [[0, -.035], [.032, -.05], [-.03, -.058]]) { const [u, v] = toUV(u0, c[0] + dx * k, c[1] + dy * k); D(u, v, .026 * k, b3); }
+    }
+    ringLine(v0 + .42 * k / L, .012 * k, b2, .9); ringLine(v0 - .42 * k / L, .012 * k, b2, .9);
+  }
+  return out;
+}
+// brush choice for a glass: primary, accent, berry
+function patternInks(glassIdx, primary) {
+  if (primary != null) { const acc = primary === 0 ? 1 : 0; const berry = primary === 2 ? 0 : 2; return [primary, acc, berry]; }
+  return [[0, 1, 2], [0, 1, 0], [1, 0, 2], [0, 1, 2], [2, 0, 0]][glassIdx];
+}
+
+/* ================= materials ================= */
+const GLSL_NOISE = `
+float gHash( vec3 p ) { p = fract( p * 0.3183099 + 0.1 ); p *= 17.0; return fract( p.x * p.y * p.z * ( p.x + p.y + p.z ) ); }
+float gNoise( vec3 x ) {
+  vec3 i = floor( x ); vec3 f = fract( x ); f = f * f * ( 3.0 - 2.0 * f );
+  return mix( mix( mix( gHash( i ), gHash( i + vec3( 1.0, 0.0, 0.0 ) ), f.x ), mix( gHash( i + vec3( 0.0, 1.0, 0.0 ) ), gHash( i + vec3( 1.0, 1.0, 0.0 ) ), f.x ), f.y ),
+              mix( mix( gHash( i + vec3( 0.0, 0.0, 1.0 ) ), gHash( i + vec3( 1.0, 0.0, 1.0 ) ), f.x ), mix( gHash( i + vec3( 0.0, 1.0, 1.0 ) ), gHash( i + vec3( 1.0, 1.0, 1.0 ) ), f.x ), f.y ), f.z );
+}`;
+const GLSL_PARS = `
+uniform sampler2D uPaintM;
+uniform float uTempK;
+uniform float uPaintVis;
+uniform float uGlowK;
+uniform float uWobble;
+uniform vec4 uSilv;     // silvering front: x height, y mode (1 pour, 2 lacquer), z direction (+1 up, -1 down, 0 fade), w clear-glass amount
+uniform vec4 uPool;     // the silvering solution: plane normal and level, object space
+uniform vec2 uFinOld;   // roughness and clearcoat roughness before a finish change
+uniform float uFlaw;    // pinholes and the tide line
+uniform float uBumps;   // warts, for one green gather
+uniform float uLustre;  // a fumed metal-oxide film
+uniform vec4 uGlint;    // a window glint carried past: view-space direction and strength
+varying vec3 vGPos;
+` + GLSL_NOISE + `
+// Tanner Helland's Kelvin to sRGB fit, returned linear
+vec3 gBlackbody( float T ) {
+  float t = T / 100.0;
+  float g = clamp( ( 99.4708 * log( t ) - 161.1196 ) / 255.0, 0.0, 1.0 );
+  float b = t <= 19.0 ? 0.0 : clamp( ( 138.5177 * log( t - 10.0 ) - 305.0448 ) / 255.0, 0.0, 1.0 );
+  return pow( vec3( 1.0, g, b ), vec3( 2.2 ) );
+}`;
+const GLSL_MAP = `
+float gAng = vUv.x * 6.2831853;
+vec3 gP = vec3( cos( gAng ) * 1.7, sin( gAng ) * 1.7, vUv.y * 5.5 );
+float gN = gNoise( gP ) * 0.62 + gNoise( gP * 2.3 + 3.7 ) * 0.38;
+float gT = 300.0 + ( uTempK - 300.0 ) * ( 1.06 - 0.42 * min( vUv.y, 0.93 ) - 0.14 * gN );
+float gHot = smoothstep( 800.0, 1180.0, gT );
+float gDark = smoothstep( 690.0, 940.0, gT );
+float gVis = uPaintVis * ( 1.0 - gHot );
+// silvering: gMir is how much of the wall is mirror, gLac how far a new lacquer has spread
+float gMir = 1.0, gLac = 1.0, gFog = 0.0, gWet = 0.0, gMen = 0.0, gPin = 0.0, gTide = 0.0;
+float gMot = 0.5;
+if ( uSilv.y > 0.5 ) {
+  gMot = gNoise( vGPos * 9.0 ) * 0.6 + gNoise( vGPos * 23.0 + 5.0 ) * 0.4;
+  float gH = vUv.y + 0.3 * ( gMot - 0.5 );
+  float gF = uSilv.z > 0.5 ? 1.0 - smoothstep( uSilv.x - 0.08, uSilv.x, gH )
+           : uSilv.z < -0.5 ? smoothstep( 1.0 - uSilv.x, 1.08 - uSilv.x, gH )
+           : smoothstep( gMot * 0.6, gMot * 0.6 + 0.4, uSilv.x );
+  gFog = gF * ( 1.0 - gF ) * 4.0;
+  if ( uSilv.y < 1.5 ) {
+    gMir = mix( 1.0, gF, uSilv.w );
+    float gLev = dot( vGPos, uPool.xyz ) - uPool.w;
+    gWet = ( 1.0 - gMir ) * smoothstep( 0.015, -0.015, gLev );
+    gMen = ( 1.0 - gMir ) * smoothstep( 0.022, 0.0, abs( gLev ) ) * step( 0.001, uPool.w + 9.0 );   // the meniscus catches the light
+  } else gLac = gF;
+}
+if ( uFlaw > 0.0 ) {
+  vec3 gC = floor( vGPos * 38.0 );
+  if ( gHash( gC + 7.13 ) < 0.0011 ) {
+    vec3 gO = fract( vGPos * 38.0 ) - 0.5 - 0.3 * ( vec3( gHash( gC + 1.0 ), gHash( gC + 2.0 ), gHash( gC + 3.0 ) ) - 0.5 );
+    gPin = smoothstep( 0.24, 0.12, length( gO ) ) * uFlaw;
+  }
+  gTide = smoothstep( 0.014, 0.0, abs( vGPos.y - 0.84 - 0.03 * ( gNoise( gP * 2.0 + 9.0 ) - 0.5 ) ) ) * uFlaw;
+  gMir *= 1.0 - gPin;
+}
+// the env is bright, so clear glass over a dark inside has almost no diffuse: only its reflections show
+diffuseColor.rgb = mix( diffuseColor.rgb * 0.012, diffuseColor.rgb, gMir );
+diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.075, 0.072, 0.07 ) * ( 0.5 + gMot ), gFog * 0.85 * float( uSilv.y < 1.5 ) );   // nucleating silver: a fine grey mist
+diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.11, 0.1, 0.085 ), clamp( gWet, 0.0, 1.0 ) * 0.9 );  // the solution against the wall
+diffuseColor.rgb += vec3( 0.18, 0.17, 0.15 ) * gMen;
+diffuseColor.rgb *= 1.0 - 0.12 * gTide;
+if ( uLustre > 0.0 ) {
+  // thin-film interference: violet face-on, through blue and green, to gold at the rim
+  float gFt = 1.0 - abs( dot( normalize( vNormal ), normalize( vViewPosition ) ) );
+  vec3 gFilm = 0.5 + 0.5 * cos( 6.2831853 * ( vec3( 0.0, 0.33, 0.67 ) + 0.22 + 0.68 * gFt ) );
+  float gLum = max( max( diffuseColor.r, diffuseColor.g ), diffuseColor.b );
+  diffuseColor.rgb = mix( diffuseColor.rgb, gFilm * ( 0.3 + 0.7 * gLum ), uLustre * 0.55 * gMir );
+}
+vec4 pc = texture2D( map, vUv ) * gVis;
+vec4 pm = texture2D( uPaintM, vUv ) * gVis;
+diffuseColor.rgb = diffuseColor.rgb * ( 1.0 - pc.a ) + pc.rgb;
+// glowing glass loses its body colour: grey it out and darken it, so only the heat colour shows
+diffuseColor.rgb = mix( diffuseColor.rgb, vec3( dot( diffuseColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) ) ), gDark );
+diffuseColor.rgb *= 1.0 - 0.965 * max( gHot, gDark );
+float gRough = mix( 0.04, mix( uFinOld.x, roughness, gLac ), gMir );
+gRough = mix( gRough, 0.46, gFog * 0.8 ) + 0.1 * gTide;
+gRough = mix( gRough, 0.12, clamp( gWet, 0.0, 1.0 ) );
+gRough = mix( gRough, 0.03, gMen );
+float gMetal = metalness * gMir * ( 1.0 - 0.2 * gTide );
+gMetal = mix( gMetal, 0.45, gFog * 0.85 * float( uSilv.y < 1.5 ) );
+`;
+const GLSL_GLOW = `
+{
+  float gNdV = abs( dot( normal, normalize( vViewPosition ) ) );
+  float gTr = gT - 170.0 * pow( 1.0 - gNdV, 1.5 );   // the thin rim runs cooler, so it dims first
+  float gI = pow( clamp( gTr / 1380.0, 0.0, 1.3 ), 4.0 ) * smoothstep( 798.0, 990.0, gTr );
+  if ( gI > 0.0 ) totalEmissiveRadiance += gBlackbody( gTr * 1.08 ) * gI * uGlowK * ( 0.8 + 0.3 * pow( 1.0 - gNdV, 1.4 ) );
+}
+if ( uGlint.w > 0.001 ) {
+  vec3 gR = reflect( -normalize( vViewPosition ), normal );
+  float gS = pow( max( dot( gR, uGlint.xyz ), 0.0 ), mix( 140.0, 24.0, roughnessFactor ) );
+  totalEmissiveRadiance += vec3( 1.0, 0.86, 0.66 ) * gS * uGlint.w * ( 1.0 - 0.75 * roughnessFactor ) * 1.4;
+}`;
+const GLSL_GLOW_V1 = `
+float gI = pow( clamp( ( gT - 798.0 ) / 600.0, 0.0, 1.0 ), 1.7 );
+if ( gI > 0.0 ) {
+  float gX = clamp( ( gT - 798.0 ) / 650.0, 0.0, 1.0 );
+  vec3 gBB = vec3( 1.0, 0.018 + 0.17 * gX, 0.014 * gX * gX );
+  float gNdV = abs( dot( normal, normalize( vViewPosition ) ) );
+  totalEmissiveRadiance += gBB * gI * uGlowK * ( 0.66 + 0.62 * pow( 1.0 - gNdV, 1.4 ) );
+}`;
+function patchShader(fs) {
+  return fs
+    .replace('#include <common>', '#include <common>\n' + GLSL_PARS)
+    .replace('#include <map_fragment>', GLSL_MAP)
+    .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = mix( gRough * ( 1.0 - pm.a ) + pm.r, 0.1, gHot );')
+    .replace('#include <metalnessmap_fragment>', 'float metalnessFactor = mix( gMetal * ( 1.0 - pm.a ) + pm.g, 0.0, gHot );')
+    .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n' + (FX.blackbody ? GLSL_GLOW : GLSL_GLOW_V1))
+    .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n  normal = normalize( normal + uWobble * vec3( gNoise( gP * 1.3 + 11.0 ) - 0.5, gNoise( gP * 1.3 + 29.0 ) - 0.5, 0.0 ) + uBumps * vec3( gNoise( gP * 4.2 + 3.0 ) - 0.5, gNoise( gP * 4.2 + 41.0 ) - 0.5, 0.0 ) );')
+    .replace('#include <lights_physical_fragment>', THREE.ShaderChunk.lights_physical_fragment
+      .replace('material.clearcoat = clearcoat;', 'material.clearcoat = clearcoat * ( 1.0 - pm.a ) + pm.b;')
+      .replace('material.clearcoatRoughness = clearcoatRoughness;', 'material.clearcoatRoughness = mix( uFinOld.y, clearcoatRoughness, gLac ) + 0.25 * gFog;'));
+}
+// vertex side: the object-space position for the silvering, a gravity sag for hot glass, and warts for the gherkin
+const GLSL_VERT_PARS = `
+uniform float uSag;
+uniform float uBumps;
+varying vec3 vGPos;
+` + GLSL_NOISE;
+const GLSL_VERT = `
+vGPos = position;
+transformed.y -= uSag * smoothstep( 0.9, -1.7, position.y );
+transformed.xz *= 1.0 - 0.3 * uSag * smoothstep( 0.9, -1.2, position.y );
+if ( uBumps > 0.0 ) {
+  float gA = uv.x * 6.2831853;
+  vec3 gPv = vec3( cos( gA ) * 1.7, sin( gA ) * 1.7, uv.y * 5.5 );
+  transformed += objectNormal * uBumps * ( gNoise( gPv * 4.2 + 3.0 ) - 0.45 ) * 0.07 * smoothstep( 0.98, 0.7, uv.y );
+  transformed.x += uBumps * 0.03 * pow( 1.0 - position.y, 2.0 );
+}`;
+function makeBodyMaterial(P) {
+  const u = {
+    uPaintM: { value: P.tm }, uTempK: { value: 300 }, uPaintVis: { value: 1 }, uGlowK: { value: 6.5 }, uWobble: { value: .07 },
+    uSilv: { value: new THREE.Vector4(0, 0, 0, 0) }, uPool: { value: new THREE.Vector4(0, 1, 0, -9) }, uFinOld: { value: new THREE.Vector2(.05, .03) },
+    uFlaw: { value: 0 }, uBumps: { value: 0 }, uLustre: { value: 0 }, uGlint: { value: new THREE.Vector4(0, 0, 1, 0) }, uSag: { value: 0 },
+  };
+  const m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: P.tc, metalness: .92, roughness: .05, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: 1.35 });
+  m.userData.u = u;
+  m.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, u);
+    sh.fragmentShader = patchShader(sh.fragmentShader);
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + GLSL_VERT_PARS).replace('#include <begin_vertex>', '#include <begin_vertex>\n' + GLSL_VERT);
+  };
+  m.customProgramCacheKey = () => 'glasshouse-bauble-2';
+  return m;
+}
+const goldMat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(tok('--gold', '#d9b36c')), metalness: 1, roughness: .26, clearcoat: .4, clearcoatRoughness: .2, side: THREE.DoubleSide });
+const wireMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(tok('--silver', '#c9ccd6')), metalness: 1, roughness: .28 });
+const steelMat = new THREE.MeshStandardMaterial({ color: new THREE.Color('#7e8089'), metalness: 1, roughness: .32 });
+const bossMat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color('#2a2026'), metalness: .2, roughness: .08, clearcoat: 1, emissive: new THREE.Color(0, 0, 0) });
+
+/* ---------- cap, eyelet and hook geometry (shared) ---------- */
+const CAP_Y = .968;
+const capGeo = (() => {
+  const g = new THREE.CylinderGeometry(.176, .2, .16, 84, 12, true);
+  const p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), y = p.getY(i), z = p.getZ(i), th = Math.atan2(x, z), h = (y + .08) / .16;
+    const fl = Math.pow(.5 + .5 * Math.cos(th * 14), 2);
+    let k = 1 + .04 * Math.exp(-Math.pow((h - .74) / .06, 2)) + .03 * Math.exp(-Math.pow((h - .9) / .04, 2));
+    if (h < .56) k += (.56 - h) / .56 * .075 * fl;
+    let yy = y; if (h < .04) yy += .034 * (1 - fl);
+    p.setXYZ(i, x * k, yy, z * k);
+  }
+  g.computeVertexNormals(); g.translate(0, CAP_Y + .08, 0);
+  return g;
+})();
+const domeGeo = (() => { const g = new THREE.SphereGeometry(.18, 64, 10, 0, TAU, 0, Math.PI / 2); g.scale(1, .32, 1); g.translate(0, CAP_Y + .158, 0); return g; })();
+const EYE_Y = CAP_Y + .158 + .058 + .04;
+const eyeGeo = (() => { const g = new THREE.TorusGeometry(.042, .011, 10, 30); g.translate(0, EYE_Y, 0); return g; })();
+const PIVOT = new THREE.Vector3(.085, 1.62, 0);
+const hookGeo = (() => {
+  const pts = [];
+  for (let i = 0; i <= 8; i++) pts.push(new THREE.Vector3(.003 * Math.sin(i), lerp(EYE_Y - .03, 1.54, i / 8), 0));
+  const cx = .085, cy = 1.54, rr = .085;
+  for (let i = 1; i <= 14; i++) { const a = Math.PI - Math.PI * i / 14; pts.push(new THREE.Vector3(cx + rr * Math.cos(a), cy + rr * Math.sin(a), 0)); }
+  pts.push(new THREE.Vector3(.172, 1.5, 0), new THREE.Vector3(.168, 1.47, 0));
+  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 80, .0088, 8, false);
+})();
+
+/* ---------- ornament factory ---------- */
+function makeOrnament(params, prof, res, lod) {
+  const P = makePaint(res[0], res[1]);
+  const mat = makeBodyMaterial(P);
+  const body = new THREE.Mesh(lod ? makeLathe(prof, lod[0], lod[1]) : makeLathe(prof), mat);
+  const cap = new THREE.Group();
+  cap.add(new THREE.Mesh(capGeo, goldMat), new THREE.Mesh(domeGeo, goldMat), new THREE.Mesh(eyeGeo, goldMat));
+  const hook = new THREE.Mesh(hookGeo, wireMat);
+  const spinner = new THREE.Group(); spinner.add(body, cap);
+  const orn = new THREE.Group(); orn.add(spinner, hook); orn.position.copy(PIVOT).multiplyScalar(-1);
+  const holder = new THREE.Group(); holder.add(orn);
+  const o = { holder, orn, spinner, body, cap, hook, P, mat, prof, params: Object.assign({}, params) };
+  applyLook(o, 1);
+  return o;
+}
+const _col = new THREE.Color();
+function applyLook(o, k) {
+  const g = GLASS[o.params.glass], f = FINISH[o.params.finish];
+  _col.set(g.hex); _col.r = Math.min(1, _col.r * g.gain[0]); _col.g = Math.min(1, _col.g * g.gain[1]); _col.b = Math.min(1, _col.b * g.gain[2]);
+  o.mat.color.lerp(_col, k);
+  o.mat.metalness = lerp(o.mat.metalness, g.metal, k);
+  o.mat.roughness = lerp(o.mat.roughness, f.rough, k);
+  o.mat.clearcoatRoughness = lerp(o.mat.clearcoatRoughness, f.ccr, k);
+  o.mat.userData.u.uLustre.value = lerp(o.mat.userData.u.uLustre.value, f.irid && FX.lustre ? g.lustre : 0, k);   // fumed lustre: violet to gold with the angle of view
+  o.mat.userData.u.uBumps.value = o.params.shape === 4 && FX.pickle ? 1 : 0;
+}
+
+/* ================= the lathe (main ornament) ================= */
+const sceneR = rng('scene');
+const glassOrder = shuffle([0, 1, 2, 3, 4], sceneR);
+const patOrder = shuffle([0, 1, 2], sceneR);
+const state = {
+  glass: glassOrder[0], finish: sceneR() < .72 ? 0 : 1, shape: (sceneR() * 3) | 0, brush: 0,
+  spinToggle: false, count: 3, step: 0,
+};
+// baubles hung on earlier visits (read before the lathe is numbered, so lot numbers carry on)
+function readTree() {
+  const raw = store.get('tree'), out = [], seen = new Set();
+  if (!Array.isArray(raw)) return out;
+  const img = (v) => (typeof v === 'string' && v.startsWith('data:image/') && v.length < 40000 ? v : '');
+  for (const m of raw) {
+    if (!m || typeof m !== 'object') continue;
+    const g = m.g | 0, f = m.f | 0, sh = m.s | 0, slot = m.slot | 0, no = m.no | 0;
+    if (g < 0 || g >= GLASS.length || f < 0 || f >= FINISH.length || sh < 0 || sh >= SHAPES.length || slot < 0 || slot >= MAX_HUNG || seen.has(slot) || no < 1 || no > 99999) continue;
+    seen.add(slot);
+    out.push({ g, f, s: sh, slot, no, size: clamp(+m.size || .27, .2, .32), d: typeof m.d === 'string' ? m.d.slice(0, 10) : '', c: img(m.c), m: img(m.m) });
+  }
+  return out.sort((a, b) => a.no - b.no).slice(-MAX_HUNG);
+}
+const MEM = FX.memory ? readTree() : [];
+for (const m of MEM) state.count = Math.max(state.count, m.no + 1);
+const mainProf = cloneProf(PROFILES[state.shape]);
+const main = makeOrnament({ glass: state.glass, finish: state.finish, shape: state.shape, no: state.count }, mainProf, [PW, PH]);
+main.holder.position.copy(PIVOT);
+scene.add(main.holder);
+main.mat.userData.u.uFlaw.value = FX.flaws ? 1 : 0;
+main.wobPh = rng('wobble')() * TAU;   // the bauble sits a hair off-centre on its cap
+
+const punty = new THREE.Mesh(new THREE.CylinderGeometry(.036, .046, 8, 28, 1, false), steelMat);
+const boss = new THREE.Mesh(new THREE.SphereGeometry(.07, 24, 16), bossMat);
+scene.add(punty, boss);
+const glowLight = new THREE.PointLight(0xff7a2a, 0, 6, 2);
+scene.add(glowLight);
+// the pipe can be carried to the glory hole: pipe.x and pipe.y offset the whole lathe
+const pipe = { x: 0, y: 0, tx: 0, ty: 0, drag: null, key: false, prox: 0, inHole: false, dwell: 0, peak: 0, coolIn: false, sx: 0, sy: 0, by: 0, reveal: false, roll: 0 };
+function seatPunty() { const yb = mainProf.y[0]; punty.position.set(pipe.x, yb - 4 - .02 + pipe.y, 0); boss.position.set(pipe.x, yb - .015 + pipe.y, 0); }
+seatPunty();
+
+// spin guide: a faint ring at the brush latitude
+const guideGeo = new THREE.BufferGeometry(); guideGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(129 * 3), 3));
+const guide = new THREE.Line(guideGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false }));
+main.body.add(guide);
+function setGuide(v) {
+  const r = rAt(mainProf, v) * 1.012 + .004, f = clamp(v, 0, 1) * NP, i = Math.min(NP - 1, f | 0), y = lerp(mainProf.y[i], mainProf.y[i + 1], f - i);
+  const a = guideGeo.attributes.position.array;
+  for (let k = 0; k <= 128; k++) { const t = k / 128 * TAU; a[k * 3] = r * Math.sin(t); a[k * 3 + 1] = y; a[k * 3 + 2] = r * Math.cos(t); }
+  guideGeo.attributes.position.needsUpdate = true; guideGeo.computeBoundingSphere();
+}
+
+/* ================= the fir bough ================= */
+const branch = { group: new THREE.Group(), wood: null, needles: null, slots: [], by: 0, bv: 0, key: '' };
+scene.add(branch.group);
+const needleMat = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
+const woodMatL = new THREE.MeshLambertMaterial({ color: new THREE.Color(tok('--wood', '#2a1810')) });
+const needleMatLoose = needleMat.clone();   // for the few needles that fall
+// each hanging twig can dip under a bauble's weight, and its needles quiver: aDip = (slot, weight along the twig, phase)
+const dipU = { uDip: { value: new Float32Array(MAX_HUNG) }, uQuiv: { value: new Float32Array(MAX_HUNG) }, uTime: { value: 0 } };
+function dipPatch(m, quiver, key) {
+  if (!FX.hangPhysics) return;
+  m.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, dipU);
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', `#include <common>
+attribute vec3 aDip;
+uniform float uDip[ ${MAX_HUNG} ];
+uniform float uQuiv[ ${MAX_HUNG} ];
+uniform float uTime;`)
+      .replace('#include <project_vertex>', `
+float gDip = 0.0, gQv = 0.0;
+for ( int i = 0; i < ${MAX_HUNG}; i++ ) { if ( abs( aDip.x - float( i ) ) < 0.5 ) { gDip = uDip[ i ]; gQv = uQuiv[ i ]; } }
+${quiver ? 'transformed.x += position.y * gQv * min( aDip.y, 1.6 ) * 0.014 * sin( uTime * 27.0 + aDip.z );' : ''}
+vec4 mvPosition = vec4( transformed, 1.0 );
+#ifdef USE_INSTANCING
+  mvPosition = instanceMatrix * mvPosition;
+#endif
+mvPosition.y += gDip * aDip.y;
+mvPosition = modelViewMatrix * mvPosition;
+gl_Position = projectionMatrix * mvPosition;`);
+  };
+  m.customProgramCacheKey = () => key;
+}
+dipPatch(needleMat, true, 'glasshouse-needle-dip');
+dipPatch(woodMatL, false, 'glasshouse-wood-dip');
+const firLight = new THREE.DirectionalLight(0xffc29a, .55); firLight.position.set(-3, -2, 6); scene.add(firLight);
+const firHemi = new THREE.HemisphereLight(0xffb27a, 0x2a0d12, .5); scene.add(firHemi);
+// a needle is one folded blade: two triangles along a midrib, dark on one half, silvery on the other
+const needleGeo = (() => {
+  const w = .026, t = .008;
+  const B = [0, 0, t], L = [-w / 2, .22, 0], R = [w / 2, .22, 0], T = [0, 1, t * .4];
+  const top = new THREE.Color(tok('--fir', '#10281b')), under = new THREE.Color(tok('--fir-under', '#4a7466'));
+  const pos = [...B, ...R, ...T, ...B, ...T, ...L], col = [];
+  for (let i = 0; i < 3; i++) col.push(top.r, top.g, top.b);
+  for (let i = 0; i < 3; i++) col.push(under.r, under.g, under.b);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.computeVertexNormals();
+  return g;
+})();
+
+function buildBranch() {
+  const key = `${Math.round(view.W)}x${Math.round(view.H)}:${Math.round(view.fx1)}`;
+  if (key === branch.key) return; branch.key = key;
+  if (branch.wood) { branch.group.remove(branch.wood); branch.wood.geometry.dispose(); }
+  if (branch.needles) { branch.group.remove(branch.needles); branch.needles.geometry.dispose(); branch.needles.dispose(); }
+  const R = rng('fir'), zb = -0.95, ppuB = view.ppu * CAM_D / (CAM_D - zb);
+  const toW = (px, py) => [(px - view.cx) / ppuB, (view.cy - py) / ppuB];
+  const W = view.W, H = view.H, desk = view.desk;
+  const pts = [];
+  for (let k = 0; k <= 10; k++) {
+    const t = k / 10, px = lerp(W * 1.06, -W * .06, t);
+    const fy = desk ? lerp(-.01, .125, Math.pow(t, .8)) + .018 * Math.sin(t * Math.PI * 1.5 + .4) : lerp(.05, .095, t) + .012 * Math.sin(t * Math.PI * 1.6 + .8);
+    const [x, y] = toW(px, fy * H);
+    pts.push(new THREE.Vector3(x, y, zb + .14 * Math.sin(t * 5.2 + 1)));
+  }
+  const stem = new THREE.CatmullRomCurve3(pts);
+  const wpos = [], wnor = [], widx = [];
+  let dipSlot = -1;
+  const wdip = [], ndip = [], QR = rng('quiver');
+  const dipW = (t) => (dipSlot < 0 ? 0 : Math.min(2.4, Math.pow(t / .62, 2)));
+  const tube = (curve, segs, r0, r1) => {
+    const frames = curve.computeFrenetFrames(segs, false), base = wpos.length / 3, rs = 7;
+    for (let i = 0; i <= segs; i++) {
+      const p = curve.getPointAt(i / segs), N = frames.normals[i], B = frames.binormals[i], r = lerp(r0, r1, i / segs), w = dipW(i / segs);
+      for (let j = 0; j <= rs; j++) { const a = j / rs * TAU, c = Math.cos(a), s = Math.sin(a); const nx = c * N.x + s * B.x, ny = c * N.y + s * B.y, nz = c * N.z + s * B.z; wpos.push(p.x + r * nx, p.y + r * ny, p.z + r * nz); wnor.push(nx, ny, nz); wdip.push(dipSlot, w, 0); }
+    }
+    for (let i = 0; i < segs; i++) for (let j = 0; j < rs; j++) { const a = base + i * (rs + 1) + j, b = a + rs + 1; widx.push(a, b, a + 1, b, b + 1, a + 1); }
+  };
+  const mats = [], cols = [];
+  const up = new THREE.Vector3(0, 1, 0), T = new THREE.Vector3(), B1 = new THREE.Vector3(), B2 = new THREE.Vector3(), dir = new THREE.Vector3(), X = new THREE.Vector3(), Z = new THREE.Vector3(), m4 = new THREE.Matrix4(), cl = new THREE.Color();
+  const needle = (p, d, nh, len, t) => {
+    Z.copy(nh).addScaledVector(d, -nh.dot(d)).normalize(); X.crossVectors(d, Z).normalize();
+    m4.makeBasis(X, dir.copy(d).multiplyScalar(len), Z); m4.setPosition(p);
+    mats.push(m4.clone()); const v = .72 + R() * .5; cl.setRGB(v, v * (.95 + R() * .1), v * (.92 + R() * .12)); cols.push(cl.clone());
+    ndip.push(dipSlot, dipW(t), QR() * TAU);
+  };
+  const needlesAlong = (curve, lenA, lenB, step) => {
+    const L = curve.getLength(), n = Math.max(2, Math.floor(L / step));
+    for (let k = 0; k < n; k++) {
+      const t = (k + .5) / n, p = curve.getPointAt(t); curve.getTangentAt(t, T);
+      B1.crossVectors(T, up); if (B1.lengthSq() < 1e-4) B1.set(1, 0, 0); B1.normalize(); B2.crossVectors(B1, T).normalize();
+      const len = lerp(lenA, lenB, t) * (.82 + R() * .3);
+      for (const sd of [-1, 1]) {
+        const g = -.3 + R() * .75;
+        dir.copy(T).multiplyScalar(.32 + R() * .3).addScaledVector(B1, sd * Math.cos(g)).addScaledVector(B2, Math.sin(g)).normalize();
+        needle(p, dir.clone(), B2, len, t);
+      }
+      if (R() < .55) { dir.copy(T).multiplyScalar(.45).addScaledVector(B2, .9).addScaledVector(B1, (R() - .5) * .9).normalize(); needle(p, dir.clone(), B1, len * .8, t); }
+    }
+  };
+  tube(stem, 160, .036, .016);
+  needlesAlong(stem, .24, .18, .03);
+  const SL = stem.getLength();
+  let s = .1, side = 1;
+  while (s < SL - .1) {
+    const t = s / SL, p = stem.getPointAt(t), tn = stem.getTangentAt(t); side = -side;
+    const d = new THREE.Vector3(tn.x * (.4 + R() * .4), -.06 - R() * .2, side * (.7 + R() * .35) + (R() - .5) * .3).normalize();
+    const len = (.42 + R() * .55) * (1 - .25 * t);
+    const droop = new THREE.Vector3(0, -.05 - R() * .1, 0);
+    const c = new THREE.CatmullRomCurve3([p.clone(), p.clone().addScaledVector(d, len * .5).add(droop), p.clone().addScaledVector(d, len).addScaledVector(droop, 2.4)]);
+    tube(c, 14, .013, .005); needlesAlong(c, .21, .13, .027);
+    if (R() < .5) {
+      const q = c.getPointAt(.45), d2 = new THREE.Vector3(tn.x * .8, -.05, side * .3).normalize(), l2 = len * .45;
+      const c2 = new THREE.CatmullRomCurve3([q.clone(), q.clone().addScaledVector(d2, l2 * .5), q.clone().addScaledVector(d2, l2).add(new THREE.Vector3(0, -.05, 0))]);
+      tube(c2, 8, .008, .004); needlesAlong(c2, .17, .11, .026);
+    }
+    s += .17 + R() * .15;
+  }
+  // seven hanging twigs reaching toward the viewer
+  branch.slots = [];
+  const fw = view.fx1 - view.fx0;
+  for (let i = 0; i < MAX_HUNG; i++) {
+    const px = view.fx0 + fw * (.1 + .8 * (i + .5 + (R() - .5) * .35) / MAX_HUNG);
+    const [wx] = toW(px, 0);
+    let bt = 0, bd = 1e9; for (let k = 0; k <= 400; k++) { const q = stem.getPointAt(k / 400); const dd = Math.abs(q.x - wx); if (dd < bd) { bd = dd; bt = k / 400; } }
+    const p = stem.getPointAt(bt), low = i % 2 === 1;
+    const d = new THREE.Vector3((R() - .5) * .12, -(low ? .42 : .2) - R() * .1, 1).normalize();
+    const len = .56 + R() * .1;
+    const c = new THREE.CatmullRomCurve3([p.clone(), p.clone().addScaledVector(d, len * .5).add(new THREE.Vector3(0, -.03, 0)), p.clone().addScaledVector(d, len).add(new THREE.Vector3(0, -.08, 0))]);
+    dipSlot = i; tube(c, 14, .014, .006); needlesAlong(c, .19, .12, .028); dipSlot = -1;
+    const pv = c.getPointAt(.62); pv.y += .01;
+    branch.slots.push({ pivot: pv, x: pv.x });
+  }
+  const wg = new THREE.BufferGeometry();
+  wg.setAttribute('position', new THREE.Float32BufferAttribute(wpos, 3));
+  wg.setAttribute('normal', new THREE.Float32BufferAttribute(wnor, 3));
+  wg.setIndex(widx);
+  wg.setAttribute('aDip', new THREE.Float32BufferAttribute(wdip, 3));
+  branch.wood = new THREE.Mesh(wg, woodMatL);
+  const ng = needleGeo.clone(); ng.setAttribute('aDip', new THREE.InstancedBufferAttribute(new Float32Array(ndip), 3));
+  branch.needles = new THREE.InstancedMesh(ng, needleMat, mats.length);
+  for (let i = 0; i < mats.length; i++) { branch.needles.setMatrixAt(i, mats[i]); branch.needles.setColorAt(i, cols[i]); }
+  branch.needles.instanceMatrix.needsUpdate = true; if (branch.needles.instanceColor) branch.needles.instanceColor.needsUpdate = true;
+  branch.needles.frustumCulled = false;
+  branch.group.add(branch.wood, branch.needles);
+  branch.stemPts = []; for (let k = 0; k <= 48; k++) branch.stemPts.push(stem.getPointAt(k / 48));
+  for (const h of hung) h.o.holder.position.copy(branch.slots[h.slot].pivot);
+}
+
+/* ================= hanging ornaments ================= */
+const hung = [];   // {o, slot, size, th, om, ph, pv, ps, psv, ps0, freq, sx, sy, sr, tw, twv, bob, bobv}
+const leaving = [];
+const flights = [];
+const slotOrder = shuffle([0, 1, 2, 3, 4, 5, 6], rng('slots'));
+function sizeFor(shape, R) { return (.25 + R() * .05) * (shape === 1 ? .9 : shape === 2 ? .96 : shape === 3 ? .86 : shape === 4 ? .84 : 1); }
+// pitch comes from the size (smaller rings higher), quantised to D major pentatonic, so no two baubles clash
+const NOTES = [880, 987.77, 1174.66, 1318.51, 1479.98, 1760, 1975.53];
+function freqFor(o, size) {
+  if (!FX.chime) return 1180 * (.27 / size) * GLASS[o.params.glass].pitch * ([1, 1.12, .9, 1.2, .85][o.params.shape] || 1);
+  const s = clamp((size - .215) / .09, 0, 1), k = [0, 1, -1, 2, -2][o.params.shape] || 0;
+  return NOTES[clamp(Math.round((1 - s) * 4) + 1 + k, 0, NOTES.length - 1)];
+}
+function freeSlot() {
+  const used = new Set(hung.map((h) => h.slot).concat(flights.map((f) => f.slot)));
+  for (const s of slotOrder) if (!used.has(s)) return s;
+  return -1;
+}
+// the deepest twig, nearest the trunk (the bough thickens to the right)
+function trunkSlot() { let b = 0; branch.slots.forEach((sl, i) => { if (sl.x > branch.slots[b].x) b = i; }); return b; }
+function attach(o, slot, size, th, om) {
+  const h = { o, slot, size, th, om, ph: 0, pv: 0, ps: o.spinner.rotation.y, psv: 0, ps0: o.spinner.rotation.y, freq: freqFor(o, size), sx: -999, sy: -999, sr: 0, seed: hung.length * 1.7 + slot, tw: 0, twv: 0, bob: 0, bobv: 0, lastTink: -9 };
+  branch.group.add(o.holder);
+  o.holder.position.copy(branch.slots[slot].pivot);
+  o.holder.scale.setScalar(size);
+  o.holder.rotation.set(0, 0, th);
+  hung.push(h);
+  updateSlotsUI();
+  return h;
+}
+function seedHung() {
+  const R = rng('hung');
+  const taken = new Set(MEM.map((m) => m.slot));
+  const picks = [glassOrder[1], glassOrder[2]];
+  picks.forEach((gi, n) => {
+    const shape = (R() * 3) | 0, finish = R() < .6 ? 0 : (R() < .5 ? 1 : 2);
+    const prof = cloneProf(PROFILES[shape]);
+    const inks = patternInks(gi);
+    const dabs = patternDabs(patOrder[(n + 1) % 3], R, prof, ...inks);
+    const rot = R() * TAU, slot = slotOrder[n], size = sizeFor(shape, R), th = (R() - .5) * .05;
+    if (taken.has(slot)) return;   // a bauble from an earlier visit hangs here now
+    const o = makeOrnament({ glass: gi, finish, shape, no: n + 1 }, prof, [512, 256], HUNG_LOD);
+    flushDabs(o.P, prof, dabs);
+    o.spinner.rotation.y = rot;
+    attach(o, slot, size, th, 0);
+  });
+  // the seven slots: the two seeded ones go first in slotOrder, so new baubles fill the rest
+  // then the baubles hung on earlier visits, in the order they were made
+  for (const m of MEM) {
+    const prof = cloneProf(PROFILES[m.s]);
+    const o = makeOrnament({ glass: m.g, finish: m.f, shape: m.s, no: m.no, user: true, date: m.d, snap: m.c ? [m.c, m.m] : null }, prof, [512, 256], HUNG_LOD);
+    if (m.c) paintFromSnap(o.P, m.c, m.m);
+    else flushDabs(o.P, prof, patternDabs(m.no % 3, rng('memory-' + m.no), prof, ...patternInks(m.g)));
+    o.spinner.rotation.y = (m.no * 2.39996) % TAU;
+    attach(o, m.slot, m.size, 0, 0);
+  }
+}
+// the tree remembers: up to seven small parameter sets, each with a 128 x 64 picture of its paint
+function snapPaint(P) {
+  try {
+    const c = document.createElement('canvas'); c.width = 128; c.height = 64; const x = c.getContext('2d');
+    x.drawImage(P.cc, 0, 0, 128, 64); const a = c.toDataURL('image/png');
+    x.clearRect(0, 0, 128, 64); x.drawImage(P.cm, 0, 0, 128, 64); const b = c.toDataURL('image/png');
+    return [a, b];
+  } catch (e) { return null; }
+}
+function paintFromSnap(P, c, m) {
+  [[c, P.xc], [m, P.xm]].forEach(([src, x]) => {
+    if (!src) return;
+    const im = new Image();
+    im.onload = () => { x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; x.clearRect(0, 0, P.w, P.h); x.drawImage(im, 0, 0, P.w, P.h); P.dirty = true; P.inked = true; };
+    im.src = src;
+  });
+}
+function saveTree() {
+  if (!FX.memory) return;
+  const list = hung.filter((h) => h.o.params.user).map((h) => {
+    const q = h.o.params;
+    return { no: q.no, g: q.glass, f: q.finish, s: q.shape, slot: h.slot, size: +h.size.toFixed(3), d: q.date || '', c: q.snap ? q.snap[0] : '', m: q.snap ? q.snap[1] : '' };
+  });
+  if (!store.set('tree', list)) store.set('tree', list.map((x) => Object.assign(x, { c: '', m: '' })));
+}
+
+/* ================= heat (gather + cooling) ================= */
+const T_PEAK = 1380, T_ROOM = 300, T_DRAPER = 798, TAU_COOL = 1.94;
+const heat = { T: T_ROOM, phase: 'idle', t: 0, from: T_ROOM, ramp: .3, hold: .1, onPeak: null, noted: false, cool0: T_PEAK, noteT: 0, hotIdle: 0, sag: 0, quiet: false };
+const tickR2 = rng('contraction');
+function startHeat(opts) {
+  heat.phase = 'ramp'; heat.t = 0; heat.from = heat.T; heat.ramp = opts.ramp; heat.hold = opts.hold; heat.onPeak = opts.onPeak || null; heat.noted = false; heat.quiet = false;
+  readout.classList.add('on'); readout.classList.remove('cool'); tempNote.textContent = 'Glass temperature';
+  sfx.roar();
+}
+function updateHeat(dt) {
+  if (heat.phase === 'idle') return;
+  heat.t += dt;
+  if (heat.phase === 'ramp') {
+    const k = clamp(heat.t / heat.ramp, 0, 1); heat.T = lerp(heat.from, T_PEAK, easeOut(k));
+    if (k >= 1) { heat.phase = 'hold'; heat.t = 0; if (heat.onPeak) { heat.onPeak(); heat.onPeak = null; } }
+  } else if (heat.phase === 'hold') {
+    if (heat.t >= heat.hold) { heat.phase = 'cool'; heat.t = 0; heat.cool0 = heat.T; if (!FX.furnaceSound) sfx.ticks(); }
+  } else if (heat.phase === 'cool') {
+    heat.T = T_ROOM + (heat.cool0 - T_ROOM) * Math.exp(-heat.t / TAU_COOL);
+    if (!heat.noted && heat.T < T_DRAPER) { heat.noted = true; onCooled(); }
+    // looks cool, still hot: the numerals go grey and keep counting down
+    if (FX.stillHot && !heat.quiet && heat.noted && heat.t - heat.noteT > 1.6 && tempNote.dataset.k !== 'still') { tempNote.dataset.k = 'still'; tempNote.textContent = 'Looks cool. Still hot.'; }
+    // the glass ticks as it contracts, less often as it cools
+    if (FX.furnaceSound && sfx.on && tickR2() < (heat.T - T_ROOM) / TAU_COOL / 170 * dt) sfx.tick(tickR2);
+    if (heat.T < T_ROOM + (FX.stillHot ? 40 : 260)) { heat.phase = 'idle'; heat.T = T_ROOM; if (FX.stillHot) readout.classList.remove('on'); }
+  }
+  // 'reheat': the glory hole sets the temperature in updatePipe()
+  const c = Math.round(heat.T - 273);
+  if (heat.phase !== 'idle') tempVal.textContent = String(Math.max(c, 0));
+}
+const glowAmt = () => Math.pow(clamp((heat.T - T_DRAPER) / (T_PEAK - T_DRAPER), 0, 1), 1.5);
+const isHot = () => heat.T >= T_DRAPER || heat.phase === 'ramp' || heat.phase === 'hold' || heat.phase === 'reheat';
+function onCooled() {
+  tempNote.textContent = 'Below the Draper point, 525 °C'; tempNote.dataset.k = '';
+  heat.noteT = heat.t;
+  if (FX.stillHot && !heat.quiet) readout.classList.add('cool');
+  else setTimeout(() => { if (!isHot()) readout.classList.remove('on'); }, 2200);
+  if (gather.capPending) { gather.capPending = false; capDrop.t = 0; capDrop.on = true; }
+  if (pendingPattern != null) { const k = pendingPattern; pendingPattern = null; playPattern(k); }
+  refreshControls();
+}
+
+/* ---------- the glory hole: carry the punty back to the furnace mouth at the stage's left edge ---------- */
+const _ps = new THREE.Vector3();
+function pipeProject() {
+  _ps.set(pipe.x, pipe.y, 0).project(camera); pipe.sx = (_ps.x + 1) / 2 * view.W; pipe.sy = (1 - _ps.y) / 2 * view.H;
+  _ps.set(pipe.x, mainProf.y[0] + pipe.y, 0).project(camera); pipe.by = (1 - _ps.y) / 2 * view.H;
+}
+const canCarry = () => FX.gloryHole && main.holder.visible && !gather.on && !main.flying && !playing && !clearing && !paintStroke && !morph;
+function onPunty(x, y) { return canCarry() && Math.abs(x - pipe.sx) < (pointer.type === 'mouse' ? 12 : 22) && y > pipe.by - 4; }
+const pipeMinX = () => (view.ppu * .42 - view.cx) / view.ppu;
+function updatePipe(dt) {
+  if (!FX.gloryHole) return;
+  if (pipe.key && canCarry()) { pipe.tx = pipeMinX(); pipe.ty = 0; }
+  else if (!pipe.drag) { pipe.tx = 0; pipe.ty = 0; }
+  const held = !!(pipe.drag || (pipe.key && canCarry()));
+  // the vertical travel of the hand this frame winds the lathe one way, whichever way the stroke went
+  if (pipe.drag && pipe.roll > 0 && dt > 0) { const dir = lathe.omega < 0 ? -1 : 1; lathe.omega = clamp(lerp(lathe.omega, dir * pipe.roll * .012 / dt, .5), -9, 9); }
+  pipe.roll = 0;
+  const ox = pipe.x, oy = pipe.y;
+  pipe.x = damp(pipe.x, pipe.tx, held ? .07 : reduced ? .03 : .26, dt); pipe.y = damp(pipe.y, pipe.ty, held ? .07 : reduced ? .03 : .26, dt);
+  if (!held && Math.abs(pipe.x) < 2e-4 && Math.abs(pipe.y) < 2e-4) pipe.x = pipe.y = 0;
+  if (ox !== pipe.x || oy !== pipe.y) { main.holder.position.set(PIVOT.x + pipe.x, PIVOT.y + pipe.y, PIVOT.z); seatPunty(); }
+  pipeProject();
+  pipe.prox = pipe.x < -.01 ? clamp(1 - (pipe.sx - view.ppu * .42) / Math.max(1, view.cx * .85), 0, 1) : 0;
+  const carried = pipe.x < -.08;
+  if (carried !== stageUi.classList.contains('carried')) stageUi.classList.toggle('carried', carried);
+  const shift = carried && view.desk ? Math.max(0, Math.round(pipe.sx + 34 - stageUi.offsetLeft)) : 0;
+  if (shift !== pipe.shift) { pipe.shift = shift; stageUi.style.setProperty('--shift', shift + 'px'); }
+  const inHole = main.holder.visible && pipe.x < -.05 && pipe.sx < view.ppu * 1.05;
+  if (inHole) {
+    if (!pipe.inHole) {
+      pipe.inHole = true; pipe.dwell = 0; pipe.peak = 0; pipe.coolIn = heat.T < T_DRAPER;
+      heat.phase = 'reheat'; heat.noted = false; heat.onPeak = null; heat.quiet = false;
+      readout.classList.add('on'); readout.classList.remove('cool'); tempNote.textContent = 'In the glory hole'; tempNote.dataset.k = '';
+      sfx.roar(); refreshControls();
+    }
+    pipe.dwell += dt;
+    heat.T = damp(heat.T, T_PEAK, .9, dt);
+    if (heat.T > T_PEAK - 60) pipe.peak += dt;
+    furnace.flare = Math.max(furnace.flare, .85);
+    // the secret: only in Silver, only for glass that went in cool, and only after three seconds at full heat
+    if (FX.lustre && pipe.coolIn && silverStep() && pipe.peak > 3 && main.params.finish !== 3) fume();
+  } else if (pipe.inHole) {
+    pipe.inHole = false;
+    heat.phase = 'hold'; heat.t = 0; heat.hold = .15;
+    tempNote.textContent = 'Glass temperature';
+    // the new finish joins the row once the glass is out, so the bench never shifts mid-gesture
+    if (pipe.reveal) { pipe.reveal = false; $('#finish-lustre').hidden = false; $('#finishRow').classList.add('has-lustre'); fitFinish(); fixSeps(); fitBench(); }
+  }
+}
+const silverStep = () => state.step === 1 || (MQ_PAGER.matches && curTab === 1);
+// held at full heat in the glory hole, cool silvered glass takes an iridescent film; the finish stays on offer for the session
+function fume() {
+  if ($('#finish-lustre').hidden) pipe.reveal = true;
+  state.finish = main.params.finish = 3; silver.done(); lookK = 1; applyLook(main, 1); updateLabels(); armHang();
+  say('Fumed in the glory hole. The glass takes a lustre.');
+}
+// hot glass left still begins to sag; turning the pipe brings it back
+const chalk = $('#chalk');
+function updateSag(dt) {
+  const turning = Math.abs(lathe.omega) > 1.6;
+  if (isHot() && !turning && main.holder.visible) heat.hotIdle += dt; else heat.hotIdle = 0;
+  const target = FX.sag && !reduced && heat.hotIdle > 4 ? .045 * smooth(T_DRAPER, T_PEAK, heat.T) : 0;
+  heat.sag = damp(heat.sag, target, target > heat.sag ? 1.3 : .45, dt);
+  main.mat.userData.u.uSag.value = heat.sag;
+  if (!FX.hints) return;
+  const carried = pipe.inHole && !!(pipe.drag || pipe.key);   // only while the glass is held in the furnace
+  if (chalk.classList.contains('on')) {
+    if (turning && isHot()) { chalk.classList.remove('on'); hintMem.pipe++; store.set('hints', hintMem); }
+    else if (!carried || !isHot()) chalk.classList.remove('on');
+    else placeChalk();
+  } else if (carried && heat.hotIdle > 4 && hintMem.pipe < 2 && hintMem.pipeShown < 3) {
+    // a pointer carrying the punty turns it by moving up and down; the keyboard turns it with the arrows
+    const keys = pipe.key && !pipe.drag;
+    chalk.textContent = keys ? 'keep the pipe turning' : 'drag up and down';
+    placeChalk(); chalk.classList.add('on'); hintMem.pipeShown++; store.set('hints', hintMem);
+    say(keys ? 'Keep the pipe turning. The arrow keys turn it.' : 'Keep the pipe turning. Drag up and down to turn it.');
+  }
+}
+// beside the glass in open velvet, clear of the readout and the tool tip
+function placeChalk() {
+  const w = chalk.offsetWidth, h = chalk.offsetHeight, o = view.rect || stage.getBoundingClientRect();
+  let rmax = 0; for (let j = 0; j <= NP; j++) rmax = Math.max(rmax, mainProf.r[j]);
+  const x = Math.max(8, Math.min(pipe.sx + rmax * view.ppu + 26, (view.desk ? view.fx1 : view.W) - w - 12));
+  let y = pipe.sy + view.ppu * .2 - h / 2;
+  for (const el of [readout, toolTip]) {
+    if (!el.classList.contains('on')) continue;
+    const r = el.getBoundingClientRect(), l = r.left - o.left - 8, t = r.top - o.top - 8, rr = r.right - o.left + 8, b = r.bottom - o.top + 8;
+    if (x < rr && x + w > l && y < b && y + h > t) y = t - h;
+  }
+  chalk.style.transform = `translate(${Math.round(x)}px, ${Math.round(clamp(y, 8, view.H - h - 8))}px)`;
+}
+const hintMem = Object.assign({ paint: 0, turn: 0, pipe: 0, pipeShown: 0 }, store.get('hints') || {});
+
+/* ---------- heat shimmer: the air above the gather keeps bending light after the glow has gone ---------- */
+const shimmer = (() => {
+  if (!FX.shimmer || !THREE.FramebufferTexture) return { level: 0, warmAt: 0, draw() {} };
+  const sc = new THREE.Scene(), cam = new THREE.OrthographicCamera(0, 1, 1, 0, -1, 1);
+  const u = { uTex: { value: null }, uRect: { value: new THREE.Vector4() }, uCol: { value: new THREE.Vector3() }, uTime: { value: 0 }, uAmp: { value: 0 } };
+  const mat = new THREE.ShaderMaterial({
+    uniforms: u, depthTest: false, depthWrite: false, blending: THREE.NoBlending, toneMapped: false,
+    vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
+    fragmentShader: `
+uniform sampler2D uTex; uniform vec4 uRect; uniform vec3 uCol; uniform float uTime, uAmp;
+varying vec2 vUv;
+float h21( vec2 p ) { return fract( sin( dot( p, vec2( 127.1, 311.7 ) ) ) * 43758.5453 ); }
+float vn( vec2 p ) { vec2 i = floor( p ), f = fract( p ); f = f * f * ( 3.0 - 2.0 * f ); return mix( mix( h21( i ), h21( i + vec2( 1.0, 0.0 ) ), f.x ), mix( h21( i + vec2( 0.0, 1.0 ) ), h21( i + vec2( 1.0, 1.0 ) ), f.x ), f.y ); }
+void main() {
+  vec2 q = ( uRect.xy + vUv * uRect.zw - uCol.xy ) / uCol.z;
+  float env = exp( -q.x * q.x * 1.8 ) * smoothstep( -0.1, 0.6, q.y ) * exp( -max( q.y, 0.0 ) * 0.32 );
+  env *= smoothstep( 0.0, 0.12, vUv.x ) * smoothstep( 1.0, 0.88, vUv.x ) * smoothstep( 0.0, 0.08, vUv.y ) * smoothstep( 1.0, 0.92, vUv.y );
+  vec2 n = vec2( vn( vec2( q.x * 4.0, q.y * 2.6 - uTime * 2.4 ) ) + 0.5 * vn( vec2( q.x * 9.0, q.y * 6.0 - uTime * 4.1 ) ), vn( vec2( q.x * 4.0 + 17.0, q.y * 2.6 - uTime * 2.0 ) ) ) - vec2( 0.75, 0.5 );
+  gl_FragColor = texture2D( uTex, vUv + n * vec2( 1.0, 0.45 ) * uAmp * env / uRect.zw );
+}`,
+  });
+  const quad = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat); quad.frustumCulled = false; sc.add(quad);
+  let tex = null, tw = 0, th = 0;
+  const pos = new THREE.Vector2();
+  return {
+    level: 0,
+    // the program and the copy target are made once, about a second after the first frame, by one draw with no bend
+    // (it writes back the very pixels it copied), so the first Gather never waits for them
+    warmAt: 1.2,
+    draw(t) {
+      const warm = this.warmAt > 0 && t > this.warmAt;
+      if (warm) this.warmAt = 0;
+      if (!warm && (this.level < .01 || reduced)) return;
+      const dpr = renderer.getPixelRatio(), bw = Math.round(view.W * dpr), bh = Math.round(view.H * dpr), r = view.ppu * dpr;
+      const w = Math.min(bw, Math.round(r * 2.4)), h = Math.min(bh, Math.round(r * 3.4));
+      if (w < 8 || h < 8) return;
+      if (!tex || tw !== w || th !== h) {
+        if (tex) tex.dispose();
+        tex = new THREE.FramebufferTexture(w, h, THREE.RGBAFormat); tex.minFilter = tex.magFilter = THREE.LinearFilter;
+        tw = w; th = h; u.uTex.value = tex;
+      }
+      const cx = pipe.sx * dpr, baseY = bh - (pipe.sy - view.ppu * .35) * dpr;
+      const x0 = clamp(Math.round(cx - w / 2), 0, bw - w), y0 = clamp(Math.round(baseY - r * .3), 0, bh - h);
+      renderer.copyFramebufferToTexture(pos.set(x0, y0), tex);
+      cam.right = bw; cam.top = bh; cam.updateProjectionMatrix();
+      quad.position.set(x0 + w / 2, y0 + h / 2, 0); quad.scale.set(w, h, 1);
+      u.uRect.value.set(x0, y0, w, h); u.uCol.value.set(cx, baseY, r); u.uTime.value = t; u.uAmp.value = warm ? 0 : 1.5 * dpr * this.level;
+      const ac = renderer.autoClear; renderer.autoClear = false; renderer.render(sc, cam); renderer.autoClear = ac;
+    },
+  };
+})();
+
+// fresh gather (after hanging) and cap drop
+const gather = { on: false, t: 0, capPending: false };
+const capDrop = { on: false, t: 0 };
+let hangCount = store.get('made') | 0;
+function freshGather() {
+  state.count++;
+  silver.done(); heat.sag = 0; main.mat.userData.u.uSag.value = 0;
+  main.params.poured = false;
+  // after six baubles, one gather comes out green and bumpy
+  if (FX.pickle && hangCount >= 6 && !store.get('pickle') && !hung.some((h) => h.o.params.shape === 4)) {
+    state.glass = 2; state.finish = 1;
+    if (state.shape !== 4) { state.shape = 4; for (let j = 0; j <= NP; j++) { mainProf.r[j] = PROFILES[4].r[j]; mainProf.y[j] = PROFILES[4].y[j]; } mainProf.L = PROFILES[4].L; writeLathe(main.body.geometry, mainProf); seatPunty(); }
+  } else if (state.shape === 4) {
+    state.shape = 0; for (let j = 0; j <= NP; j++) { mainProf.r[j] = PROFILES[0].r[j]; mainProf.y[j] = PROFILES[0].y[j]; } mainProf.L = PROFILES[0].L; writeLathe(main.body.geometry, mainProf); seatPunty();
+  }
+  main.params.glass = state.glass; main.params.finish = state.finish; main.params.shape = state.shape; main.params.no = state.count;
+  updateLabels();
+  clearPaintCanvas(main.P);
+  main.mat.userData.u.uPaintVis.value = 1;
+  applyLook(main, 1);
+  main.orn.rotation.set(0, 0, 0); lathe.angle = 0;
+  main.cap.visible = false; main.hook.visible = false; main.holder.visible = true; main.holder.scale.setScalar(1);
+  gather.on = true; gather.t = 0; gather.capPending = true;
+  playing = null; clearing = null; armHang(false);
+  heat.T = T_PEAK - 40;
+  startHeat({ ramp: .12, hold: .95 });
+  updateTag(); refreshControls();
+}
+function updateGather(dt) {
+  if (gather.on) {
+    gather.t += dt;
+    const k = clamp(gather.t / 1.15, 0, 1);
+    const s = lerp(.12, 1, easeOutBack(k, 1.15));
+    const wob = .05 * Math.sin(gather.t * 12) * Math.exp(-gather.t * 3);
+    main.body.scale.set(s * (1 + wob), s * (1 - wob * .8), s * (1 + wob));
+    main.body.position.y = mainProf.y[0] * (1 - s);
+    if (k >= 1) { gather.on = false; main.body.scale.setScalar(1); main.body.position.y = 0; }
+  } else {
+    const sw = 1 + .022 * glowAmt();
+    main.body.scale.setScalar(sw); main.body.position.y = mainProf.y[0] * (1 - sw);
+  }
+  if (capDrop.on) {
+    capDrop.t += dt;
+    const k = clamp(capDrop.t / .55, 0, 1);
+    main.cap.visible = main.hook.visible = true;
+    const off = .55 * (1 - easeOutBack(k, 1.7));
+    main.cap.position.y = off; main.hook.position.y = off;
+    if (k >= 1) { capDrop.on = false; main.cap.position.y = main.hook.position.y = 0; sfx.tink(2900, .5); }
+  }
+}
+
+/* ================= finish + shape transitions ================= */
+let lookK = 1;
+let morph = null;
+function setShapeMorph(i) {
+  const from = cloneProf(mainProf), to = PROFILES[i];
+  morph = { from, to, t: 0 };
+}
+function updateMorph(dt) {
+  if (!morph) return;
+  morph.t += dt; const k = easeInOut(clamp(morph.t / .75, 0, 1));
+  for (let j = 0; j <= NP; j++) { mainProf.r[j] = lerp(morph.from.r[j], morph.to.r[j], k); mainProf.y[j] = lerp(morph.from.y[j], morph.to.y[j], k); }
+  mainProf.L = lerp(morph.from.L, morph.to.L, k);
+  writeLathe(main.body.geometry, mainProf); seatPunty();
+  if (k >= 1) morph = null;
+}
+
+/* ---------- silvering: a pool of solution swirls inside and the mirror blooms where it touches ----------
+   Mirror (once per bauble) pours the solution into clear glass; other finishes spread as a lacquer front:
+   satin is dipped from the bottom, frosted is an etch haze that spreads down from the neck. */
+const _pn = new THREE.Vector3();
+const silver = {
+  on: false, mode: 0, t: 0, dur: 2.5, front: 0, dir: 1, tx: 0, tz: 0, vx: 0, vz: 0, swirl: 0, input: 0,
+  start(f) {
+    const u = main.mat.userData.u;
+    if (this.on) this.done();
+    u.uFinOld.value.set(main.mat.roughness, main.mat.clearcoatRoughness);
+    main.params.finish = f; applyLook(main, 1); lookK = 1;
+    this.on = true; this.t = 0; this.front = 0; this.tx = this.tz = this.vx = this.vz = this.swirl = this.input = 0;
+    if (f === 0 && !main.params.poured && !reduced) {
+      main.params.poured = true; this.mode = 1; this.dur = 2.5;
+      say('Silver solution poured in. Swirl it, and the mirror forms where it touches.');
+    } else {
+      this.mode = 2; this.dir = reduced || f === 3 ? 0 : f === 2 ? -1 : 1; this.dur = reduced ? .6 : [.8, .9, 1.4, .6][f];
+    }
+  },
+  kick(dx, dy) { if (this.on && this.mode === 1) { this.vx -= dx * .01; this.vz += dy * .006; this.input = 1; } },
+  update(dt) {
+    if (!this.on) return;
+    const u = main.mat.userData.u;
+    this.t += dt;
+    if (this.mode === 2) {
+      this.front = Math.min(1.14, this.t / this.dur * 1.14);
+      u.uSilv.value.set(this.front, 2, this.dir, 1);
+      if (this.front >= 1.14) this.done();
+      return;
+    }
+    // the liquid: a damped spring, pushed by the pointer and the lathe, rocked by the hand when left alone
+    const k = 24, c = 2.4, rock = .2 * (1 - clamp(this.input, 0, 1));
+    this.input = Math.max(0, this.input - dt * .8);
+    for (let n = Math.ceil(dt / PH_STEP), q = 0; q < n; q++) {
+      const h = dt / n;
+      this.vx += (-k * this.tx - c * this.vx + Math.cos(this.t * 2.7) * rock * k) * h;
+      this.vz += (-k * this.tz - c * this.vz + Math.sin(this.t * 2.7) * rock * k) * h;
+      this.tx = clamp(this.tx + this.vx * h, -.55, .55); this.tz = clamp(this.tz + this.vz * h, -.55, .55);
+    }
+    this.swirl = damp(this.swirl, Math.hypot(this.vx, this.vz) + Math.abs(lathe.omega) * .12, .25, dt);
+    const clearK = clamp(this.t / .35, 0, 1), fill = clamp((this.t - .3) / .45, 0, 1);
+    if (this.t > .6) this.front += dt / this.dur * 1.14 * (1 + 1.2 * clamp(this.swirl - 1, 0, 1.2));   // swirling it yourself works faster than the hand's rocking
+    const spent = clamp(this.front / 1.14, 0, 1), depth = .44 * easeOut(fill) * (1 - .8 * spent);
+    const a = lathe.angle, ox = Math.cos(a) * this.tx - Math.sin(a) * this.tz, oz = Math.sin(a) * this.tx + Math.cos(a) * this.tz;
+    _pn.set(ox, 1, oz).normalize();
+    u.uPool.value.set(_pn.x, _pn.y, _pn.z, (mainProf.y[0] + depth) * _pn.y);
+    u.uSilv.value.set(this.front - .02, 1, 1, clearK);
+    sfx.slosh(fill * (1 - spent) * clamp(this.swirl * .8, .15, 1.2));
+    if (this.front >= 1.14) this.done();
+  },
+  done() {
+    if (!this.on) return;
+    this.on = false; this.mode = 0;
+    const u = main.mat.userData.u;
+    u.uSilv.value.set(0, 0, 0, 0); u.uPool.value.set(0, 1, 0, -9);
+    sfx.slosh(0);
+  },
+};
+
+/* ================= lathe + painting ================= */
+const lathe = { angle: 0, omega: .18 };
+const IDLE_W = .18, SPIN_W = 3.6, PLAY_W = 4.3;
+let brushRad = .055;
+const pointer = { x: 0, y: 0, inside: false, type: 'mouse', overGlass: false };
+let paintStroke = null;      // {id, last}
+let orbit = null;            // {id, x, y, t}
+let shiftDown = false, touchSpin = false;
+const activePointers = new Map();
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+// Shift only spins the lathe while the brush is on the glass, so Shift+Tab never sets it turning
+const spinEngaged = () => state.spinToggle || touchSpin || (shiftDown && (!!paintStroke || pointer.overGlass));
+const canPaint = () => !isHot() && !gather.on && main.holder.visible && !playing && !clearing && !main.flying;
+
+function hitMain(px, py) {
+  if (!main.holder.visible) return null;
+  ndc.set(px / view.W * 2 - 1, -(py / view.H) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+  const h = raycaster.intersectObject(main.body, false)[0];
+  return h && h.uv ? { u: h.uv.x, v: h.uv.y } : null;
+}
+function paintSegment(a, b, turned) {
+  let du = b.u - a.u; if (du > .5) du -= 1; if (du < -.5) du += 1;
+  if (turned && Math.abs(turned) > .2) {
+    // the lathe turned under the brush: follow the turn, plus whatever the hand moved
+    const sweep = clamp(-turned / TAU, -1, 1);
+    let rest = du - sweep; rest = rest - Math.round(rest);
+    du = sweep + rest;
+  }
+  const dv = b.v - a.v, vm = (a.v + b.v) / 2, rr = rAt(mainProf, vm);
+  const dist = Math.hypot(du * TAU * rr, dv * mainProf.L);
+  const n = Math.min(1600, Math.ceil(dist / (brushRad * .3)));
+  const s = paintStroke;
+  // the bristles lie along the stroke
+  const ang = dist > 1e-5 ? Math.atan2(-dv * mainProf.L, du * TAU * rr) : (s ? s.dir : 0);
+  if (s && dist > 1e-5) s.dir = ang;
+  // spinning under a still brush: the bauble sits a hair off-centre on its cap, so the ring wobbles and never quite closes
+  const ringing = FX.springRing && s && spinEngaged() && Math.abs(lathe.omega) > 1;
+  const decay = s && n ? Math.exp(-dist / n / (LOAD_LEN[BRUSH[state.brush].kind] || 6)) : 1;
+  for (let i = 1; i <= n; i++) {
+    const u = a.u + du * i / n; let v = a.v + dv * i / n;
+    if (ringing) {
+      s.sweep += Math.abs(du) / n;
+      v += .0045 * Math.sin(TAU * u + main.wobPh) + .0022 * s.sweep;
+      if (!s.ring0) s.ring0 = { u, v };
+      if (s.sweep >= 1 && !s.blob) { s.blob = true; dab(main.P, mainProf, s.ring0.u, s.ring0.v, brushRad * 1.12, state.brush, paintR() * TAU, .8); }
+    }
+    strokeDab(u, v, ang);
+    if (s) s.load *= decay;
+  }
+}
+function strokeDab(u, v, ang) {
+  const s = paintStroke;
+  if (!FX.bristles || !s) { dab(main.P, mainProf, u, v, brushRad, state.brush, paintR() * TAU); return; }
+  const lv = s.load > .72 ? 0 : s.load > .47 ? 1 : s.load > .27 ? 2 : 3;
+  dab(main.P, mainProf, u, v, brushRad, state.brush, ang, .55 + .45 * Math.min(1, s.load * 1.5), bristleStamps(state.brush)[s.layout][lv]);
+}
+function updatePainting() {
+  if (!paintStroke) return;
+  if (!canPaint()) { paintStroke.last = paintStroke.cur = null; return; }
+  const h = hitMain(pointer.x, pointer.y);
+  paintStroke.cur = h;
+  if (!h) { paintStroke.last = null; return; }
+  if (!paintStroke.last) strokeDab(h.u, h.v, paintStroke.dir);
+  else paintSegment(paintStroke.last, h, lathe.angle - paintStroke.lastAngle);
+  paintStroke.last = h; paintStroke.lastAngle = lathe.angle;
+  if (!paintStroke.painted) armHang();
+  paintStroke.painted = true;
+}
+
+// pattern play: the lathe turns once and the pattern is laid at the front meridian
+let playing = null, pendingPattern = null;
+const patCount = [0, 0, 0];
+function frontU() { return mod1(-(lathe.angle) / TAU); }
+// a pattern replaces what is on the glass: old paint fades out first, then the lathe lays the new one
+function playPattern(kind) {
+  if (!main.holder.visible || gather.on) return;
+  if (isHot()) { pendingPattern = kind; return; }
+  armHang();
+  if (clearing) { clearing.then = () => startPattern(kind); return; }
+  if (main.P.inked || playing) { playing = null; clearing = { t: 0, then: () => startPattern(kind) }; refreshControls(); return; }
+  startPattern(kind);
+}
+function startPattern(kind) {
+  if (!main.holder.visible || gather.on || isHot()) return;
+  const R = rng('pattern-' + kind + '-' + (patCount[kind]++) + '-' + state.count);
+  const inks = patternInks(state.glass, state.brush);
+  const list = patternDabs(kind, R, mainProf, ...inks);
+  const u0 = frontU();
+  for (const d of list) d.key = mod1(u0 - d.u);
+  list.sort((a, b) => a.key - b.key);
+  playing = { list, i: 0, swept: 0, last: lathe.angle };
+  refreshControls();
+}
+function updatePlay() {
+  if (!playing) return;
+  playing.swept += (lathe.angle - playing.last) / TAU; playing.last = lathe.angle;
+  const lim = reduced ? 2 : playing.swept + .002;
+  const L = playing.list;
+  let budget = 900;
+  while (playing.i < L.length && L[playing.i].key <= lim && budget-- > 0) { const d = L[playing.i++]; dab(main.P, mainProf, d.u, d.v, d.rad, d.b, d.rot, d.a); }
+  if (playing.i >= L.length) { playing = null; refreshControls(); }
+}
+let clearing = null;
+function clearPaint() {
+  playing = null;
+  if (clearing) { clearing.then = null; return; }
+  if (main.P.inked) { clearing = { t: 0, then: null }; armHang(); }
+  refreshControls();
+}
+function updateClear(dt) {
+  if (!clearing) return;
+  clearing.t += dt; const u = main.mat.userData.u;
+  if (clearing.t < .4) u.uPaintVis.value = 1 - easeInOut(clearing.t / .4);
+  else { const then = clearing.then; clearPaintCanvas(main.P); u.uPaintVis.value = 1; clearing = null; if (then) then(); refreshControls(); }
+}
+
+function updateLathe(dt) {
+  let target = IDLE_W * (reduced ? 0 : 1);
+  if (playing) target = reduced ? 0 : PLAY_W;
+  else if (spinEngaged()) target = SPIN_W;
+  else if (paintStroke) target = 0;
+  if (!orbit) lathe.omega = damp(lathe.omega, target, target > Math.abs(lathe.omega) ? .45 : .9, dt);
+  lathe.angle += lathe.omega * dt;
+  main.orn.rotation.y = lathe.angle;
+  sfx.hum(Math.abs(lathe.omega) / SPIN_W);
+}
+
+/* ================= flight to the branch ================= */
+function hang() {
+  if (!canPaint() || paintStroke) return;
+  silver.done();
+  const pickle = main.params.shape === 4;
+  let slot = pickle ? trunkSlot() : freeSlot();
+  if (pickle) {
+    // the gherkin only fits the deepest twig, by the trunk
+    const i = hung.findIndex((h) => h.slot === slot);
+    if (i >= 0) { const old = hung.splice(i, 1)[0]; leaving.push({ o: old.o, t: 0, s0: old.size }); updateSlotsUI(); }
+    if (flights.some((f) => f.slot === slot)) return;
+  } else if (slot < 0) {
+    const old = hung.shift(); slot = old.slot;
+    leaving.push({ o: old.o, t: 0, s0: old.size });
+    updateSlotsUI();
+  }
+  // a copy flies; the lathe gets a fresh gather
+  const R = rng('hang-' + state.count);
+  const o = makeOrnament(Object.assign({}, main.params, { user: true, date: todayIso() }), cloneProf(mainProf), [512, 256], HUNG_LOD);
+  copyPaint(main.P, o.P);
+  o.mat.color.copy(main.mat.color); o.mat.metalness = main.mat.metalness; o.mat.roughness = main.mat.roughness; o.mat.clearcoatRoughness = main.mat.clearcoatRoughness;
+  o.orn.rotation.y = lathe.angle;
+  scene.add(o.holder); o.holder.position.copy(main.holder.position);
+  const size = sizeFor(main.params.shape, R);
+  const target = branch.group.localToWorld(branch.slots[slot].pivot.clone());
+  const p0 = main.holder.position.clone();
+  flights.push({ o, slot, size, t: 0, dur: reduced ? .6 : 1.8, p0, p1: p0.clone().add(new THREE.Vector3((target.x - p0.x) * .1, 1.5, .9)), p2: target.clone().add(new THREE.Vector3(0, .62, .45)), p3: target, a0: lathe.angle, prevX: p0.x, sway: 0, swayV: 0 });
+  main.holder.visible = false;
+  main.flying = true;
+  if (pickle) store.set('pickle', 1);
+  sfx.tink(FX.chime ? 2349.32 : 2400, .35);
+  say('Hung on the branch. ' + (hung.length + flights.length) + ' of 7.');
+  hangCount++; store.set('made', hangCount);
+  refreshControls();
+}
+const _b = new THREE.Vector3();
+function bez(f, e, out) {
+  const u = 1 - e;
+  return out.set(0, 0, 0).addScaledVector(f.p0, u * u * u).addScaledVector(f.p1, 3 * u * u * e).addScaledVector(f.p2, 3 * u * e * e).addScaledVector(f.p3, e * e * e);
+}
+function updateFlights(dt) {
+  for (let i = flights.length - 1; i >= 0; i--) {
+    const f = flights[i]; f.t += dt;
+    const k = clamp(f.t / f.dur, 0, 1), e = easeInOut(k);
+    f.p3 = branch.group.localToWorld(branch.slots[f.slot].pivot.clone());
+    bez(f, e, _b); f.o.holder.position.copy(_b);
+    f.o.holder.scale.setScalar(lerp(1, f.size, easeInOut(clamp(k / .85, 0, 1))));
+    // turn the hook toward the viewer, and let the glass lag behind the motion
+    let da = (-f.a0) % TAU; if (da > Math.PI) da -= TAU; if (da < -Math.PI) da += TAU;
+    f.o.orn.rotation.y = f.a0 + da * easeInOut(clamp(k / .7, 0, 1));
+    const vx = (_b.x - f.prevX) / Math.max(dt, 1e-3); f.prevX = _b.x;
+    for (let n = Math.ceil(dt / PH_STEP), q = 0; q < n; q++) { const h2 = dt / n; f.swayV += (-(f.sway) * 40 - f.swayV * 7 - vx * 1.4) * h2; f.sway += f.swayV * h2; }
+    if (!f.gathered && f.t > (reduced ? .2 : .62)) { f.gathered = true; main.flying = false; freshGather(); }
+    f.o.holder.rotation.z = clamp(f.sway, -.5, .5);
+    if (k >= 1) {
+      flights.splice(i, 1);
+      scene.remove(f.o.holder);
+      const side = f.p0.x > f.p3.x ? 1 : -1;
+      const h = attach(f.o, f.slot, f.size, FX.hangPhysics ? clamp(f.o.holder.rotation.z * .3 + .1 * side, -.13, .13) : f.o.holder.rotation.z * .5 + .32 * side, 0);
+      h.ps = h.ps0 = 0; f.o.orn.rotation.y = 0;
+      if (FX.hangPhysics) catchHook(h, side); else branch.bv -= reduced ? 0 : .55;
+      sfx.chime(FX.chime ? h.freq : h.freq * 1.5, FX.chime ? .55 : .32, panOf(h.sx));
+      f.o.params.snap = snapPaint(f.o.P); saveTree();
+      showHungTag(h, true);
+    }
+  }
+  for (let i = leaving.length - 1; i >= 0; i--) {
+    const l = leaving[i]; l.t += dt; const k = clamp(l.t / .7, 0, 1);
+    l.o.holder.scale.setScalar(l.s0 * (1 - easeInOut(k)));
+    l.o.holder.position.y += dt * .5;
+    if (k >= 1) { branch.group.remove(l.o.holder); disposeOrn(l.o); leaving.splice(i, 1); }
+  }
+}
+function disposeOrn(o) { o.body.geometry.dispose(); o.mat.dispose(); o.P.tc.dispose(); o.P.tm.dispose(); }
+
+/* ================= pendulums ================= */
+const _v = new THREE.Vector3();
+let clock = 0;
+const PH_STEP = 1 / 120;
+let physAcc = 0;
+// each twig is a spring: it dips under a new bauble and springs back
+const dip = dipU.uDip.value, dipV = new Float32Array(MAX_HUNG), quiv = dipU.uQuiv.value;
+function stepPhysics(h2) {
+  branch.bv += (-branch.by * 34 - branch.bv * 4.2) * h2; branch.by += branch.bv * h2;
+  for (let i = 0; i < MAX_HUNG; i++) { dipV[i] += (-dip[i] * 58 - dipV[i] * 3.4) * h2; dip[i] += dipV[i] * h2; }
+  for (const h of hung) {
+    const amb = reduced ? 0 : .012 * Math.sin(clock * .9 + h.seed);
+    h.om += (-15 * Math.sin(h.th) - .55 * h.om + amb) * h2; h.th += h.om * h2;
+    h.pv += (-13 * Math.sin(h.ph) - .8 * h.pv) * h2; h.ph += h.pv * h2;
+    const drift = reduced ? 0 : .55 * Math.sin(clock * .11 + h.seed * 2.1);
+    h.psv += (-.9 * (h.ps - h.ps0 - drift) - .5 * h.psv) * h2; h.ps += h.psv * h2;
+    // the thread's torsion unwinds in a few lazy turns; the spring-wire loop bounces once on the hook
+    h.twv += (-h.tw * 2.3 - h.twv * 1.35) * h2; h.tw += h.twv * h2;
+    h.bobv += (-h.bob * 190 - h.bobv * 9) * h2; h.bob += h.bobv * h2;
+  }
+}
+const nods = [], fallers = [];
+const needleR = rng('fallen needles');
+function catchHook(h, side) {
+  const s = h.slot;
+  h.tw = reduced ? 0 : -side * (1.15 + needleR() * .35) * TAU;   // wound by the flight, two or three turns to let go
+  h.bobv = reduced ? 0 : -.3;
+  h.om += side * .25;
+  dipV[s] -= reduced ? 0 : .42;
+  if (!reduced) quiv[s] = 1;
+  branch.bv -= reduced ? 0 : .12;
+  // a few needles let go
+  if (FX.needles && !reduced) { const n = 2 + ((needleR() * 3) | 0); for (let i = 0; i < n; i++) dropNeedle(branch.slots[s].pivot, i); }
+  // the neighbours nod in turn, nearest first
+  if (FX.sympathy && !reduced) for (const o of hung) {
+    if (o === h) continue;
+    const dx = branch.slots[o.slot].x - branch.slots[s].x;
+    nods.push({ h: o, at: clock + .08 + Math.abs(dx) * .12, dv: Math.sign(dx || 1) * .16 / (1 + Math.abs(dx) * .7) });
+  }
+}
+function dropNeedle(p, i) {
+  const m = new THREE.Mesh(needleGeo, needleMatLoose), len = .13 + needleR() * .07;
+  m.scale.set(1, len, 1);
+  m.position.set(p.x + (needleR() - .5) * .3, p.y - .02 - needleR() * .06, p.z + (needleR() - .5) * .12);
+  m.rotation.set(needleR() * TAU, needleR() * TAU, needleR() * TAU);
+  branch.group.add(m);
+  fallers.push({ m, vy: -.1 - i * .05, vx: (needleR() - .5) * .25, w: [(needleR() - .5) * 9, (needleR() - .5) * 6, (needleR() - .5) * 9], ph: needleR() * TAU, t: -i * .07 });
+}
+function updateFallers(dt) {
+  if (!fallers.length) return;
+  const floor = -(view.H - view.cy) / view.ppu - 1.2 - branch.group.position.y;
+  for (let i = fallers.length - 1; i >= 0; i--) {
+    const f = fallers[i]; f.t += dt; if (f.t < 0) continue;
+    f.vy = Math.max(f.vy - 3 * dt, -1.05);   // a needle falls at about a metre a second, fluttering
+    f.m.position.y += f.vy * dt; f.m.position.x += (f.vx + .32 * Math.sin(f.t * 4.3 + f.ph)) * dt;
+    f.m.rotation.x += f.w[0] * dt; f.m.rotation.y += f.w[1] * dt; f.m.rotation.z += f.w[2] * dt;
+    if (f.m.position.y < floor) { branch.group.remove(f.m); fallers.splice(i, 1); }
+  }
+}
+function updateHung(dt) {
+  physAcc = Math.min(physAcc + dt, .5);
+  while (physAcc >= PH_STEP) { physAcc -= PH_STEP; stepPhysics(PH_STEP); }
+  for (let i = nods.length - 1; i >= 0; i--) { const n = nods[i]; if (clock >= n.at) { if (hung.includes(n.h)) { n.h.om += n.dv; n.h.pv += Math.abs(n.dv) * .4; } nods.splice(i, 1); } }
+  for (let i = 0; i < MAX_HUNG; i++) quiv[i] = quiv[i] > .002 ? quiv[i] * Math.exp(-dt / .45) : 0;
+  dipU.uTime.value = clock;
+  updateFallers(dt);
+  branch.group.position.y = branch.by * .12;
+  branch.group.rotation.z = reduced ? 0 : .003 * Math.sin(clock * .37);
+  for (const h of hung) {
+    h.o.holder.rotation.set(h.ph, 0, h.th);
+    h.o.spinner.rotation.y = h.ps + h.tw;
+    const pv = branch.slots[h.slot].pivot;
+    h.o.holder.position.set(pv.x, pv.y + dip[h.slot] + h.bob, pv.z);
+    h.o.body.getWorldPosition(_v);
+    const dist = _v.distanceTo(camera.position);
+    _v.project(camera);
+    h.sx = (_v.x + 1) / 2 * view.W; h.sy = (1 - _v.y) / 2 * view.H; h.sr = h.size * view.ppu * CAM_D / dist;
+  }
+}
+function hungAt(px, py) {
+  let best = null, bd = 1e9;
+  for (const h of hung) { const d = Math.hypot(px - h.sx, py - h.sy); if (d < h.sr * 1.08 && d < bd) { best = h; bd = d; } }
+  return best;
+}
+function strike(h, px, py) {
+  const dir = clamp((h.sx - px) / h.sr, -1, 1);
+  h.om += (dir >= 0 ? 1 : -1) * (.9 + Math.abs(dir) * .9);
+  h.psv += dir * 1.2;
+  h.pv += .35;
+  h.lastTink = clock;
+  if (sfx.on) sfx.chime(h.freq, FX.chime ? .6 + .4 * Math.abs(dir) : 1, panOf(h.sx)); else nudgeSound();
+}
+const panOf = (x) => clamp((x / view.W) * 2 - 1, -.8, .8);
+
+/* ================= camera framing ================= */
+const view = { W: 1, H: 1, desk: true, fx0: 0, fx1: 1, cx: 0, cy: 0, ppu: 100, dpr: 1 };
+const cam = { az: 0, el: 0, taz: 0, tel: 0 };
+function applyProjection() {
+  const n = camera.near, s = n / (view.ppu * CAM_D);
+  camera.projectionMatrix.makePerspective(-view.cx * s, (view.W - view.cx) * s, view.cy * s, -(view.H - view.cy) * s, n, camera.far);
+  camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
+}
+function updateCamera(dt) {
+  if (!orbit) { cam.taz = damp(cam.taz, 0, 2.6, dt); cam.tel = damp(cam.tel, 0, 2.6, dt); }
+  cam.az = damp(cam.az, cam.taz, .35, dt); cam.el = damp(cam.el, cam.tel, .35, dt);
+  camera.position.set(CAM_D * Math.sin(cam.az) * Math.cos(cam.el), CAM_D * Math.sin(cam.el), CAM_D * Math.cos(cam.az) * Math.cos(cam.el));
+  camera.lookAt(0, 0, 0);
+}
+function layout() {
+  const r = stage.getBoundingClientRect();
+  view.W = Math.max(1, r.width); view.H = Math.max(1, r.height);
+  view.rect = r;
+  view.desk = !MQ_STACK.matches;
+  const phone = !view.desk;
+  if (view.desk) {
+    const br = bench.getBoundingClientRect();
+    view.fx0 = 0; view.fx1 = Math.max(200, br.left - r.left - 8);
+  } else { view.fx0 = 0; view.fx1 = view.W; }
+  const fw = view.fx1 - view.fx0;
+  view.cx = view.fx0 + fw / 2;
+  view.cy = view.H * (phone ? .6 : .585);
+  view.ppu = phone ? Math.min(fw * .23, view.H * .19) : Math.min(fw, view.H) * .188;
+  view.dpr = Math.min(window.devicePixelRatio || 1, phone ? 1.5 : 2);
+  renderer.setPixelRatio(view.dpr);
+  renderer.setSize(view.W, view.H, false);
+  applyProjection();
+  bk.resize();
+  buildBranch();
+  ring.style.setProperty('--d', Math.round(brushRad * 2 * view.ppu * CAM_D / (CAM_D - .9)) + 'px');
+  // keep the stage caption left of the punty rod
+  stageUi.style.maxWidth = view.desk ? Math.max(180, Math.round(view.cx - 22 - stageUi.offsetLeft)) + 'px' : '';
+  fitOver();
+  fitFinish();
+  fitBench();
+  fixSeps();
+}
+// the earned Lustre bead must not move the shape icons: if they sat on the finish line without it, keep them there
+function fitFinish() {
+  const fr = $('#finishRow'), row = fr.parentElement, sh = $('#shapeRow'), b = $('#finish-lustre');
+  row.classList.remove('snug-1', 'snug-2');
+  if (b.hidden || MQ_PAGER.matches) return;
+  const wraps = () => sh.offsetTop > fr.offsetTop + 8;
+  b.hidden = true; const before = wraps(); b.hidden = false;
+  if (before || !wraps()) return;
+  for (const c of ['snug-1', 'snug-2']) { row.classList.remove('snug-1', 'snug-2'); row.classList.add(c); if (!wraps()) return; }
+  row.classList.remove('snug-1', 'snug-2');
+}
+// a separator dot left at the end of a wrapped row, or starting a new line, reads as a stray mark: hide it
+function fixSeps() {
+  const seps = [...document.querySelectorAll('.sep')];
+  seps.forEach((sp) => sp.classList.remove('is-wrapped'));
+  seps.forEach((sp) => {
+    if (!sp.offsetParent) return;
+    const nx = sp.nextElementSibling, pv = sp.previousElementSibling;
+    if ((nx && nx.offsetTop > sp.offsetTop + 8) || (pv && sp.offsetTop > pv.offsetTop + pv.offsetHeight - 4)) sp.classList.add('is-wrapped');
+  });
+}
+// two columns: if the workbench is taller than the screen, drop the least needed text, then show that it scrolls
+function fitBench() {
+  bench.classList.remove('fit-1', 'fit-2', 'fit-3', 'scrolls');
+  if (MQ_PAGER.matches) return;
+  const over = () => bench.scrollHeight > bench.clientHeight + 1;
+  for (const c of ['fit-1', 'fit-2', 'fit-3']) { if (!over()) break; bench.classList.add(c); }
+  bench.classList.toggle('scrolls', over());
+}
+
+/* ================= pointer handling ================= */
+let lastInput = 0, strokeN = 0, sweep = null, pressT = 0;
+const tinkQueue = [];
+function touched() { lastInput = clock; glint.stop(); }
+function hintDone(k) { if (!FX.hints) return; hintMem[k] = (hintMem[k] || 0) + 1; store.set('hints', hintMem); }
+function local(e) { const r = view.rect || stage.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+glCanvas.addEventListener('pointerdown', (e) => {
+  touched();
+  const [x, y] = local(e);
+  activePointers.set(e.pointerId, { x, y });
+  // a second finger while painting only spins the lathe; the brush stays under the first finger
+  if (activePointers.size >= 2 && paintStroke) { touchSpin = true; updateCursor(pointer.x, pointer.y); return; }
+  if (activePointers.size >= 2) return;
+  pointer.x = x; pointer.y = y; pointer.type = e.pointerType; pointer.inside = true;
+  shiftDown = e.shiftKey; stage.classList.remove('kbd');
+  if (stageUi.classList.contains('fresh') && e.pointerType !== 'mouse') stageUi.classList.remove('fresh');
+  const h = hungAt(x, y);
+  if (h) {
+    strike(h, x, y);
+    // touch has no hover: a long press reads the bauble's tag
+    if (FX.tags && e.pointerType !== 'mouse') { clearTimeout(pressT); pressT = setTimeout(() => showHungTag(h, false, 2.4), 420); }
+    return;
+  }
+  const hit = hitMain(x, y);
+  if (hit && canPaint()) {
+    paintStroke = { id: e.pointerId, last: null, painted: false, load: 1, layout: (strokeN++) & 1, dir: 0, sweep: 0 };
+    try { glCanvas.setPointerCapture(e.pointerId); } catch (er) {}
+    markStep(2);
+    updatePainting();
+    updateCursor(x, y);
+    return;
+  }
+  // the punty: carry the glass back to the glory hole
+  if (!hit && onPunty(x, y)) {
+    pipe.drag = { id: e.pointerId, x0: x, y: y, px: pipe.x }; pipe.roll = 0;
+    try { glCanvas.setPointerCapture(e.pointerId); } catch (er) {}
+    glCanvas.classList.add('is-grabbing');
+    return;
+  }
+  // a finger drawn along the bough sets the hung glass tinkling
+  if (!hit && FX.branchSweep && hung.length && nearBough(x, y)) {
+    sweep = { id: e.pointerId, x, y };
+    try { glCanvas.setPointerCapture(e.pointerId); } catch (er) {}
+    return;
+  }
+  if (hit && isHot()) showHotTip(x, y);
+  orbit = { id: e.pointerId, x, y, t: performance.now(), vx: 0, moved: 0 };
+  try { glCanvas.setPointerCapture(e.pointerId); } catch (er) {}
+  glCanvas.classList.add('is-grabbing');
+  setHint(2);
+});
+glCanvas.addEventListener('pointermove', (e) => {
+  touched();
+  const [x, y] = local(e);
+  const prev = activePointers.get(e.pointerId);
+  if (prev) { prev.x = x; prev.y = y; }
+  const dx = x - pointer.x, dy = y - pointer.y;
+  if (!paintStroke || paintStroke.id === e.pointerId) { pointer.x = x; pointer.y = y; }
+  pointer.inside = true; pointer.type = e.pointerType;
+  if (pipe.drag && pipe.drag.id === e.pointerId) {
+    pipe.tx = clamp(pipe.drag.px + (x - pipe.drag.x0) / view.ppu, pipeMinX(), .7); pipe.ty = 0;
+    // strokes up and down wind the pipe round (see updatePipe), the way a gaffer keeps hot glass turning
+    pipe.roll += Math.abs(y - pipe.drag.y); pipe.drag.y = y;
+  }
+  if (orbit && orbit.id === e.pointerId) {
+    const now = performance.now(), ddt = Math.max(1, now - orbit.t) / 1000;
+    const ox = x - orbit.x, oy = y - orbit.y; orbit.x = x; orbit.y = y; orbit.t = now; orbit.moved += Math.abs(ox);
+    lathe.angle += ox * .009; lathe.omega = clamp(ox * .009 / ddt, -9, 9);
+    cam.taz = clamp(cam.taz - ox * .0016, -.32, .32);
+    cam.tel = clamp(cam.tel + oy * .0016, -.1, .2);
+  }
+  if (sweep && sweep.id === e.pointerId) sweepAlong(x, y);
+  silver.kick(dx, dy);
+  // brushing past hanging glass
+  if (!paintStroke && Math.abs(dx) + Math.abs(dy) > 0) {
+    for (const h of hung) {
+      const d = Math.hypot(x - h.sx, y - h.sy);
+      if (d < h.sr * 1.5) { const f = 1 - d / (h.sr * 1.5); h.om += clamp(dx / h.sr, -1, 1) * .5 * f; h.psv += clamp(dx / h.sr, -1, 1) * .3 * f; }
+    }
+  }
+  if (ring.classList.contains('on') && (!paintStroke || paintStroke.id === e.pointerId)) ring.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  pointer.moved = true;
+});
+function endPointer(e) {
+  activePointers.delete(e.pointerId);
+  clearTimeout(pressT);
+  if (activePointers.size < 2) touchSpin = false;
+  if (paintStroke && paintStroke.id === e.pointerId) { if (paintStroke.painted) hintDone('paint'); paintStroke = null; }
+  if (orbit && orbit.id === e.pointerId) { if (orbit.moved > 40) hintDone('turn'); orbit = null; glCanvas.classList.remove('is-grabbing'); }
+  if (pipe.drag && pipe.drag.id === e.pointerId) { pipe.drag = null; glCanvas.classList.remove('is-grabbing'); }
+  if (sweep && sweep.id === e.pointerId) sweep = null;
+  if (e.pointerType !== 'mouse') { ring.classList.remove('on'); main.showGuide = false; }
+}
+glCanvas.addEventListener('pointerup', endPointer);
+glCanvas.addEventListener('pointercancel', endPointer);
+glCanvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !paintStroke && !pipe.drag) { pointer.inside = false; pointer.overGlass = false; ring.classList.remove('on'); hotTip.classList.remove('on'); main.showGuide = false; glCanvas.className = ''; setHint(0); tipHide('hover'); tipHide('pipe'); } });
+glCanvas.addEventListener('wheel', (e) => {
+  touched();
+  const [x, y] = local(e);
+  if (!hitMain(x, y)) return;
+  e.preventDefault();
+  brushRad = clamp(brushRad * (e.deltaY > 0 ? .9 : 1.11), .02, .16);
+  ring.style.setProperty('--d', Math.round(brushRad * 2 * view.ppu * CAM_D / (CAM_D - .9)) + 'px');
+}, { passive: false });
+addEventListener('keydown', (e) => { touched(); if (e.key === 'Shift') { shiftDown = true; updateCursor(pointer.x, pointer.y); } });
+addEventListener('keyup', (e) => { if (e.key === 'Shift') { shiftDown = false; updateCursor(pointer.x, pointer.y); } });
+addEventListener('blur', () => { shiftDown = false; pipe.key = false; });
+// keyboard on the stage: arrows flick the lathe round, Enter or Space rings the branch left to right, G holds the glass in the glory hole
+glCanvas.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    const d = e.key === 'ArrowLeft' ? -1 : 1;
+    lathe.omega = clamp(lathe.omega + d * 1.4, -6, 6);
+    cam.taz = clamp(cam.taz - d * .04, -.32, .32);
+  } else if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    if (e.repeat) return;
+    hung.slice().sort((a, b) => a.sx - b.sx).forEach((h, i) => setTimeout(() => { if (hung.includes(h)) strike(h, h.sx - h.sr * .5, h.sy); }, i * 150));
+  } else if ((e.key === 'g' || e.key === 'G') && FX.gloryHole && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    e.preventDefault(); pipe.key = true;
+  }
+});
+glCanvas.addEventListener('keyup', (e) => { if (e.key === 'g' || e.key === 'G') pipe.key = false; });
+glCanvas.addEventListener('focus', () => { if (glCanvas.matches(':focus-visible')) stage.classList.add('kbd'); });
+glCanvas.addEventListener('blur', () => { stage.classList.remove('kbd'); pipe.key = false; });
+// the stage hint lights the clause that matches what the pointer is over: 1 = glass (paint), 2 = beside it (turn)
+const hintPaint = $('#hintPaint'), hintTurn = $('#hintTurn');
+function setHint(k) { hintPaint.classList.toggle('is-on', k === 1); hintTurn.classList.toggle('is-on', k === 2); }
+// each clause retires once it has been followed twice (remembered for the next visit)
+if (FX.hints) { hintPaint.hidden = hintMem.paint >= 2; hintTurn.hidden = hintMem.turn >= 2; }
+
+/* ---------- sweeping the bough ---------- */
+const _bv = new THREE.Vector3();
+function toScreen(p, out) { _bv.copy(p); branch.group.localToWorld(_bv); _bv.project(camera); out[0] = (_bv.x + 1) / 2 * view.W; out[1] = (1 - _bv.y) / 2 * view.H; return out; }
+const _sp = [0, 0];
+function nearBough(x, y) {
+  if (!branch.stemPts) return false;
+  for (const p of branch.stemPts) { toScreen(p, _sp); if (Math.hypot(_sp[0] - x, _sp[1] - y) < 30) return true; }
+  for (const sl of branch.slots) { toScreen(sl.pivot, _sp); if (Math.hypot(_sp[0] - x, _sp[1] - y) < 26) return true; }
+  return false;
+}
+function sweepAlong(x, y) {
+  const x0 = sweep.x, sp = Math.abs(x - x0);
+  if (sp < 1) return;
+  hung.filter((h) => (x0 - h.sx) * (x - h.sx) <= 0 && Math.abs(y - h.sy) < h.sr * 3.4 && clock - h.lastTink > .15)
+    .sort((a, b) => Math.abs(a.sx - x0) - Math.abs(b.sx - x0))
+    .forEach((h, i) => { h.lastTink = clock + i * .09; tinkQueue.push({ h, at: clock + i * .09, dir: Math.sign(x - x0), v: clamp(sp / 50, .2, .6) }); });
+  // the twig nearest the finger shivers
+  let bi = -1, bd = 60;
+  branch.slots.forEach((sl, i) => { toScreen(sl.pivot, _sp); const d = Math.hypot(_sp[0] - x, _sp[1] - y); if (d < bd) { bd = d; bi = i; } });
+  if (bi >= 0 && !reduced) quiv[bi] = Math.max(quiv[bi], .7);
+  sweep.x = x; sweep.y = y;
+}
+function updateTinks() {
+  for (let i = tinkQueue.length - 1; i >= 0; i--) {
+    const q = tinkQueue[i]; if (clock < q.at) continue;
+    tinkQueue.splice(i, 1);
+    if (!hung.includes(q.h)) continue;
+    q.h.om += q.dir * .45; q.h.psv += q.dir * .3;
+    sfx.chime(q.h.freq, q.v, panOf(q.h.sx));
+  }
+}
+
+/* ---------- the tool tip: names the punty and the glory hole, reads a hung bauble's tag ---------- */
+const toolTip = $('#toolTip');
+const tip = { key: '', h: null, x: 0, y: 0, w: 0, text: '' };
+function tipShow(key, text, x, y, h) {
+  tip.key = key; tip.h = h || null; tip.x = x; tip.y = y;
+  if (tip.text !== text) {
+    tip.text = text;
+    const parts = text.split(' · ');
+    toolTip.replaceChildren(...parts.flatMap((p, i) => { const sp = document.createElement('span'); sp.className = 'nw'; sp.textContent = p + (i < parts.length - 1 ? ' ·' : ''); return i ? [' ', sp] : [sp]; }));
+    tip.w = toolTip.offsetWidth;
+  }
+  toolTip.classList.add('on'); placeTip();
+}
+function tipHide(key) { if (!key || tip.key === key) { tip.key = ''; tip.h = null; toolTip.classList.remove('on'); } }
+function placeTip() {
+  if (!tip.key) return;
+  let x = tip.x, y = tip.y;
+  if (tip.h) { x = tip.h.sx - tip.w / 2; y = tip.h.sy - tip.h.o.prof.y[0] * tip.h.sr * 1.04 + 6; }   // just below the glass, whatever its length
+  x = clamp(x, 8, Math.max(8, (view.desk ? view.fx1 : view.W) - tip.w - 8)); y = clamp(y, 8, view.H - 40);
+  toolTip.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+}
+function hungText(h) {
+  const q = h.o.params;
+  if (q.shape === 4) return 'Weihnachtsgurke · whoever finds it opens a present first';
+  return `No. ${q.no} · ` + (q.user ? 'hung ' + (dayLabel(q.date) || 'today') : GLASS[q.glass].name + ', workshop sample');
+}
+let tagSeq = null;
+function showHungTag(h, fresh, dur = 1.8) { if (FX.tags) tagSeq = { h, t: 0, fresh: fresh && h.o.params.shape !== 4, dur }; }
+function updateTips(dt) {
+  if (pipe.drag || pipe.inHole || (pipe.key && pipe.x < -.05)) {
+    if (pipe.prox > .35 || pipe.inHole) tipShow('hole', 'Glory hole', 14, pipe.sy - view.ppu * 1.9 - 8);   // at the furnace edge, above the glass
+    else tipShow('pipe', 'Punty', pipe.sx + 16, pipe.by + 8);
+  } else if (tip.key === 'hole' || (tip.key === 'pipe' && !pipe.hover)) tipHide();
+  if (tagSeq) {
+    tagSeq.t += dt;
+    const T = tagSeq.t, f = tagSeq.fresh, end = (f ? 3 : 0) + tagSeq.dur;
+    if (T > end || !hung.includes(tagSeq.h)) { if (tip.key === 'tag') tipHide('tag'); tagSeq = null; }
+    else if (!tip.key || tip.key === 'tag') tipShow('tag', f && T < 3 ? 'Paint drying. Please don’t touch.' : hungText(tagSeq.h), 0, 0, tagSeq.h);
+  }
+  if (tip.h) placeTip();
+}
+
+let hotTipTimer = 0;
+function showHotTip(x, y) {
+  hotTip.style.transform = `translate(${Math.round(x + 16)}px, ${Math.round(y - 34)}px)`;
+  hotTip.classList.add('on'); clearTimeout(hotTipTimer); hotTipTimer = setTimeout(() => hotTip.classList.remove('on'), 900);
+}
+function updateCursor(x, y) {
+  if (!pointer.inside) return;
+  const hit = paintStroke ? paintStroke.cur : (pointer.type === 'mouse' ? hitMain(x, y) : null);
+  pointer.overGlass = !!hit;
+  const overHung = !paintStroke && !orbit && !pipe.drag && hungAt(x, y);
+  pipe.hover = pointer.type === 'mouse' && !hit && !paintStroke && !orbit && !overHung && !sweep && onPunty(x, y);
+  setHint(orbit ? 2 : paintStroke ? 1 : pointer.type !== 'mouse' ? 0 : hit && canPaint() ? 1 : overHung || hit || pipe.hover ? 0 : 2);
+  let cls = orbit || pipe.drag ? 'is-grabbing' : '';
+  const showRing = !!(hit && canPaint()) || (paintStroke && canPaint());
+  if (overHung) cls = 'is-ring';
+  else if (hit && canPaint()) cls = 'is-paint';
+  else if (hit && isHot()) cls = 'is-hot';
+  glCanvas.className = cls;
+  if (showRing && !overHung) {
+    ring.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    ring.classList.add('on');
+    ring.classList.toggle('spin', spinEngaged());
+    main.showGuide = spinEngaged() && hit;
+    if (hit) main.guideV = hit.v;
+  } else { ring.classList.remove('on'); main.showGuide = false; }
+  if (hit && isHot() && pointer.type === 'mouse') showHotTip(x, y);
+  // tier two: the punty's name, a hung bauble's tag
+  if (pipe.hover && !pipe.drag) tipShow('pipe', 'Punty', pipe.sx + 16, pipe.by + 8);
+  else if (tip.key === 'pipe' && !pipe.drag) tipHide('pipe');
+  if (FX.tags && overHung && pointer.type === 'mouse') tipShow('hover', hungText(overHung), 0, 0, overHung);
+  else if (tip.key === 'hover') tipHide('hover');
+}
+
+/* ---------- an idle glint: after twenty quiet seconds a light passes the window and crosses the hung glass, one bauble after another ---------- */
+const glint = {
+  on: false, t: 0, last: -99, order: [],
+  stop() { if (!this.on) return; this.on = false; this.last = clock; for (const h of this.order) h.o.mat.userData.u.uGlint.value.w = 0; },
+  update(dt) {
+    if (!FX.glint || reduced) return;
+    if (!this.on) {
+      if (clock - lastInput > 20 && clock - this.last > 26 && hung.length) { this.on = true; this.t = 0; this.order = hung.slice().sort((a, b) => a.sx - b.sx); }
+      return;
+    }
+    this.t += dt;
+    let live = false;
+    this.order.forEach((h, i) => {
+      const g = h.o.mat.userData.u.uGlint.value, s = (this.t - i * .42) / 1.8;
+      if (s >= 1 || !hung.includes(h)) { g.w = 0; return; }
+      live = true;
+      if (s <= 0) { g.w = 0; return; }
+      const x = lerp(-.8, .8, easeInOut(s)), L = Math.hypot(x, .38, .85);
+      g.set(x / L, .38 / L, .85 / L, Math.pow(Math.sin(Math.PI * s), 2) * 1.2);
+    });
+    if (!live) this.stop();
+  },
+};
+
+/* ================= sound ================= */
+// all synthesised, quiet (a -30 dB limiter keeps the output peak near -24 dBFS), at most six chimes at once
+const sfx = (() => {
+  let ctx = null, master = null, verb = null, humO = null, humG = null, humN = null, brG = null, slG = null, humI = -1, brL = 0, slL = 0;
+  const api = { on: false };
+  const voices = [];
+  function init() {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+    ctx = new AC();
+    master = ctx.createGain(); master.gain.value = 0;
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = FX.chime ? -30 : -14; comp.knee.value = FX.chime ? 3 : 30; comp.ratio.value = FX.chime ? 20 : 3; comp.attack.value = .002; comp.release.value = .2;
+    // the compressor adds its own make-up gain (about +17 dB at these settings), so trim after it
+    const trim = ctx.createGain(); trim.gain.value = FX.chime ? .2 : 1;
+    master.connect(comp); comp.connect(trim); trim.connect(ctx.destination);
+    verb = ctx.createConvolver();
+    const len = (ctx.sampleRate * 3.2) | 0, ir = ctx.createBuffer(2, len, ctx.sampleRate), R = rng('reverb');
+    for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); let lp = 0; for (let i = 0; i < len; i++) { const t = i / len; lp = lp * .55 + (R() * 2 - 1) * .45; d[i] = lp * Math.exp(-t * 5.2) * (1 - t); } }
+    verb.buffer = ir;
+    const wet = ctx.createGain(); wet.gain.value = .5; verb.connect(wet); wet.connect(master);
+    // lathe hum: a triangle that steps through the page's scale with the spin
+    humO = ctx.createOscillator(); humO.type = 'triangle'; humO.frequency.value = 73.42;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380;
+    humG = ctx.createGain(); humG.gain.value = 0; humO.connect(lp); lp.connect(humG); humG.connect(master); humO.start();
+    const nb = noiseBuf(2), ns = ctx.createBufferSource(); ns.buffer = nb; ns.loop = true;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = .8;
+    humN = ctx.createGain(); humN.gain.value = 0; ns.connect(bp); bp.connect(humN); humN.connect(master); ns.start();
+    // furnace breath: low noise that rises and falls about once every ten seconds, as loud as the glass is hot
+    const bs = ctx.createBufferSource(); bs.buffer = nb; bs.loop = true; bs.loopStart = .3;
+    const blp = ctx.createBiquadFilter(); blp.type = 'lowpass'; blp.frequency.value = 200;
+    const lfoS = ctx.createGain(); lfoS.gain.value = .7;
+    const lfo = ctx.createOscillator(); lfo.frequency.value = .1; const lfoG = ctx.createGain(); lfoG.gain.value = .3; lfo.connect(lfoG); lfoG.connect(lfoS.gain); lfo.start();
+    brG = ctx.createGain(); brG.gain.value = 0; bs.connect(blp); blp.connect(lfoS); lfoS.connect(brG); brG.connect(master); bs.start();
+    // the silvering solution sloshing
+    const ss = ctx.createBufferSource(); ss.buffer = nb; ss.loop = true; ss.loopStart = .9;
+    const slp = ctx.createBiquadFilter(); slp.type = 'lowpass'; slp.frequency.value = 650; slp.Q.value = .7;
+    slG = ctx.createGain(); slG.gain.value = 0; ss.connect(slp); slp.connect(slG); slG.connect(master); ss.start();
+    return true;
+  }
+  let nbCache = null;
+  function noiseBuf(sec) { if (nbCache && nbCache.duration >= sec) return nbCache; const R = rng('noise'); const b = ctx.createBuffer(1, (ctx.sampleRate * sec) | 0, ctx.sampleRate); const d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = R() * 2 - 1; nbCache = b; return b; }
+  function out(node, pan) {
+    let n = node;
+    if (ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = pan || 0; node.connect(p); n = p; }
+    n.connect(master); n.connect(verb);
+  }
+  const detR = rng('chime');
+  // glass chime: free-bar partials 1 : 2.756 : 5.404, and a twin of the fundamental 0.15% sharp, so it beats like real glass
+  function glass(freq, vel, pan) {
+    const now = ctx.currentTime;
+    for (let i = voices.length - 1; i >= 0; i--) if (voices[i].end < now) voices.splice(i, 1);
+    if (voices.length >= 6) { const v = voices.shift(); v.g.gain.cancelScheduledValues(now); v.g.gain.setTargetAtTime(0, now, .012); }
+    const t = now + .004, bus = ctx.createGain(), lpf = ctx.createBiquadFilter();
+    lpf.type = 'lowpass'; lpf.frequency.value = 2000 + 6000 * clamp(vel, 0, 1); lpf.Q.value = .4;
+    bus.connect(lpf); out(lpf, pan);
+    const parts = [[1, 1, 1.2], [1.0015, .7, 1.2], [2.756, .38, .4], [5.404, .2, .15]];
+    for (const [ratio, amp, dec] of parts) {
+      if (freq * ratio > ctx.sampleRate * .42) continue;
+      const os = ctx.createOscillator(), g = ctx.createGain();
+      os.frequency.value = freq * ratio * (1 + (detR() - .5) * .0006);
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(amp * vel * .05, t + .002); g.gain.exponentialRampToValueAtTime(.0001, t + dec);
+      os.connect(g); g.connect(bus); os.start(t); os.stop(t + dec + .05);
+    }
+    const src = ctx.createBufferSource(); src.buffer = noiseBuf(2); const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3200;
+    const g = ctx.createGain(); g.gain.setValueAtTime(.02 * vel, t); g.gain.exponentialRampToValueAtTime(.0001, t + .02);
+    src.connect(hp); hp.connect(g); g.connect(bus); src.start(t, detR()); src.stop(t + .03);
+    voices.push({ g: bus, end: t + 1.25 });
+  }
+  api.chime = (freq, vel = 1, pan = 0) => {
+    if (!api.on || !ctx) return;
+    if (FX.chime) { glass(freq, vel, pan); return; }
+    const t = ctx.currentTime + .004, bus = ctx.createGain(); bus.gain.value = 1; out(bus, pan);
+    const parts = [[1, 1, 3.8], [2.32, .5, 2.6], [4.25, .3, 1.7], [6.63, .17, 1.1], [9.38, .09, .72], [12.7, .05, .45]];
+    for (const [ratio, amp, dec] of parts) {
+      if (freq * ratio > ctx.sampleRate * .42) continue;
+      const pair = ratio < 3 ? [-1, 1] : [0];
+      for (const d of pair) {
+        const os = ctx.createOscillator(), g = ctx.createGain();
+        os.frequency.value = freq * ratio * (1 + (detR() - .5) * .004) + d * .8;
+        g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(amp * vel * .15 / pair.length, t + .003); g.gain.exponentialRampToValueAtTime(.0001, t + dec);
+        os.connect(g); g.connect(bus); os.start(t); os.stop(t + dec + .05);
+      }
+    }
+  };
+  api.tink = (f = 2600, v = .4) => api.chime(f, v * .6, 0);
+  api.roar = () => {
+    if (!api.on || !ctx) return;
+    const k = FX.chime ? .3 : 1;
+    const t = ctx.currentTime, src = ctx.createBufferSource(); src.buffer = noiseBuf(2);
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = .7; bp.frequency.setValueAtTime(260, t); bp.frequency.exponentialRampToValueAtTime(820, t + .35); bp.frequency.exponentialRampToValueAtTime(320, t + 1.6);
+    const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.2 * k, t + .22); g.gain.exponentialRampToValueAtTime(.0001, t + 1.7);
+    src.connect(bp); bp.connect(g); out(g, -.5); src.start(t); src.stop(t + 1.8);
+    const o = ctx.createOscillator(), og = ctx.createGain(); o.frequency.value = 52; og.gain.setValueAtTime(.0001, t); og.gain.exponentialRampToValueAtTime(.08 * k, t + .2); og.gain.exponentialRampToValueAtTime(.0001, t + 1.4); o.connect(og); out(og, -.4); o.start(t); o.stop(t + 1.5);
+  };
+  const tickR = rng('ticks');
+  api.ticks = () => {
+    if (!api.on || !ctx) return;
+    const t0 = ctx.currentTime;
+    for (let i = 0; i < 9; i++) {
+      const t = t0 + .25 + tickR() * 1.8, src = ctx.createBufferSource(); src.buffer = noiseBuf(2);
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3000 + tickR() * 4000; bp.Q.value = 4;
+      const g = ctx.createGain(); g.gain.setValueAtTime(.05 + tickR() * .07, t); g.gain.exponentialRampToValueAtTime(.0001, t + .012);
+      src.connect(bp); bp.connect(g); out(g, (tickR() - .5) * .4); src.start(t, tickR()); src.stop(t + .02);
+    }
+  };
+  // one contraction tick: 1 to 3 ms of band-passed noise
+  api.tick = (R) => {
+    if (!api.on || !ctx) return;
+    const t = ctx.currentTime + .005, src = ctx.createBufferSource(); src.buffer = noiseBuf(2);
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2600 + R() * 4200; bp.Q.value = 3;
+    const g = ctx.createGain(), d = .001 + R() * .002; g.gain.setValueAtTime(.025 + R() * .03, t); g.gain.exponentialRampToValueAtTime(.0001, t + d + .004);
+    src.connect(bp); bp.connect(g); out(g, (R() - .5) * .5); src.start(t, R()); src.stop(t + d + .01);
+  };
+  const HUM = [73.42, 82.41, 92.5, 110, 123.47, 146.83];
+  api.hum = (level) => {
+    if (!ctx || !api.on) return;
+    const t = ctx.currentTime;
+    if (FX.furnaceSound) {
+      const i = clamp(Math.round(level * 5), 0, 5);
+      if (i !== humI) { humI = i; humO.frequency.setTargetAtTime(HUM[i], t, .08); }
+      humG.gain.setTargetAtTime(.012 * clamp(level, 0, 1.2), t, .12); humN.gain.setTargetAtTime(.005 * clamp(level - .1, 0, 1.2), t, .12);
+    } else { humG.gain.setTargetAtTime(.05 * clamp(level, 0, 1.2), t, .12); humN.gain.setTargetAtTime(.022 * clamp(level - .1, 0, 1.2), t, .12); }
+  };
+  api.breath = (level) => { if (!ctx || !api.on || !FX.furnaceSound || Math.abs(level - brL) < .01) return; brL = level; brG.gain.setTargetAtTime(.09 * level, ctx.currentTime, .35); };
+  api.slosh = (level) => { if (!ctx || !api.on || Math.abs(level - slL) < .01) return; slL = level; slG.gain.setTargetAtTime(.07 * level, ctx.currentTime, .08); };
+  api.toggle = () => {
+    if (!ctx && !init()) return false;
+    api.on = !api.on;
+    const t = ctx.currentTime;
+    if (api.on) { ctx.resume(); master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(FX.chime ? 1 : .9, t, .05); setTimeout(() => api.chime(FX.chime ? 1174.66 : 1568, .45, 0), 60); }
+    else { master.gain.setTargetAtTime(0, t, .05); humG.gain.setTargetAtTime(0, t, .05); humN.gain.setTargetAtTime(0, t, .05); brG.gain.setTargetAtTime(0, t, .05); slG.gain.setTargetAtTime(0, t, .05); brL = slL = 0; }
+    return api.on;
+  };
+  return api;
+})();
+let nudgeT = 0;
+function nudgeSound() { const b = $('#sound'); b.classList.add('nudge'); clearTimeout(nudgeT); nudgeT = setTimeout(() => b.classList.remove('nudge'), 1400); }
+
+/* ================= bokeh ================= */
+const bk = (() => {
+  const ctx = bokehCanvas.getContext('2d');
+  const R = rng('bokeh');
+  const pal = [[255, 172, 92], [255, 172, 92], [255, 150, 70], [243, 66, 0], [217, 179, 108], [217, 179, 108], [236, 196, 128], [150, 26, 38], [150, 26, 38]];
+  const discs = [];
+  for (let i = 0; i < 52; i++) {
+    const c = pal[(R() * pal.length) | 0], big = R() > .8;
+    discs.push({ x: R(), y: .1 + R() * .88, r: big ? .045 + R() * .06 : .007 + Math.pow(R(), 1.6) * .03, c, a: big ? .03 + R() * .05 : .07 + R() * .17, edge: !big && R() < .72, ph: R() * TAU, sp: .15 + R() * .45, dx: (R() - .5) * .004, dy: -.002 - R() * .004 });
+  }
+  let w = 1, h = 1, sc = .5;
+  // each disc is drawn once into its own small sprite at full alpha; frames just blit it with globalAlpha
+  function sprite(d, r) {
+    const n = Math.max(2, Math.ceil(r * 2)), c = document.createElement('canvas'); c.width = c.height = n;
+    const x = c.getContext('2d'), [cr, cg, cb] = d.c, g = x.createRadialGradient(n / 2, n / 2, 0, n / 2, n / 2, n / 2);
+    if (d.edge) { g.addColorStop(0, `rgba(${cr},${cg},${cb},.42)`); g.addColorStop(.78, `rgba(${cr},${cg},${cb},.6)`); g.addColorStop(.9, `rgba(${cr},${cg},${cb},1)`); g.addColorStop(.96, `rgba(${cr},${cg},${cb},.5)`); g.addColorStop(1, `rgba(${cr},${cg},${cb},0)`); }
+    else { g.addColorStop(0, `rgba(${cr},${cg},${cb},1)`); g.addColorStop(1, `rgba(${cr},${cg},${cb},0)`); }
+    x.fillStyle = g; x.fillRect(0, 0, n, n);
+    return c;
+  }
+  return {
+    resize() {
+      w = Math.max(1, Math.round(view.W * sc)); h = Math.max(1, Math.round(view.H * sc)); bokehCanvas.width = w; bokehCanvas.height = h;
+      const m = Math.min(w, h);
+      for (const d of discs) { d.rr = d.r * m * 1.4; d.img = sprite(d, d.rr); }
+    },
+    draw(t) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, w, h);
+      ctx.globalCompositeOperation = 'lighter';
+      const fx1 = view.fx1 * sc;
+      const g = glowAmt(), tt = reduced ? 0 : t;
+      // furnace glow, lower left: brightens when the door opens for a gather
+      const fur = .2 + .025 * Math.sin(tt * .7) + .02 * Math.sin(tt * 1.9 + 1) + furnace.flare * .28;
+      let gr = ctx.createRadialGradient(fx1 * .02, h * 1.02, 0, fx1 * .02, h * 1.02, h * .78);
+      gr.addColorStop(0, `rgba(243,80,10,${fur})`); gr.addColorStop(.45, `rgba(170,30,12,${fur * .4})`); gr.addColorStop(1, 'rgba(120,10,10,0)');
+      ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h);
+      // the furnace door at the left edge: a crack of light that breathes about once every ten seconds, and opens as the pipe comes near
+      if (FX.gloryHole) {
+        const my = (view.cy + .2 * view.ppu) * sc, mh = view.ppu * 1.45 * sc, pr = pipe.prox, br0 = .5 + .5 * Math.sin(tt * TAU * .1);
+        const rw = Math.max(4, (22 + 80 * pr * pr) * sc), a0 = .085 + .035 * br0 + .5 * pr;
+        ctx.save(); ctx.translate(0, my); ctx.scale(1, mh / rw);
+        gr = ctx.createRadialGradient(0, 0, 0, 0, 0, rw);
+        gr.addColorStop(0, `rgba(255,170,90,${a0})`); gr.addColorStop(.3, `rgba(250,110,40,${a0 * .5})`); gr.addColorStop(1, 'rgba(200,40,10,0)');
+        ctx.fillStyle = gr; ctx.fillRect(0, -rw, rw, rw * 2);
+        ctx.restore();
+      }
+      // warm wall light behind the lathe so the glass reads against the dark
+      const bx = (view.cx + pipe.x * view.ppu) * sc, by = (view.cy - pipe.y * view.ppu) * sc, br = view.ppu * sc;
+      gr = ctx.createRadialGradient(bx, by, br * .2, bx, by, br * 3.1);
+      gr.addColorStop(0, 'rgba(110,22,30,.2)'); gr.addColorStop(.5, 'rgba(70,12,22,.09)'); gr.addColorStop(1, 'rgba(60,10,16,0)');
+      ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h);
+      for (const d of discs) {
+        if (!d.img) continue;
+        const x = mod1(d.x + d.dx * tt) * w, y = (((d.y + d.dy * tt - .1) % .9 + .9) % .9 + .1) * h, r = d.rr;
+        let a = d.a * (1 + .22 * Math.sin(tt * d.sp + d.ph));
+        if (view.desk && x > fx1) a *= .45;
+        ctx.globalAlpha = Math.min(1, a); ctx.drawImage(d.img, x - r, y - r, r * 2, r * 2);
+      }
+      // reflected light from each hung bauble lies on the velvet below it, tinted by its glass
+      if (FX.caustics) for (const hh of hung) {
+        if (hh.sx < -900) continue;
+        const cimg = causticFor(hh.o.params.glass), cr = hh.sr * 1.7 * sc;
+        ctx.globalAlpha = .16; ctx.drawImage(cimg, hh.sx * sc + hh.sr * .45 * sc - cr, hh.sy * sc + hh.sr * .9 * sc - cr * .7, cr * 2, cr * 1.4);
+      }
+      ctx.globalAlpha = 1;
+      if (g > 0.001) {
+        const s = main.body.scale.x;
+        gr = ctx.createRadialGradient(bx, by, br * .5 * s, bx, by, br * 2.6 * s);
+        gr.addColorStop(0, `rgba(255,140,50,${.5 * g})`); gr.addColorStop(.4, `rgba(243,70,10,${.22 * g})`); gr.addColorStop(1, 'rgba(200,30,0,0)');
+        ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h);
+      }
+    },
+  };
+})();
+const furnace = { flare: 0 };
+// a soft pool tinted by the glass, with the bright crescent a convex mirror throws
+const causticCache = {};
+function causticFor(gi) {
+  if (causticCache[gi]) return causticCache[gi];
+  const n = 64, c = document.createElement('canvas'); c.width = c.height = n; const x = c.getContext('2d'), [r, g, b] = hexRgb(GLASS[gi].hex);
+  const lift = (v) => Math.round(v + (255 - v) * .35);
+  let gr = x.createRadialGradient(n / 2, n / 2, 0, n / 2, n / 2, n / 2);
+  gr.addColorStop(0, `rgba(${lift(r)},${lift(g)},${lift(b)},.5)`); gr.addColorStop(.6, `rgba(${r},${g},${b},.22)`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
+  x.fillStyle = gr; x.fillRect(0, 0, n, n);
+  // the brighter focus a convex mirror throws, soft and off-centre toward the light
+  gr = x.createRadialGradient(n * .4, n * .36, 0, n * .4, n * .36, n * .2);
+  gr.addColorStop(0, 'rgba(255,232,200,.32)'); gr.addColorStop(1, 'rgba(255,232,200,0)');
+  x.globalCompositeOperation = 'lighter'; x.fillStyle = gr; x.fillRect(0, 0, n, n);
+  causticCache[gi] = c;
+  return c;
+}
+
+// velvet grain
+(function grain() {
+  const c = document.createElement('canvas'); c.width = c.height = 180; const x = c.getContext('2d'); const d = x.createImageData(180, 180); const R = rng('grain');
+  for (let i = 0; i < d.data.length; i += 4) { const v = (R() * 255) | 0; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+  x.putImageData(d, 0, 0);
+  try { $('#grain').style.backgroundImage = `url(${c.toDataURL('image/png')})`; } catch (e) {}
+})();
+
+/* ================= UI ================= */
+const steps = [...document.querySelectorAll('.step')];
+const tabs = [...document.querySelectorAll('.tab')];
+function markStep(i) { state.step = i; steps.forEach((s, k) => s.classList.toggle('is-active', k === i)); }
+function pressed(sel, attr, idx) { document.querySelectorAll(sel).forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset[attr] === idx))); }
+function say(t) { live.textContent = t; }
+function updateTag() {
+  $('#tag').innerHTML = `<b>No. ${state.count}</b><span>${GLASS[state.glass].name}</span><i>&middot;</i><span>${FINISH[state.finish].name}</span><i>&middot;</i><span>${SHAPES[state.shape]}</span>`;
+}
+function updateLabels() {
+  $('#valGlass').textContent = GLASS[state.glass].name;
+  $('#valSilver').textContent = FINISH[state.finish].name + ' · ' + SHAPES[state.shape];
+  $('#valPaint').textContent = BRUSH[state.brush].name;
+  pressed('[data-glass]', 'glass', state.glass);
+  pressed('[data-finish]', 'finish', state.finish);
+  pressed('[data-shape]', 'shape', state.shape);
+  pressed('[data-brush]', 'brush', state.brush);
+  ring.style.setProperty('--bc', BRUSH[state.brush].hex);
+  guide.material.color.set(BRUSH[state.brush].hex);
+  updateTag();
+}
+// the dots fill left to right in the order the baubles were hung; one still in flight shows as a gold ring
+function updateSlotsUI() {
+  const n = hung.length + flights.length;
+  $('#valHang').textContent = `${n} of ${MAX_HUNG}`;
+  [...document.querySelectorAll('#slots i')].forEach((d, i) => {
+    const h = hung[i], hex = h && GLASS[h.o.params.glass].hex;
+    d.classList.toggle('full', !!h);
+    d.classList.toggle('flying', !h && i < n);
+    d.style.background = h ? `radial-gradient(circle at 35% 30%, color-mix(in srgb, ${hex}, white 25%), ${hex} 55%, color-mix(in srgb, ${hex}, black 55%))` : '';
+  });
+  $('#slots').setAttribute('aria-label', `${n} of ${MAX_HUNG} on the branch`);
+  hangText();
+}
+function hangText() {
+  const full = hung.length + flights.length >= MAX_HUNG && hung.length;
+  $('#hangLabel').textContent = full ? `Hang it in place of No. ${hung[0].o.params.no}` : 'Hang it on the fir';
+  const busy = isHot() || gather.on || !main.holder.visible;
+  $('#hang').setAttribute('aria-label', $('#hangLabel').textContent + (busy ? ' (the glass is still cooling)' : ''));
+}
+function refreshControls() {
+  const busy = isHot() || gather.on || !main.holder.visible;
+  $('#hang').disabled = busy || !!playing || !!clearing;
+  hangText();
+}
+// the Hang button stays an ember outline until the bauble on the lathe has been worked
+function armHang(on = true) { $('#hang').classList.toggle('is-quiet', !on); }
+
+document.querySelector('#glassRow').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-glass]'); if (!b) return;
+  const i = +b.dataset.glass; markStep(0);
+  if (gather.on || !main.holder.visible) { state.glass = i; main.params.glass = i; updateLabels(); return; }
+  state.glass = i; updateLabels(); armHang();
+  furnace.flare = 1;
+  startHeat({ ramp: .32, hold: .12, onPeak: () => { main.params.glass = i; applyLook(main, 1); } });
+  say(GLASS[i].name + ' glass gathered. It glows, then cools.');
+  refreshControls();
+});
+document.querySelector('#finishRow').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-finish]'); if (!b) return;
+  const f = +b.dataset.finish; markStep(1);
+  state.finish = f; updateLabels(); armHang();
+  if (FX.silvering && main.holder.visible && !gather.on) silver.start(f);
+  else { main.params.finish = f; lookK = 0; }
+});
+document.querySelector('#shapeRow').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-shape]'); if (!b) return;
+  const i = +b.dataset.shape; markStep(1);
+  if (i === state.shape) return;
+  state.shape = main.params.shape = i; setShapeMorph(i); updateLabels(); armHang();
+  main.mat.userData.u.uBumps.value = 0;
+});
+document.querySelector('#brushRow').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-brush]'); if (!b) return;
+  state.brush = +b.dataset.brush; markStep(2); updateLabels();
+});
+$('#spin').addEventListener('click', () => {
+  state.spinToggle = !state.spinToggle; $('#spin').setAttribute('aria-pressed', String(state.spinToggle)); markStep(2);
+  say(state.spinToggle ? 'The lathe spins. Hold the brush still to paint a ring.' : 'The lathe slows.');
+});
+document.querySelectorAll('[data-pattern]').forEach((b) => b.addEventListener('click', () => { markStep(2); playPattern(+b.dataset.pattern); }));
+$('#clear').addEventListener('click', () => { markStep(2); clearPaint(); });
+$('#hang').addEventListener('click', () => { markStep(3); hang(); });
+$('#sound').addEventListener('click', () => {
+  const on = sfx.toggle();
+  $('#sound').setAttribute('aria-pressed', String(!!on)); $('#soundLabel').textContent = on ? 'Sound on' : 'Sound off';
+});
+// phone pager
+const stepsEl = $('#steps');
+tabs.forEach((t) => t.addEventListener('click', () => { const i = +t.dataset.go; stepsEl.scrollTo({ left: i * stepsEl.clientWidth, behavior: reduced ? 'auto' : 'smooth' }); setTab(i); }));
+let curTab = 0;
+function setTab(i) { curTab = i; tabs.forEach((t, k) => t.setAttribute('aria-current', String(k === i))); }
+let pagerT = 0;
+stepsEl.addEventListener('scroll', () => { clearTimeout(pagerT); pagerT = setTimeout(() => { if (stepsEl.clientWidth) setTab(Math.round(stepsEl.scrollLeft / stepsEl.clientWidth)); }, 60); }, { passive: true });
+stepsEl.addEventListener('focusin', (e) => { const st = e.target.closest('.step'); if (st && MQ_PAGER.matches) setTab(steps.indexOf(st)); });
+// the season clock adds a stamp to the over-line and, from Christmas Eve to Twelfth Night, the finial
+function applySeason() {
+  SEASON = season(seasonNow());
+  $('#season').innerHTML = FX.seasonStamp && SEASON.stamp ? '<i>&middot;</i>' + SEASON.stamp : '';
+  $('#over').classList.toggle('has-season', !!(FX.seasonStamp && SEASON.stamp));
+  $('#shape-finial').hidden = !(FX.finial && (SEASON.finial || state.shape === 3));
+  fitOver(); fixSeps(); fitBench();
+}
+// if the stamp would wrap the over-line, it drops to a second line of its own
+function fitOver() {
+  const o = $('#over'); o.classList.remove('tight');
+  if (o.classList.contains('has-season') && o.getBoundingClientRect().height > 20) o.classList.add('tight');
+}
+addEventListener('hashchange', applySeason);
+if (coarse) {
+  $('#paintCap').textContent = 'Drag on the glass. Press Spin, or touch with two fingers, and a dab becomes a ring.';
+  $('#hintPaint').textContent = 'Touch the glass to paint.';
+}
+
+/* ================= initial, finished state ================= */
+(function seedScene() {
+  // the opening bauble wears a bold band below the window reflections, so the decoration reads at a glance
+  const R = rng('first');
+  const inks = patternInks(state.glass);
+  const list = patternDabs(patOrder[0], R, mainProf, ...inks, { bold: true, drop: .34 });
+  flushDabs(main.P, mainProf, list);
+  if (R() < .6) { // a fine companion pinstripe outside each band line, as a finisher
+    const L = mainProf.L, v = list.v0 != null ? list.v0 : eqV(mainProf), off = list.band != null ? list.band + .075 : .62;
+    for (const s of [-1, 1]) { const vv = v + s * off / L, C = TAU * rAt(mainProf, vv), n = Math.ceil(C / .005); for (let i = 0; i < n; i++) dab(main.P, mainProf, i / n, vv, .0075, inks[1], paintR() * TAU, .9); }
+  }
+  lathe.angle = R() * TAU;
+})();
+updateLabels();
+layout();
+seedHung();
+updateSlotsUI();
+refreshControls();
+applySeason();
+
+/* ================= loop ================= */
+let last = performance.now(), raf = 0, bokehAcc = 1, frameN = 0;
+let MAX_DT = .05;
+function frame(now) {
+  raf = requestAnimationFrame(frame);
+  const dt = Math.min(MAX_DT, Math.max(0, (now - last) / 1000)); last = now; clock += dt; frameN++;
+  updateHeat(dt);
+  updatePipe(dt);
+  updateLathe(dt);
+  updateSag(dt);
+  updateMorph(dt);
+  updateGather(dt);
+  updatePainting();
+  updatePlay();
+  updateClear(dt);
+  silver.update(dt);
+  if (lookK < 1) { lookK = Math.min(1, lookK + dt / .6); applyLook(main, lookK >= 1 ? 1 : 1 - Math.exp(-dt / .14)); }
+  updateFlights(dt);
+  updateHung(dt);
+  updateTinks();
+  glint.update(dt);
+  updateCamera(dt);
+  furnace.flare = damp(furnace.flare, 0, .9, dt);
+  // glow
+  const g = glowAmt();
+  main.mat.userData.u.uTempK.value = heat.T;
+  glowLight.intensity = g * 3.2; glowLight.position.set(pipe.x, mainProf.y[0] * .4 + pipe.y, 0);
+  sfx.breath(FX.furnaceSound ? clamp((heat.T - T_ROOM) / (T_PEAK - T_ROOM), 0, 1) : 0);
+  bossMat.emissive.setRGB(g * 5, g * .7, g * .04);
+  // spin guide
+  if (main.showGuide && canPaint()) { setGuide(main.guideV); guide.material.opacity = damp(guide.material.opacity, .5, .15, dt); }
+  else guide.material.opacity = damp(guide.material.opacity, 0, .15, dt);
+  guide.visible = guide.material.opacity > .01;
+  // two 1024x512 uploads per frame are heavy on phones: while a finger paints, upload every other frame
+  if (main.P.dirty && !(coarse && paintStroke && (frameN & 1))) { main.P.tc.needsUpdate = main.P.tm.needsUpdate = true; main.P.dirty = false; }
+  for (const h of hung) if (h.o.P.dirty) { h.o.P.tc.needsUpdate = h.o.P.tm.needsUpdate = true; h.o.P.dirty = false; }
+  for (const f of flights) if (f.o.P.dirty) { f.o.P.tc.needsUpdate = f.o.P.tm.needsUpdate = true; f.o.P.dirty = false; }
+  if (pointer.inside && (pointer.moved || paintStroke || now - curT > 120)) { curT = now; pointer.moved = false; if (!orbit || pointer.type !== 'mouse') updateCursor(pointer.x, pointer.y); }
+  updateTips(dt);
+  // the ring's arc is the paint left on the brush; it refills when the brush lifts
+  if (FX.loadArc && ring.classList.contains('on')) { const L = paintStroke && paintStroke.load != null ? paintStroke.load : 1; if (Math.abs(L - ringLoadV) > .004) { ringLoadV = L; ringLoad.style.strokeDashoffset = (100 * (1 - L)).toFixed(1); } }
+  bokehAcc += dt;
+  if (bokehAcc > (reduced ? .5 : 1 / 30) || g > 0 || furnace.flare > .01 || pipe.prox > 0) { bk.draw(clock); bokehAcc = 0; }
+  renderer.render(scene, camera);
+  shimmer.level = FX.shimmer && !reduced && main.holder.visible ? Math.pow(clamp((heat.T - T_ROOM - 25) / 240, 0, 1), .7) : 0;
+  shimmer.draw(clock);
+  if (heat.phase === 'idle' && wasHot) { wasHot = false; refreshControls(); }
+  if (heat.phase !== 'idle') wasHot = true;
+}
+let wasHot = false, curT = 0, ringLoadV = 1, hiddenAt = 0;
+const ringLoad = $('#ringLoad');
+bk.draw(0);
+// the loader hands over: if the kiln glow is showing, the first live gather starts at its temperature and cools from there
+const kiln = $('#kiln');
+if (kiln && kiln._stop) kiln._stop();
+if (kiln && kiln.classList.contains('on') && FX.kiln) {
+  // the live glass takes over at working heat, where its whole body glows as the kiln's did
+  heat.T = T_PEAK; heat.phase = 'hold'; heat.hold = .5; heat.t = 0; heat.noted = false; heat.quiet = true;
+  tempVal.textContent = String(Math.round(T_PEAK - 273));
+  main.mat.userData.u.uTempK.value = heat.T;
+  bossMat.emissive.setRGB(glowAmt() * 5, glowAmt() * .7, glowAmt() * .04);
+  // one frame, then the shaders compile and the kiln fades into the live glass
+  requestAnimationFrame(() => setTimeout(() => {
+    renderer.render(scene, camera);
+    // the hot glass needs the shimmer at once, so warm it now, while the kiln still covers the stage
+    if (shimmer.warmAt) { shimmer.warmAt = 1e-6; shimmer.draw(1e-3); }
+    kiln.classList.add('off'); setTimeout(() => kiln.remove(), 400);
+    last = performance.now(); raf = requestAnimationFrame(frame);
+  }, 0));
+} else {
+  if (kiln) kiln.remove();
+  renderer.render(scene, camera);
+  raf = requestAnimationFrame(frame);
+}
+const TITLE = document.title;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { cancelAnimationFrame(raf); raf = 0; hiddenAt = performance.now(); if (FX.tabTitle) document.title = 'The furnace is banked'; }
+  else {
+    if (FX.tabTitle) document.title = TITLE;
+    // the glass kept cooling while you were away (up to half a minute of it)
+    if (heat.phase === 'cool' && hiddenAt) heat.t += Math.min(30, (performance.now() - hiddenAt) / 1000);
+    if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+  }
+});
+let rzT = 0;
+const ro = new ResizeObserver(() => { clearTimeout(rzT); rzT = setTimeout(layout, 120); });
+ro.observe(stage);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => layout());
+
+})();
+</script>
