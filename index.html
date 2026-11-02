@@ -1,0 +1,572 @@
+<title>Five Gold Rings</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Geist:wght@300;400;500&family=Geist+Mono:wght@300;400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@500&family=Anybody:wdth,wght@140,900&family=Newsreader:ital,wght@1,300&family=Bodoni+Moda:ital,opsz,wght@1,6..96,500&family=Big+Shoulders+Display:wght@800&display=swap&text=AstrolabeofMidwinterOverprintNo%C3%ABlTheFrostedPaneMidnightGlasshouseGingerbreadConstructionSet%20">
+<style>
+/* Layout: one gold thread across the page; five engraved rings hang from it like ornaments, each opening one seed's page. Phone: a vertical list. */
+:root {
+  --bg: #0c1512;
+  --bg-2: #14211c;
+  --gold: #d4ae62;
+  --gold-hi: #f4e2ab;
+  --gold-lo: #7c5c26;
+  --text: #ebe5d5;
+  --muted: #8f9b92;
+  --line: rgba(212, 174, 98, 0.28);
+  --focus: #f4e2ab;
+  --f-display: "Gloock", "Bodoni Moda", Georgia, serif;
+  --f-body: "Geist", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(120% 70% at 50% 0%, var(--bg-2) 0%, transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font: 400 15px/1.55 var(--f-body);
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: clamp(28px, 6vw, 72px) clamp(28px, 5vw, 56px);
+}
+header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 27rem);
+  gap: clamp(16px, 4vw, 64px);
+  align-items: end;
+}
+.eyebrow {
+  font: 400 11px/1.4 var(--f-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 14px;
+}
+h1 {
+  font: 400 clamp(50px, 7.4vw, 112px)/0.92 var(--f-display);
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+h1 em { font-style: normal; color: var(--gold); }
+.intro { margin: 0; max-width: 34rem; color: var(--muted); font-size: 15px; }
+.intro strong { color: var(--text); font-weight: 500; }
+
+/* garland */
+.garland { position: relative; margin-top: clamp(28px, 4.5vw, 56px); padding-top: 18px; }
+.thread { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.thread path { fill: none; stroke: var(--gold-lo); stroke-width: 1.2; }
+.rings {
+  list-style: none; margin: 0; padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 28px);
+}
+.rings li { min-width: 0; display: flex; }
+.ring {
+  --drop: 0px;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  width: 100%;
+  padding-top: var(--drop);
+  color: inherit; text-decoration: none;
+  border-radius: 6px;
+  outline: none;
+}
+.ring .hang { width: 1px; height: 28px; background: var(--gold-lo); margin-bottom: -18px; }
+@property --sc { syntax: '<number>'; inherits: false; initial-value: 1; }
+@property --tilt { syntax: '<number>'; inherits: false; initial-value: 0; }
+.ring canvas {
+  --swing: 0;
+  width: min(100%, 200px); aspect-ratio: 1; max-width: 100%;
+  display: block;
+  transform: rotate(calc((var(--swing) + var(--tilt)) * 1deg)) scale(var(--sc));
+  transition: --sc 0.6s cubic-bezier(.2,.7,.2,1), --tilt 0.6s cubic-bezier(.2,.7,.2,1);
+  transform-origin: 50% -14px;
+}
+.ring:hover canvas, .ring:focus-visible canvas { --sc: 1.04; --tilt: -2; }
+.cap { text-align: center; display: grid; gap: 8px; justify-items: center; min-width: 0; }
+.num { font: 400 11px/1 var(--f-mono); letter-spacing: 0.18em; color: var(--gold); }
+.name { font-size: clamp(19px, 1.7vw, 24px); line-height: 1.08; text-wrap: balance; transition: color 0.3s; }
+.ring:hover .name, .ring:focus-visible .name { color: var(--gold-hi); }
+.desc { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--muted); max-width: 22ch; text-wrap: pretty; }
+.open {
+  font: 400 11px/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--gold); padding: 7px 0 5px; border-bottom: 1px solid var(--line);
+  transition: border-color 0.3s, color 0.3s;
+}
+.ring:hover .open, .ring:focus-visible .open { color: var(--gold-hi); border-color: var(--gold-hi); }
+.ring:focus-visible { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus); }
+.hash span { transition: color 0.5s, text-shadow 0.5s; }
+.hash span.lit { color: var(--gold-hi); text-shadow: 0 0 8px rgba(244, 226, 171, 0.45); transition: none; }
+.season {
+  margin: 14px 0 0; font: 400 11px/1.5 var(--f-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold);
+  display: flex; align-items: center; gap: 10px;
+}
+.season::before { content: ""; width: 18px; height: 1px; background: var(--gold-lo); }
+.hash {
+  font: 300 10px/1.5 var(--f-mono); letter-spacing: 0.04em; color: color-mix(in srgb, var(--muted) 70%, transparent);
+  word-break: break-all; width: 16.4ch; max-width: 100%; margin: 2px 0 0; letter-spacing: 0;
+}
+
+/* each studio's own display face */
+.f1 { font-family: "Cormorant Unicase", Georgia, serif; font-weight: 500; letter-spacing: 0.02em; }
+.f2 { font-family: "Anybody", "Arial Black", sans-serif; font-weight: 900; font-stretch: 140%; letter-spacing: -0.01em; }
+.f3 { font-family: "Newsreader", Georgia, serif; font-style: italic; font-weight: 300; }
+.f4 { font-family: "Bodoni Moda", Didot, Georgia, serif; font-style: italic; font-weight: 500; }
+.f5 { font-family: "Big Shoulders Display", "Arial Narrow", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.01em; }
+
+footer {
+  margin-top: clamp(40px, 6vw, 80px);
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 8px 32px; justify-content: space-between;
+  font: 400 11px/1.6 var(--f-mono); letter-spacing: 0.06em; color: var(--muted);
+}
+footer p { margin: 0; max-width: 64ch; }
+
+@media (max-width: 1020px) {
+  header { grid-template-columns: 1fr; align-items: start; }
+  .thread { display: none; }
+  .rings { grid-template-columns: 1fr; gap: 0; }
+  .rings li { border-top: 1px solid var(--line); }
+  .rings li:last-child { border-bottom: 1px solid var(--line); }
+  .ring { --drop: 0px !important; flex-direction: row; align-items: center; gap: clamp(16px, 4vw, 32px); padding-block: 18px; }
+  .ring .hang { display: none; }
+  .ring canvas { width: clamp(92px, 24vw, 150px); flex: none; transform-origin: 50% 50%; --swing: 0 !important; }
+  .cap { text-align: left; justify-items: start; }
+  .desc { max-width: 40ch; }
+  .hash { width: auto; max-width: 33ch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ring canvas { transition: none; --swing: 0 !important; }
+}
+</style>
+
+<main class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">Five pages · five SHA-256 seeds</p>
+      <h1>Five Gold <em>Rings</em></h1>
+    </div>
+    <div><p class="intro">Each page here grew from one 64-character hash: its palette, type, layout and every random flake or star. Each gold ring carries its seed as <strong>256 engraved ticks</strong>, one per bit. Choose a ring to open that page.</p><p class="season" id="season"></p></div>
+  </header>
+
+  <section class="garland" aria-label="The five pages">
+    <svg class="thread" id="threadSvg" aria-hidden="true"><path id="thread" d=""></path></svg>
+    <ol class="rings" id="rings"></ol>
+  </section>
+
+  <footer>
+    <p>On the fifth day of Christmas: five gold rings. Ring ticks read clockwise from twelve o'clock; a long tick is a 1 bit.</p>
+    <p>Every page opens in a new tab.</p>
+  </footer>
+</main>
+
+<script>
+(() => {
+  const PAGES = [
+    { n: 'I', seed: '219626542cc8593f42183be1137f30e8c9e9467e12bab5f4398162ea58fc22ff', title: 'Astrolabe of Midwinter', f: 'f1', url: 'https://claude.ai/artifact/RMhHepFrqTyxX8x2ktP6qd',
+      desc: 'Turn a brass astrolabe through Christmas Eve until the Winter Hexagon stands in the south at midnight.', ground: '#0b1428', glyph: 'astro' },
+    { n: 'II', seed: '6368c03348cd0583a7cd63395517ca6df3e5bea15b7ffcdc65b0c62f6b982105', title: 'Overprint Noël', f: 'f2', url: 'https://claude.ai/artifact/DPvaA5sCBNhzb1ywzbm69p',
+      desc: 'Set a card from hand-cut stamps and pull two-ink prints that never come out the same twice.', ground: '#eeeee8', glyph: 'riso' },
+    { n: 'III', seed: '85975d06017536df0c3da4f60943959a82164ad5c7c0e7daef924496312ed7f8', title: 'The Frosted Pane', f: 'f3', url: 'https://claude.ai/artifact/4HbocH97u5Rp7Qvfyg8X2q',
+      desc: 'Wipe the frost off a window to find a snowy village. Hold to breathe on the glass, then write.', ground: '#07090b', glyph: 'frost' },
+    { n: 'IV', seed: 'f342004c0ee0459d555b91360d075fe7b3bad234945c8ba5a46c42da7fc6847f', title: 'The Midnight Glasshouse', f: 'f4', url: 'https://claude.ai/artifact/UebYCbZqvZYCe6S1csGT4J',
+      desc: 'Blow, silver and paint a glass bauble in 3D, then hang it on the fir and ring it.', ground: '#1a0a10', glyph: 'glass' },
+    { n: 'V', seed: '2a34736f8713fd235f010f7d99ffa75c28eb0310a63d15f818b714eaeea8c9b9', title: 'Gingerbread Construction Set', f: 'f5', url: 'https://claude.ai/artifact/28hvjSG6sJjvfPZ1gYXZwT',
+      desc: 'Assemble a gingerbread house from a full drawing set: layers, cutting template and the recipe as a bill of materials.', ground: '#eef2ee', glyph: 'ginger' },
+  ];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const list = document.getElementById('rings');
+  const garland = list.parentElement;
+  const threadPath = document.getElementById('thread');
+  const drops = [0, 34, 52, 34, 0];
+  const rings = [];
+  const TAU = Math.PI * 2;
+
+  PAGES.forEach((p, i) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.className = 'ring';
+    a.href = p.url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.style.setProperty('--drop', drops[i] + 'px');
+    a.setAttribute('aria-label', `${p.title}. ${p.desc} Opens in a new tab.`);
+    a.innerHTML = `<span class="hang" aria-hidden="true"></span><canvas aria-hidden="true"></canvas>
+      <span class="cap"><span class="num">Seed ${p.n}</span><span class="name ${p.f}"></span><span class="desc"></span><span class="hash"></span><span class="open">Open page ↗</span></span>`;
+    a.querySelector('.name').textContent = p.title;
+    a.querySelector('.desc').textContent = p.desc;
+    const hashEl = a.querySelector('.hash');
+    hashEl.setAttribute('aria-hidden', 'true');
+    for (const ch of p.seed) { const sp = document.createElement('span'); sp.textContent = ch; hashEl.appendChild(sp); }
+    li.appendChild(a);
+    list.appendChild(li);
+    const bits = [];
+    for (const ch of p.seed) { const v = parseInt(ch, 16); for (let b = 3; b >= 0; b--) bits.push((v >> b) & 1); }
+    const r = { p, a, canvas: a.querySelector('canvas'), hang: a.querySelector('.hang'), bits,
+      angle: (parseInt(p.seed.slice(0, 4), 16) / 65535) * 0.4 - 0.2, hover: 0, target: 0, scan: -1, px: 0.2, py: 0.1, lx: 0.2, ly: 0.1,
+      chars: [...hashEl.children], litIdx: -1, swing: 0, swingV: 0 };
+    const on = () => { r.target = 1; if (r.scan < 0) r.scan = 0; wake(); };
+    const off = () => { r.target = 0; r.px = 0.2; r.py = 0.1; wake(); };
+    a.addEventListener('pointerenter', on);
+    a.addEventListener('pointerleave', off);
+    a.addEventListener('focus', on);
+    a.addEventListener('blur', off);
+    a.addEventListener('pointermove', (e) => {
+      const b = r.canvas.getBoundingClientRect();
+      r.px = (e.clientX - b.left) / b.width; r.py = (e.clientY - b.top) / b.height; wake();
+    });
+    rings.push(r);
+  });
+
+  /* ---------- caches ---------- */
+  function mk(px) { const c = document.createElement('canvas'); c.width = c.height = px; return c; }
+
+  function buildCaches(r) {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const S = r.canvas.clientWidth || 160;
+    const px = Math.max(2, Math.round(S * dpr));
+    r.canvas.width = r.canvas.height = px;
+    r.S = S; r.dpr = dpr; r.px2 = px;
+    const R2 = S * 0.47, R1 = S * 0.375;
+    r.R1 = R1; r.R2 = R2; r.Ri = S * 0.355;
+
+    // shadow under the ring
+    r.shadow = mk(px);
+    let c = r.shadow.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.shadowColor = 'rgba(0,0,0,0.55)'; c.shadowBlur = S * 0.06; c.shadowOffsetY = S * 0.025;
+    c.beginPath(); c.arc(S / 2, S / 2, R2, 0, TAU); c.arc(S / 2, S / 2, R1, 0, TAU, true);
+    c.fillStyle = '#6d4f1f'; c.fill();
+
+    // engraved ticks at angle 0 (rotated at draw time)
+    r.ticks = mk(px);
+    c = r.ticks.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.lineCap = 'round';
+    const n = r.bits.length, base = R1 + S * 0.012, cx = S / 2, cy = S / 2;
+    r.tickGeom = [];
+    for (let k = 0; k < n; k++) {
+      const a = (k / n) * TAU - Math.PI / 2;
+      const len = r.bits[k] ? S * 0.058 : S * 0.026;
+      const major = k % 16 === 0;
+      const cs = Math.cos(a), sn = Math.sin(a);
+      r.tickGeom.push([cs, sn, len, major]);
+      c.strokeStyle = 'rgba(58,36,8,0.78)';
+      c.lineWidth = Math.max(0.6, S * (major ? 0.0075 : 0.0048));
+      c.beginPath(); c.moveTo(cx + cs * base, cy + sn * base); c.lineTo(cx + cs * (base + len), cy + sn * (base + len)); c.stroke();
+      c.strokeStyle = 'rgba(255,240,200,0.22)';
+      c.lineWidth = Math.max(0.4, S * 0.0025);
+      const o = S * 0.003;
+      c.beginPath(); c.moveTo(cx + cs * base + o, cy + sn * base + o); c.lineTo(cx + cs * (base + len) + o, cy + sn * (base + len) + o); c.stroke();
+    }
+    c.fillStyle = '#3a2408';
+    c.beginPath(); c.arc(cx, cy - (R2 - S * 0.022), S * 0.009, 0, TAU); c.fill();
+
+    r.inner = mk(px); r.innerHover = -1;
+  }
+
+  function buildInner(r, h) {
+    const S = r.S, dpr = r.dpr, cx = S / 2, cy = S / 2, Ri = r.Ri;
+    const c = r.inner.getContext('2d');
+    c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, r.px2, r.px2);
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.save();
+    c.beginPath(); c.arc(cx, cy, Ri, 0, TAU); c.clip();
+    c.fillStyle = r.p.ground; c.fillRect(0, 0, S, S);
+    glyphs[r.p.glyph](c, cx, cy, Ri, h);
+    const sh = c.createRadialGradient(cx, cy - Ri * 0.3, Ri * 0.2, cx, cy, Ri);
+    sh.addColorStop(0, 'rgba(255,255,255,0)'); sh.addColorStop(1, 'rgba(0,0,0,0.35)');
+    c.fillStyle = sh; c.fillRect(0, 0, S, S);
+    c.restore();
+    c.strokeStyle = 'rgba(40,24,4,0.8)'; c.lineWidth = Math.max(1, S * 0.008);
+    c.beginPath(); c.arc(cx, cy, Ri, 0, TAU); c.stroke();
+    r.innerHover = h;
+  }
+
+  /* ---------- per-frame ---------- */
+  function drawRing(r) {
+    const ctx = r.canvas.getContext('2d');
+    const S = r.S, d = r.dpr, cx = S / 2, cy = S / 2;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, r.px2, r.px2);
+    ctx.drawImage(r.shadow, 0, 0);
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+
+    // gold band lit from the pointer direction
+    const la = Math.atan2(r.ly - 0.5, r.lx - 0.5);
+    let g;
+    if (ctx.createConicGradient) {
+      g = ctx.createConicGradient(la - Math.PI / 2, cx, cy);
+      g.addColorStop(0, '#f6e4ad'); g.addColorStop(0.12, '#c9a050'); g.addColorStop(0.3, '#8d6829');
+      g.addColorStop(0.5, '#d9b465'); g.addColorStop(0.62, '#f2dc9c'); g.addColorStop(0.78, '#9a7330'); g.addColorStop(1, '#f6e4ad');
+    } else {
+      g = ctx.createLinearGradient(0, 0, S, S); g.addColorStop(0, '#f2dc9c'); g.addColorStop(0.5, '#a57d36'); g.addColorStop(1, '#e8c97e');
+    }
+    ctx.beginPath(); ctx.arc(cx, cy, r.R2, 0, TAU); ctx.arc(cx, cy, r.R1, 0, TAU, true);
+    ctx.fillStyle = g; ctx.fill();
+    const bev = ctx.createRadialGradient(cx, cy, r.R1, cx, cy, r.R2);
+    bev.addColorStop(0, 'rgba(60,38,8,0.45)'); bev.addColorStop(0.18, 'rgba(255,240,200,0.18)');
+    bev.addColorStop(0.55, 'rgba(255,255,255,0)'); bev.addColorStop(0.88, 'rgba(255,244,210,0.22)'); bev.addColorStop(1, 'rgba(50,30,6,0.55)');
+    ctx.fillStyle = bev; ctx.fill();
+
+    // ticks, rotated
+    ctx.save();
+    ctx.translate(cx, cy); ctx.rotate(r.angle); ctx.translate(-cx, -cy);
+    ctx.drawImage(r.ticks, 0, 0, S, S);
+    // reading light running along the seed
+    if (r.scan >= 0) {
+      const n = r.bits.length, base = r.R1 + S * 0.012;
+      ctx.lineCap = 'round';
+      for (let j = 0; j < 24; j++) {
+        const k = Math.floor(r.scan) - j;
+        if (k < 0 || k >= n) continue;
+        const [cs, sn, len] = r.tickGeom[k];
+        const lit = 1 - j / 24;
+        ctx.strokeStyle = `rgba(255,250,228,${0.15 + lit * 0.85})`;
+        ctx.lineWidth = Math.max(0.6, S * 0.0055);
+        ctx.beginPath(); ctx.moveTo(cx + cs * base, cy + sn * base); ctx.lineTo(cx + cs * (base + len), cy + sn * (base + len)); ctx.stroke();
+      }
+    }
+    ctx.restore();
+
+    // inner world, re-rendered only when hover changes
+    const hq = Math.round(r.hover * 24) / 24;
+    if (hq !== r.innerHover) buildInner(r, hq);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(r.inner, 0, 0);
+  }
+
+  const glyphs = {
+    astro(ctx, cx, cy, R, h) {
+      ctx.strokeStyle = 'rgba(200,162,90,0.35)'; ctx.lineWidth = Math.max(0.6, R * 0.012);
+      for (let i = 1; i <= 3; i++) { ctx.beginPath(); ctx.arc(cx, cy + R * 0.12 * i, R * (0.22 + i * 0.16), 0, TAU); ctx.stroke(); }
+      ctx.beginPath(); ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R); ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy); ctx.stroke();
+      ctx.strokeStyle = '#c8a25a'; ctx.lineWidth = Math.max(1, R * 0.05);
+      ctx.beginPath(); ctx.arc(cx + R * 0.1, cy - R * 0.06, R * 0.62, 0, TAU); ctx.stroke();
+      const s = R * (0.34 + h * 0.06), x = cx - R * 0.06, y = cy - R * 0.18;
+      if (h > 0) { const gl = ctx.createRadialGradient(x, y, 0, x, y, s * 1.6); gl.addColorStop(0, `rgba(242,227,179,${0.35 * h})`); gl.addColorStop(1, 'rgba(242,227,179,0)'); ctx.fillStyle = gl; ctx.fillRect(x - s * 2, y - s * 2, s * 4, s * 4); }
+      ctx.fillStyle = '#f2e3b3';
+      ctx.beginPath();
+      for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2; const rr = i % 2 ? s * 0.22 : s; ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(238,243,255,0.85)';
+      [[0.55, -0.5], [-0.6, 0.3], [0.45, 0.5], [-0.3, -0.62], [0.1, 0.7]].forEach(([u, v]) => { ctx.beginPath(); ctx.arc(cx + u * R, cy + v * R, R * 0.025, 0, TAU); ctx.fill(); });
+    },
+    riso(ctx, cx, cy, R, h) {
+      ctx.fillStyle = 'rgba(61,85,136,0.10)';
+      for (let y = -R; y < R; y += R * 0.09) for (let x = -R; x < R; x += R * 0.09) { ctx.beginPath(); ctx.arc(cx + x, cy + y, R * 0.012, 0, TAU); ctx.fill(); }
+      ctx.save();
+      ctx.globalCompositeOperation = 'multiply';
+      const off = R * (0.04 + h * 0.05);
+      ctx.fillStyle = '#3255A4';
+      ctx.beginPath(); ctx.moveTo(cx, cy - R * 0.62); ctx.lineTo(cx + R * 0.42, cy + R * 0.32); ctx.lineTo(cx - R * 0.42, cy + R * 0.32); ctx.closePath(); ctx.fill();
+      ctx.fillRect(cx - R * 0.07, cy + R * 0.3, R * 0.14, R * 0.2);
+      ctx.fillStyle = '#FF7477';
+      const sx = cx + off, sy = cy - R * 0.6 + off * 0.6, s = R * 0.2;
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2; const rr = i % 2 ? s * 0.42 : s; ctx.lineTo(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr); }
+      ctx.closePath(); ctx.fill();
+      [[-0.15, -0.05], [0.16, 0.12], [-0.22, 0.22], [0.05, -0.25]].forEach(([u, v]) => { ctx.beginPath(); ctx.arc(cx + u * R + off, cy + v * R + off * 0.5, R * 0.07, 0, TAU); ctx.fill(); });
+      ctx.restore();
+    },
+    frost(ctx, cx, cy, R, h) {
+      const arm = R * (0.62 + h * 0.08);
+      ctx.strokeStyle = 'rgba(230,238,242,0.92)'; ctx.lineCap = 'round';
+      if (h > 0) { const gl = ctx.createRadialGradient(cx, cy, 0, cx, cy, R); gl.addColorStop(0, `rgba(230,238,242,${0.12 * h})`); gl.addColorStop(1, 'rgba(230,238,242,0)'); ctx.fillStyle = gl; ctx.fillRect(cx - R, cy - R, R * 2, R * 2); }
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(0.12);
+      for (let k = 0; k < 6; k++) {
+        ctx.save(); ctx.rotate(k * Math.PI / 3);
+        ctx.lineWidth = Math.max(0.8, R * 0.03);
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -arm); ctx.stroke();
+        ctx.lineWidth = Math.max(0.6, R * 0.018);
+        for (let j = 1; j <= 4; j++) {
+          const y = -arm * (0.22 + j * 0.17), l = arm * (0.36 - j * 0.06);
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(-l * 0.6, y - l * 0.8); ctx.moveTo(0, y); ctx.lineTo(l * 0.6, y - l * 0.8); ctx.stroke();
+        }
+        ctx.restore();
+      }
+      ctx.restore();
+      ctx.fillStyle = '#85975d'; ctx.beginPath(); ctx.arc(cx, cy, R * 0.06, 0, TAU); ctx.fill();
+      ctx.fillStyle = 'rgba(233,162,91,0.6)'; ctx.beginPath(); ctx.arc(cx + R * 0.58, cy + R * 0.58, R * 0.03, 0, TAU); ctx.fill();
+    },
+    glass(ctx, cx, cy, R, h) {
+      const glow = ctx.createRadialGradient(cx, cy + R * 0.1, 0, cx, cy + R * 0.1, R);
+      glow.addColorStop(0, `rgba(243,66,0,${0.22 + h * 0.2})`); glow.addColorStop(1, 'rgba(243,66,0,0)');
+      ctx.fillStyle = glow; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+      const br = R * 0.46, bx = cx, by = cy + R * 0.12;
+      ctx.strokeStyle = '#d9b36c'; ctx.lineWidth = Math.max(0.8, R * 0.025);
+      ctx.beginPath(); ctx.arc(bx, by - br - R * 0.2, R * 0.07, Math.PI, 0); ctx.stroke();
+      ctx.fillStyle = '#c99d4e'; ctx.fillRect(bx - R * 0.09, by - br - R * 0.14, R * 0.18, R * 0.12);
+      const sg = ctx.createRadialGradient(bx - br * 0.35, by - br * 0.4, br * 0.05, bx, by, br);
+      sg.addColorStop(0, '#ffb08a'); sg.addColorStop(0.25, '#f34200'); sg.addColorStop(0.75, '#7a1408'); sg.addColorStop(1, '#2a0606');
+      ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(bx, by, br, 0, TAU); ctx.fill();
+      ctx.strokeStyle = 'rgba(217,179,108,0.85)'; ctx.lineWidth = Math.max(0.8, R * 0.03);
+      ctx.beginPath(); ctx.ellipse(bx, by, br * 0.98, br * 0.22, 0, 0, Math.PI); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.beginPath(); ctx.ellipse(bx - br * 0.38, by - br * 0.42, br * 0.14, br * 0.08, -0.6, 0, TAU); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.beginPath(); ctx.ellipse(bx + br * 0.45, by - br * 0.1, br * 0.05, br * 0.14, 0.3, 0, TAU); ctx.fill();
+    },
+    ginger(ctx, cx, cy, R, h) {
+      ctx.strokeStyle = 'rgba(16,32,138,0.10)'; ctx.lineWidth = 0.6;
+      for (let v = -R; v < R; v += R * 0.16) { ctx.beginPath(); ctx.moveTo(cx + v, cy - R); ctx.lineTo(cx + v, cy + R); ctx.moveTo(cx - R, cy + v); ctx.lineTo(cx + R, cy + v); ctx.stroke(); }
+      const u = R * 0.3, c30 = Math.cos(Math.PI / 6), s30 = 0.5;
+      const P = (x, y, z) => [cx + (x - y) * c30 * u, cy + R * 0.28 + (x + y) * s30 * u - z * u];
+      const lift = h * 0.35;
+      const W = 1.2, D = 1.0, H = 0.9, RH = 0.75;
+      ctx.strokeStyle = '#10208a'; ctx.lineWidth = Math.max(0.8, R * 0.02); ctx.lineJoin = 'round';
+      const poly = (pts, fill) => { ctx.beginPath(); pts.forEach((p, i) => { const q = P(...p); i ? ctx.lineTo(...q) : ctx.moveTo(...q); }); ctx.closePath(); if (fill) { ctx.fillStyle = fill; ctx.fill(); } ctx.stroke(); };
+      poly([[-0.25, -0.25, 0], [W + 0.25, -0.25, 0], [W + 0.25, D + 0.25, 0], [-0.25, D + 0.25, 0]], '#e4eae6');
+      poly([[0, D, 0], [W, D, 0], [W, D, H], [0, D, H]], '#f4f7f4');
+      poly([[W, 0, 0], [W, D, 0], [W, D, H], [W, D / 2, H + RH], [W, 0, H]], '#e9eef0');
+      if (lift > 0.01) { ctx.save(); ctx.setLineDash([R * 0.04, R * 0.04]); ctx.lineWidth = Math.max(0.6, R * 0.012); ctx.beginPath(); ctx.moveTo(...P(0, D, H)); ctx.lineTo(...P(0, D, H + lift)); ctx.moveTo(...P(W, D, H)); ctx.lineTo(...P(W, D, H + lift)); ctx.stroke(); ctx.restore(); }
+      poly([[0, D, H + lift], [W, D, H + lift], [W, D / 2, H + RH + lift], [0, D / 2, H + RH + lift]], '#dfe5f3');
+      ctx.strokeStyle = '#fd235f'; ctx.lineWidth = Math.max(0.8, R * 0.022);
+      ctx.beginPath();
+      for (let i = 0; i <= 8; i++) { const q = P(i / 8 * W, D, H + lift - 0.04 - (i % 2) * 0.06); i ? ctx.lineTo(...q) : ctx.moveTo(...q); }
+      ctx.stroke();
+      ctx.strokeStyle = '#10208a'; ctx.lineWidth = Math.max(0.7, R * 0.016);
+      poly([[0.45, D, 0], [0.75, D, 0], [0.75, D, 0.5], [0.45, D, 0.5]], '#ffb547');
+      poly([[W, 0.25, 0.35], [W, 0.6, 0.35], [W, 0.6, 0.65], [W, 0.25, 0.65]], '#99ffa7');
+    },
+  };
+
+  /* ---------- thread through the hangers ---------- */
+  function drawThread() {
+    const gb = garland.getBoundingClientRect();
+    const svg = threadPath.ownerSVGElement;
+    if (getComputedStyle(svg).display === 'none') return;
+    svg.setAttribute('viewBox', `0 0 ${gb.width} ${gb.height}`);
+    const pts = rings.map(r => { const b = r.hang.getBoundingClientRect(); return [b.left + b.width / 2 - gb.left, b.top - gb.top]; });
+    if (!pts.length) return;
+    const step = pts.length > 1 ? pts[1][0] - pts[0][0] : 100;
+    const all = [[pts[0][0] - step * 0.55, pts[0][1] - 14], ...pts, [pts[pts.length - 1][0] + step * 0.55, pts[pts.length - 1][1] - 14]];
+    let d = `M${all[0][0].toFixed(1)},${all[0][1].toFixed(1)}`;
+    for (let i = 0; i < all.length - 1; i++) {
+      const p0 = all[Math.max(0, i - 1)], p1 = all[i], p2 = all[i + 1], p3 = all[Math.min(all.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += ` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+    }
+    threadPath.setAttribute('d', d);
+  }
+
+  /* ---------- a draught along the thread ---------- */
+  const wideMQ = matchMedia('(min-width: 1021px)');
+  let swingOn = !reduce && wideMQ.matches;
+  wideMQ.addEventListener && wideMQ.addEventListener('change', () => { swingOn = !reduce && wideMQ.matches; });
+  let lastPX = null, lastPT = 0;
+  garland.addEventListener('pointermove', (e) => {
+    if (!swingOn || e.pointerType === 'touch') return;
+    const now = performance.now();
+    if (lastPX !== null && now - lastPT < 80) {
+      const vx = (e.clientX - lastPX) / Math.max(8, now - lastPT); // px per ms
+      for (const r of rings) {
+        const b = r.canvas.getBoundingClientRect();
+        if (e.clientX < b.left - 20 || e.clientX > b.right + 20 || e.clientY < b.top - 40 || e.clientY > b.bottom + 20) continue;
+        r.swingV = Math.max(-0.02, Math.min(0.02, r.swingV + vx * 0.0045));
+      }
+      wake();
+    }
+    lastPX = e.clientX; lastPT = now;
+  });
+  garland.addEventListener('pointerleave', () => { lastPX = null; });
+
+  /* ---------- keys 1-5 ---------- */
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= rings.length) { rings[n - 1].a.focus(); }
+  });
+
+  /* ---------- the season line ---------- */
+  (function season() {
+    const el = document.getElementById('season');
+    const now = new Date();
+    const y = now.getFullYear();
+    const day = (m, d, yy = y) => new Date(yy, m, d);
+    const today = day(now.getMonth(), now.getDate());
+    const ORD = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth'];
+    const GIFTS = ['a partridge in a pear tree', 'two turtle doves', 'three French hens', 'four calling birds', 'five gold rings', 'six geese a-laying', 'seven swans a-swimming', 'eight maids a-milking', 'nine ladies dancing', 'ten lords a-leaping', 'eleven pipers piping', 'twelve drummers drumming'];
+    let text;
+    const dayMs = 86400000;
+    // Twelve Days: 25 Dec is the first day, 5 Jan the twelfth
+    let start = day(11, 25); if (today < day(0, 6) && now.getMonth() === 0) start = day(11, 25, y - 1);
+    const n12 = Math.round((today - start) / dayMs);
+    if (n12 >= 0 && n12 < 12) {
+      text = n12 === 0 ? 'Christmas Day · on the first day of Christmas, a partridge in a pear tree' : `On the ${ORD[n12]} day of Christmas · ${GIFTS[n12]}`;
+    } else if (today.getTime() === day(11, 24).getTime()) {
+      text = 'Christmas Eve is tonight';
+    } else {
+      let eve = day(11, 24); if (today > eve) eve = day(11, 24, y + 1);
+      const nights = Math.round((eve - today) / dayMs);
+      text = `${nights} ${nights === 1 ? 'night' : 'nights'} to Christmas Eve`;
+    }
+    el.textContent = text;
+  })();
+
+  /* ---------- loop ---------- */
+  let raf = 0, last = 0, acc = 0;
+  function frame(t) {
+    raf = 0;
+    const dt = last ? Math.min(64, t - last) : 16; last = t;
+    let busy = false;
+    for (const r of rings) {
+      r.hover += (r.target - r.hover) * Math.min(1, dt / 160);
+      r.lx += (r.px - r.lx) * Math.min(1, dt / 120); r.ly += (r.py - r.ly) * Math.min(1, dt / 120);
+      if (r.scan >= 0) {
+        r.scan += dt * 0.16;
+        if (r.scan > r.bits.length + 24) r.scan = r.target ? 0 : -1;
+      }
+      // the caption reads the seed in step with the light on the ticks (4 bits per hex digit)
+      const idx = r.scan >= 0 && r.scan < r.bits.length ? Math.floor(r.scan / 4) : -1;
+      if (idx !== r.litIdx) {
+        if (r.litIdx >= 0) r.chars[r.litIdx].classList.remove('lit');
+        if (idx >= 0) r.chars[idx].classList.add('lit');
+        r.litIdx = idx;
+      }
+      // a damped pendulum on its hanger
+      if (swingOn && (Math.abs(r.swing) > 0.01 || Math.abs(r.swingV) > 0.01)) {
+        const k = 0.000042, c = 0.0034;
+        r.swingV += (-k * r.swing - c * r.swingV) * dt;
+        r.swing += r.swingV * dt;
+        r.canvas.style.setProperty('--swing', r.swing.toFixed(3));
+        busy = true;
+      } else if (r.swing !== 0) { r.swing = 0; r.swingV = 0; r.canvas.style.setProperty('--swing', '0'); }
+      if (Math.abs(r.target - r.hover) > 0.003 || r.scan >= 0 || r.target) busy = true;
+    }
+    acc += dt;
+    // idle: a very slow turn, drawn about 12 times a second; busy: every frame
+    if (busy || acc > 80) {
+      for (const r of rings) {
+        if (!reduce) r.angle += acc * (0.000012 + r.hover * 0.00016);
+        drawRing(r);
+      }
+      acc = 0;
+    }
+    if (!document.hidden && (busy || !reduce)) raf = requestAnimationFrame(frame);
+  }
+  function wake() { if (!raf && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); } }
+
+  function layout() {
+    rings.forEach(buildCaches);
+    rings.forEach(drawRing);
+    drawThread();
+    wake();
+  }
+  let rz = 0;
+  new ResizeObserver(() => { cancelAnimationFrame(rz); rz = requestAnimationFrame(layout); }).observe(garland);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+  layout();
+})();
+</script>

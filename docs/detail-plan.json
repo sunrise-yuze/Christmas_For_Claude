@@ -1,0 +1,633 @@
+{
+ "principles": [
+  "Three tiers of revelation. Tier 1 (at rest) shows only the object, its one primary control and slow ambient life. Tier 2 (approach, hover, drag) shows detents, snap glyphs, guides and tags, appears within about 120 ms of proximity and is gone 200 ms after release. Tier 3 (summoned or rare) holds loupes, the backs of objects, latent marks, cameos and secrets, and is never visible unless deliberately called or a rare condition is met. A screenshot of any page at rest should look as calm as it does today.",
+  "Build on what exists. Each detail extends a system the page already has (the function names are given in howToBuild) instead of adding a parallel one. Put each detail behind its own small flag so any one can be cut without side effects.",
+  "Material truth over sparkle. Every detail is something the real object or process actually does: engraving, stencil ink, frost, hot glass, drafting. Never use glitter, lens flares, confetti, particle trails, NEW! or achievement badges, or fake 'N people online' counters.",
+  "Rarity earns motion. Routine feedback stays at or under 150 ms and 2 px. Only each page's one rare event (the midnight hexagon, the approval stamp, a print pulled, a bauble hung, the music box running down) gets a staged, staggered beat of no more than 7 steps and about 1.6 s of visuals. At most one non-ambient animation plays at a time, and idle behaviours stop in the same frame that input arrives.",
+  "Each page owns its signatures, and no trick repeats across pages. Astrolabe: raking light, turned brass, hour bells, the sky's air. Overprint: linen tester, wet ink, machine cycle, edition seeds, Advent stamp drawer. Frosted pane: glass memory, bead lenses, wound music box, the only candle, the village clock. Glasshouse: blackbody shimmer, silvering, beating glass chime, the season's box. Gingerbread: OSNAP, plotter, cyanotype wash, hold-to-approve with hit-stop, odometer BOM, incandescent string. Shared needs (season, sound toggle, hints) reuse code patterns but are expressed in each page's own nouns.",
+  "One season clock per page: season(now) with a ?date=YYYY-MM-DDTHH:MM override. Its states are out of season; pre-Advent (today, 2 Nov 2026; first Advent is 29 Nov); Advent I to IV; Heiligabend (24 Dec from 18:00); Christmas Day; the Twelve Days I to XII; and packed away after 6 Jan. Each state changes at most two quiet parameters, and every state is screenshot-tested so none looks empty. The November state ships first, so it must be the most beautiful. Use only the local clock and never ask for location.",
+  "Sound is synthesised, quiet and opt-in. Use WebAudio only, created after a gesture behind the existing toggle, with the toggle remembered through try/catch localStorage. Keep the master at or below -24 dBFS through a compressor, with at most 6 voices. Never play sound on hover. Every sound has a visible cause, ambient events are at least 20 s apart, and each page keeps one key that its pitched sounds quantise to.",
+  "Hints live in the world and retire. Show one at a time, in 4 words or fewer, drawn in the page's own medium (engraving, pencil marginalia, letters in frost, bench chalk, the CAD command line). Show a hint only after about 4 s without progress. Retire it after 2 successes or 3 showings and persist that. Mirror every hint into the existing aria-live region for screen readers.",
+  "Storage is a convenience, never a dependency. Wrap every localStorage or sessionStorage access in try/catch and render fully without storage. Persist only small things: hint flags, the sound toggle, fog strokes under 2 KB, a 64x64 polish map, the last 5 print seeds, up to 12 hung-bauble parameter sets.",
+  "Inclusive and cheap. prefers-reduced-motion keeps every detail but swaps movement for a static or crossfaded equivalent. Every pointer verb has a key and a touch equivalent (long-press stands in for hover, Shift and Z). No flash larger than 10% luminance repeats faster than 2 Hz. Simulations run on low-res grids within about 2 ms per frame. On document.hidden, pause rAF and set one in-world tab title (no emoji); on return, advance simulations by the elapsed time, capped. Copy voice: headings stay elegant, wit lives only in small mono secondary text, at most one joke per view, and the frosted pane stays wordless apart from its vertical Chinese line."
+ ],
+ "pages": [
+  {
+   "slug": "astrolabe",
+   "details": [
+    {
+     "name": "Opens on tonight",
+     "layer": "time-aware",
+     "priority": "must",
+     "spec": "On load, if the viewer's local time is 18:00-06:00, the rete starts at that same clock time on the night of 24/25 Dec (a local 21:14 opens at 21:14 Christmas Eve) and the time readout gets a 4 px brass 'live' pip. In daytime it opens at 18:00 with one 10 px Fragment Mono line under the clock at 55% opacity: '52 nights to Christmas Eve · the sky goes live after dusk'. On 24 Dec the line reads 'tonight', and from 25 Dec to 6 Jan it reads 'the Twelve Nights · III'. Nothing else changes.",
+     "howToBuild": "Compute before the first layout and feed S.t through the existing goTo(). nights = ceil((Date.UTC(y,11,24)-Date.UTC(y,m,d))/864e5), rolling to next year after 25 Dec. Refresh with a setTimeout aligned to the next minute boundary. Honour the ?date= override. The pip is a 4 px circle drawn in updateReadouts().",
+     "inspiration": "Apple dynamic wallpapers; the Google Santa Tracker countdown; Poolsuite's period clock"
+    },
+    {
+     "name": "A sky with air in it",
+     "layer": "ambient",
+     "priority": "must",
+     "spec": "Each star's tag dot and flame-pointer glint take brightness and tint from its computed altitude for the current plate and time. A star below the horizon has a plain engraved brass pointer with no glint. Within 15° of the horizon a star dims with airmass, warms toward #ffcf9a and twinkles harder. Sirius below 20° flickers faintly through blue, white and red, at no more than 10% amplitude. Tag dots use real B-V colours: Rigel blue-white, Sirius white, Procyon pale yellow, Capella and Pollux gold, Aldebaran orange, Betelgeuse deep orange. Only stars within 20° of the horizon visibly shimmer.",
+     "howToBuild": "Extend the existing twinkle() and drawPointerGlint(). Use Kasten-Young airmass X = 1/(sin h + 0.50572·(h°+6.07995)^-1.6364), dim = 10^(-0.08·X), amp = min(0.1, 0.015·X^1.75) driven by 2-6 Hz value noise, and tint = lerp(BV colour, #ffcf9a, smoothstep(1.5, 6, X)). For Sirius, run three independent noise channels on the RGB of its core sprite only.",
+     "inspiration": "Observational astronomy (atmospheric extinction; Sirius' famous colour scintillation when low in winter); Bartosz Ciechanowski's physically correct figures"
+    },
+    {
+     "name": "The town strikes the hours; midnight resolves in order",
+     "layer": "sound",
+     "priority": "must",
+     "spec": "With sound on, when a slow drag or coast (under 1 h of sky per second) crosses a whole hour, a distant bronze bell strikes the count on a 12-hour clock. 18:00 gives 6 strokes 1.8 s apart, each a little softer, and dragging away damps the remainder. Fast scrubbing keeps only the tick. At midnight the twelve strokes begin. Visually, the Winter Hexagon resolves in order: Sirius, Procyon, Pollux, Capella, Aldebaran and Rigel flare in turn 170 ms apart, each with a soft pentatonic note (D5 E5 G5 A5 B5 D6) panned by star x. The line then draws itself and closes back on Sirius 1.3× brighter, and Betelgeuse lights last inside it, with about 1.6 s of visuals in total. A hairline residue of the hexagon stays until the rete leaves 23:40-00:20, which re-arms the moment.",
+     "howToBuild": "Reuse the bell() partial table (f0 392, with the existing 1.0021 twin for the bronze warble). Add distance with a ConvolverNode on a generated 2.5 s exponential-noise impulse at 35% wet plus a 2.4 kHz lowpass, and schedule strokes on actx.currentTime. Extend startMoment() into a step timeline t_i = i·170 ms. Flare radius goes 1 → 2.2 → 1.4 over 500 ms with a 4-point glint. Draw the hexagon via setLineDash/lineDashOffset twice (blurred, then crisp) with 'lighter'.",
+     "inspiration": "Church tower bells and tuned bell partials (hum, prime, tierce, quint, nominal); Wordle's tile-by-tile reveal; Rauno Freiberg on frequency vs novelty"
+    },
+    {
+     "name": "Changing plates as a ritual",
+     "layer": "micro-interaction",
+     "priority": "must",
+     "spec": "Swapping between Bethlehem 31°42′, Nuremberg 49°27′ and Rovaniemi 66°30′ plays a physical sequence in 1.2 s or less. The horse-head wedge slides out of the pin (150 ms). The rete lifts 2 px and its shadow deepens. The old plate turns 4° to free its tab from the throne notch and slides away, showing its engraved reverse for about 6 frames ('LAT · XLIX · XXVII · NORIMBERGA'). The new plate drops in with a 1 px seat, then the wedge returns with a metallic tick. The first time a plate appears in a session, its almucantars engrave in along the cutting direction over 0.9 s and 2-3 brass swarf curls fall away. Hovering the wedge shows a tiny italic tag 'equus · the horse'. Under reduced motion the existing crossfade stays.",
+     "howToBuild": "Extend swapState() phases (out/inn) with a wedge offset and a plate rotation about the throne notch. Pre-render each plate's reverse with inverted lighting into the plateImg cache and show it while a ctx.scale(cos θ, 1) squash passes through 90°. Engrave-in uses ctx.setLineDash([len·t, len]) over the renderPlate path list, staggered by length. Swarf is at most 3 spiral beziers with gravity and spin. Sound: a 300 ms pink-noise slide through a bandpass sweeping 1200→600 Hz, then a 180 Hz 40 ms 'tok' plus a click on seating.",
+     "inspiration": "Astrolabe anatomy (mater, throne, horse and pin, plate tab and notch), History of Science Museum Oxford and Adler Planetarium instruments; the Brill/DANS interactive 3D astrolabe (1601 Coignet)"
+    },
+    {
+     "name": "Turned brass that remembers your thumb",
+     "layer": "material",
+     "priority": "must",
+     "spec": "The round sheen is replaced by two opposing anisotropic 'bow-tie' streaks across the lathe-turned mater. They rotate about the pin opposite the pointer with weighty easing, follow the rete angle on touch, and drift slowly when idle, as if a candle moved. Fine concentric turning rings show only at full size, and rete bars carry straight filed grain along each bar. Wherever the user actually grips the rete, a warm 'polished by use' spot builds over minutes of use, persists across visits and never passes 10%.",
+     "howToBuild": "In applySheen(), use ctx.createConicGradient(θ, cx, cy) with narrow stops at 0 and 0.5 (peak rgba(255,240,200,0.14)) in 'soft-light', with θ lerped 0.06 per frame. Pre-render the turning rings once to an offscreen canvas: about 600 arcs 0.5 px apart, alpha 0.015-0.035 by noise, in 'overlay'. Bar grain is a linearGradient aligned to each bar inside bakeRete(). Polish is a 64×64 alpha map that gains a radial blob at alpha 0.002 per drag frame at the grip point, composited as a warm 'screen' tint and saved base64 via try/catch.",
+     "inspiration": "Watch-movement finishing (Côtes de Genève carrying light 'in satin ribbons'); Bartosz Ciechanowski's 'Mechanical Watch'; thumb-worn spots on museum astrolabes"
+    },
+    {
+     "name": "Ticks that blur into a purr",
+     "layer": "sound",
+     "priority": "should",
+     "spec": "The existing 4-minute ticks become a brass tink with ±4% random pitch, and every hour gets a deeper detent tink. Above about 20 crossings per second the separate clicks merge into a quiet continuous 'zizz' whose loudness follows angular speed and fades 120 ms after the drag stops. At the 18:00 and 06:00 limits a single low 'thock' plays, never a buzz. There is no sound on hover.",
+     "howToBuild": "Replace the tickSound() body with pre-rendered 40 ms AudioBuffers: partials 1 : 2.76 : 5.40 × 2.4 kHz with τ 6/3/1.5 ms plus a 1 ms noise transient. Keep a running crossings-per-second rate and set gain = 0.06/(1+rate/15). The purr is a looped noise buffer through a bandpass at 3.2 kHz, Q 8, with gain ∝ |ω|. Call navigator.vibrate?.(3) on hour detents only, guarded.",
+     "inspiration": "iPod click wheel; Apple Watch Digital Crown detents; Teenage Engineering OP-1 encoders"
+    },
+    {
+     "name": "Twilight you can watch arrive",
+     "layer": "material",
+     "priority": "should",
+     "spec": "Each plate gains the crepuscular line, a fine dotted arc 18° below the horizon, and the unequal-hour lines 1-12 below the horizon, all engraved at 0.5 px. When the sun's ecliptic point on the rete (λ ≈ 272.6° on 24 Dec) crosses the dotted arc, the plate field darkens by about 3% and star tags gain the footnote 'astronomical night'; the reverse happens before dawn. Hovering the plate label shows that latitude's dusk time ('night from 19:04').",
+     "howToBuild": "Draw the almucantar for h = -18° with the existing stereographic maths (centre offset R·cosφ/(sinφ+sin h), radius R·cos h/(sinφ+sin h)) using engraveStroke in renderPlate(). For unequal hours, divide the below-horizon arc of each tropic or equator day-circle into 12 and join the points. The sun's position comes from sunLambda(); the crossing is a sign change of its altitude + 18°.",
+     "inspiration": "The crepuscular line and unequal hours on historical plates (Oxford History of Science Museum; Chaucer's 'Treatise on the Astrolabe')"
+    },
+    {
+     "name": "A secret signature in raking light",
+     "layer": "easter-egg",
+     "priority": "should",
+     "spec": "An inscription 'FECIT · IN · NOCTE · NATIVITATIS' with a tiny six-pointed star runs along the inner rim of the mater and is invisible in normal light. It shows as a thin bright scratch-line, fading in and out over about 200 ms, only when the pointer skims near the rim so that the light direction is almost tangent to the rim at that spot. On touch, the edge of the rete acts as the light while it is dragged past. Nothing in the UI hints at it.",
+     "howToBuild": "Pre-render the inscription strokes once to an offscreen canvas. Each frame, take L = normalize(pointer - centre) and T = the rim tangent at the inscription angle. Compute v = smoothstep(0.82, 0.97, |dot(L, T)|) · smoothstep(0.7R, R, |pointer - centre|) and drawImage at globalAlpha 0.35·v with 'screen' after applySheen().",
+     "inspiration": "Breguet's 'secret signature' (from 1795), micro-engraved on dials and visible only in raking light"
+    },
+    {
+     "name": "Midnight is travelling",
+     "layer": "time-aware",
+     "priority": "should",
+     "spec": "From 20 to 26 Dec, a fine index mark on the limb shows where solar midnight is right now relative to Bethlehem's meridian. One mono line of 11 px or less under the readouts reads, for example, 'Christmas has reached 17 of 38 time zones · next UTC+3, Nairobi'. On other dates the same slot shows Bethlehem local sidereal time just as quietly. Digits crossfade over 400 ms every 30 s.",
+     "howToBuild": "lon = (((-15·utcH)%360)+540)%360 - 180, and the limb index angle comes from (lon - 35.2°)/15 h on the hour scale. Hardcode the list of UTC offsets with one sample place each; reached = offsets whose local date is at least 25 Dec. Reuse the existing r-lst element and its formatter.",
+     "inspiration": "NORAD Tracks Santa and Google Santa Tracker (following midnight westward); Kiritimati (UTC+14) reaches Christmas first, Baker Island (UTC-12) last"
+    },
+    {
+     "name": "The back of the instrument",
+     "layer": "easter-egg",
+     "priority": "nice",
+     "spec": "Double-clicking (or long-pressing) the limb flips the astrolabe with a 500 ms squash. The back shows a calendar and zodiac scale with the alidade resting on today's date, 25 Dec marked with a tiny star, a shadow square, and two engraved lines: 'Litel Lowys my sone' and 'SET FOR 31°42′ N · EPOCH J2000 · FECIT MMXXVI'. The same gesture or Esc flips it back. Under reduced motion it crossfades.",
+     "howToBuild": "Build a separate offscreen render of the back with the existing engraveStroke/engraveText and the seeded PRNG. The alidade angle comes from day of year mapped to ecliptic longitude via sunLambda(). Do the squash and swap inside drawFrame().",
+     "inspiration": "Back scales and alidades of historical astrolabes; the opening of Chaucer's 'Treatise on the Astrolabe' (c. 1391)"
+    },
+    {
+     "name": "STELLA",
+     "layer": "easter-egg",
+     "priority": "nice",
+     "spec": "Typing STELLA anywhere outside a field switches to the Bethlehem plate and eases the rete to 18:00. One extra bright point then appears high in the south in Pisces, and its tag reads 'Jupiter & Saturn · 7 BC · Kepler's guess'. It lingers 60 s and fades. After the first find, the colophon gains a quiet 'secrets 1/2' (the other is the raking-light signature).",
+     "howToBuild": "Use a keydown buffer of the last 12 characters, ignoring inputs. Draw the point with the existing starCore() at about RA 0h20m, Dec +1°, using the existing altitude() so it sits correctly for the plate. Record the find via try/catch.",
+     "inspiration": "Kepler's 1606 proposal of the 7 BC Jupiter-Saturn triple conjunction as the Star of Bethlehem; Windows 93's typed secrets"
+    },
+    {
+     "name": "Rovaniemi: the sun skims, a sled waits at north",
+     "layer": "easter-egg",
+     "priority": "nice",
+     "spec": "On the Rovaniemi plate (66°30′ N), the horizon arc visibly grazes the Tropic of Capricorn circle, so the sun's point only kisses the horizon at noon, and the plate tag says 'polar night · the sun skims the horizon'. A 6 px engraved sled glyph sits at due north on the horizon line and gives a single brass glint only while the rete is within ±10 minutes of midnight.",
+     "howToBuild": "Engrave the glyph path in renderPlate() for plate index 2 only. Gate the glint through drawPointerGlint() on S.t within ±10 min of 00:00. Add the tag copy to the existing plate label.",
+     "inspiration": "Arctic Circle geometry on an astrolabe plate; tiny earned cameos like the E.T. moon silhouette"
+    },
+    {
+     "name": "Engraved hints that retire",
+     "layer": "onboarding-hint",
+     "priority": "should",
+     "spec": "The existing hint-turn and hint-star captions become 9 px engraved-style italic text 16 px from the rete grip ('turn the night'), shown only after 4 s without a drag. After the first midnight, one more hint appears once near the plate buttons: 'try another latitude'. Keyboard users see ← → keycaps instead. Each hint retires after two successes and gives up after three showings.",
+     "howToBuild": "Use a hints array of {id, test, count, shown} with 600 ms fades, persisted under 'astro-hints' through try/catch. Detect keyboard versus pointer modality from the last input event, and mirror hint text to the existing #live region.",
+     "inspiration": "Bruno Simon's 2019 folio (key glyphs painted into the world); Rauno Freiberg's 'Devouring Details'"
+    },
+    {
+     "name": "Star tags that speak and scrub",
+     "layer": "copy",
+     "priority": "should",
+     "spec": "Each star tag gains a 120×24 sparkline of that star's altitude from 18:00 to 06:00 with a dot at the current time. Its rise or set time ('rises 19:42') has a dotted underline: drag it sideways and the rete turns. There is one dry line per star in 10 px mono at 55%: Betelgeuse 'still there (probably)', Sirius 'the Dog Star · 8.6 light-years', Procyon 'before the dog', Pollux 'the immortal twin', Capella 'the little she-goat', Aldebaran 'the follower', Rigel 'Orion's foot'.",
+     "howToBuild": "In showTag(), compute 49 altitude samples with the existing altitude() into an SVG path with a 1 px stroke. The scrubbable number uses setPointerCapture with value += dx·2 min/px, cursor ew-resize, aria-valuenow and arrow keys.",
+     "inspiration": "Bret Victor's 'Explorable Explanations' and Tangle (scrubbable numbers); Bartosz Ciechanowski's figure-linked prose"
+    },
+    {
+     "name": "Idle: the sky keeps turning",
+     "layer": "ambient",
+     "priority": "nice",
+     "spec": "After 20 s without input, the rete creeps forward at 60× sidereal rate (one hour of sky per minute), and the clock gets a tiny '· drifting' suffix. It stops in the same frame input arrives and never crosses midnight on its own: it parks at 23:55 so the user gets the moment. While the tab is hidden the title reads 'the sky is turning…'.",
+     "howToBuild": "idle = clamp((now - lastInput - 20000)/3000, 0, 1) eased, multiplying a rate inside tick(). Reset it to 0 on any pointer, key or wheel event. Disable it under reduced motion and swap the title on visibilitychange.",
+     "inspiration": "A Soft Murmur; Apple TV aerial screensavers; Messenger by Abeto (a world that keeps living while you watch)"
+    }
+   ]
+  },
+  {
+   "slug": "frosted-pane",
+   "details": [
+    {
+     "name": "Frost that grows back from your edges",
+     "layer": "material",
+     "priority": "must",
+     "spec": "Frost nucleates at the putty line along each glazing bar, at the cold lower corners and at 3-5 invisible scratches per pane, then grows as feathered dendrites: a spine with side branches at ±60°, sharp tips, older parts whiter. A wiped patch does not fade back. Its own boundary becomes a new front, and needles creep inward, finer than the first growth. Growth slows as it fills, reaches about 70% cover in 2-3 minutes and stops there, so the village always shows. Within about 40 px of the candle nothing grows, and the crystals at that edge stay thin.",
+     "howToBuild": "Replace the fade term in regrow() with growth tips {x, y, angle, thick, gen} seeded every 8 px along the wipe boundary, sampled from the wipe mask's edge every 2 s. Cap at 400 tips. Each tip advances 0.6 px·speed(x,y) per frame and spawns ±60° children with p ≈ 0.02 at 0.6× width; it stops on a half-res Uint8 occupancy grid hit, the candle zone, or gen > 5. Stroke rgba(230,240,235,0.08) into the frost canvas so overlaps whiten, and seed the initial growth in genFrost() the same way.",
+     "inspiration": "Kenneth Libbrecht, snowcrystals.com (Nakaya diagram); real 'fern frost' on single glazing; the Gravner-Griffeath snow-crystal model"
+    },
+    {
+     "name": "The glass remembers what was written",
+     "layer": "easter-egg",
+     "priority": "must",
+     "spec": "Writing in fog leaves an invisible grease trace. Breathing on that spot again, minutes later or on a later visit, makes the old words condense back at about 15% as the fog forms around them. Because fog recedes edge-in, the ghost fades from the rim first. Two or three latent marks nobody made this session are hidden off-centre: a child's heart, a stick snowman and '1987'. They are never placed at the first spot people tend to breathe on (the centre pane).",
+     "howToBuild": "Extend the existing ghostAge and writeSeg() path so writing also strokes into a persistent 160×90 grease canvas at 0.15 alpha; shown fog = density·(1 - 0.7·grease). Pre-draw 2-3 seeded, jittered Catmull-Rom paths at load. Save the user's strokes, simplified with RDP to under 2 KB, through try/catch localStorage. Without storage the memory lasts for the session only.",
+     "inspiration": "The real physics of finger oil on window glass; the persistent world of Messenger by Abeto; Apple Messages 'Invisible Ink'"
+    },
+    {
+     "name": "Every bead is a lens",
+     "layer": "material",
+     "priority": "must",
+     "spec": "Beads left by breath-writing and runners render as tiny lenses of 2-7 px. Each holds a small upside-down image of the snowy village and the candle flame, with a darker rim and a pinpoint highlight. Touching beads merge, with the larger swallowing the smaller. A runner leaves a clear meandering track and a trail of tiny beads that evaporate. It is only noticed by looking closely.",
+     "howToBuild": "In drawBeads(), for each bead: save; arc clip; translate(x,y); scale(-0.35,-0.35); drawImage(villageOffscreen, -x-ox, -y-oy); restore. The rim is a radial gradient darkening from 0.85r to r, and the highlight dot sits at (-0.35r, -0.4r). Keep the existing cap of 3 runners, and use O(n²) merging for n ≤ 30.",
+     "inspiration": "Lucas Bebber, 'Rain & Water Effect Experiments' (Codrops, 2015)"
+    },
+    {
+     "name": "Six panes of old glass",
+     "layer": "material",
+     "priority": "should",
+     "spec": "Each of the six panes is its own piece of hand-made cylinder glass. Each has a gentle thickness wave bending the village 1-3 px and 2-5 elongated seed bubbles with a bright edge, and one pane is faintly greener. Moving the pointer acts like moving your head: the distortion slides and the village visibly breaks by 1-2 px at every glazing bar. It never shimmers on its own, and reduced motion freezes the parallax.",
+     "howToBuild": "In compose(), draw the village into each cellBox() as 2 px horizontal strips shifted by dx(y) = A·sin(y·f + phase_i + 0.004·pointerX), with A ≤ 3 px and per-pane f and phase from sfc(). Seeds are 2×0.8 px ellipses with a white stroke at 0.3 and a dark core. Tint with one rgba(180,210,190,0.03) fill on one pane.",
+     "inspiration": "Antique crown and cylinder window glass ('seeds' and 'cords'); window light in Dutch Golden Age interiors"
+    },
+    {
+     "name": "Wind the music box",
+     "layer": "sound",
+     "priority": "must",
+     "spec": "Stille Nacht plays only once you wind a 28 px key on the sill. You drag in circles, with a ratchet click every quarter turn; one turn gives about one verse, two at most. The first time sound is switched on, the key turns a quarter by itself with one click, so it reads as a key. While playing, the key counter-rotates in step with the notes. As the spring empties, the last six notes slow by about 15% and the final note is left hanging mid-phrase. When it stops, frost growth runs 1.5× faster for 20 s, as if it had been listening. The timbre is a steel comb: partials at 1 : 6.27 : 17.55 with their own decays, a fixed ±3 cent detune per tine, a 2 ms pin tick and a small wooden-box reverb. M winds one turn from the keyboard.",
+     "howToBuild": "Replace the autoplay in buildSong()/boxNote() with a tension-driven lookahead scheduler (25 ms timer, 120 ms horizon on actx.currentTime), tempo = base·tension^0.3, with tension falling per note. Winding: atan2 about the key centre, accumulate only positive delta, ratchet tick every π/2 (a 2 ms click into a 2.5 kHz bandpass). Per note: three sines with setTargetAtTime decays τ 0.9/0.06/0.02 s, plus the existing makeIR() at 15% wet.",
+     "inspiration": "Swiss cylinder music boxes (pinned cylinder, steel comb, air-vane governor); clamped-free bar physics; Chris Wilson, 'A Tale of Two Clocks'; Gruber's Stille Nacht (1818)"
+    },
+    {
+     "name": "A candle that answers draughts",
+     "layer": "ambient",
+     "priority": "should",
+     "spec": "The sill candle, the page's one warm light, flickers on 1/f noise at no more than 15% amplitude. A fast pointer sweep or a breath counts as a draught: the flame leans away, dims and gutters, then recovers over 1-2 s. Its reflection floats faintly on the glass, doubled 3-6 px apart by the inner and outer panes, and shifts slightly as you wipe the pane in front of it.",
+     "howToBuild": "In drawFlame(), use a Voss-McCartney sum of 4 value-noise octaves at 0.5-8 Hz, and lean = smoothed pointer vx·k (clamped), also pushed by startBreath(). The reflection is a mirrored flame sprite at about 6% alpha drawn twice with an offset in 'screen', and its visibility uses the fog and frost value under it.",
+     "inspiration": "Swedish window candles (adventsljusstake) in winter windows; how a night window doubles the room's reflection"
+    },
+    {
+     "name": "Advent wreath across the lane, and Heiligabend",
+     "layer": "time-aware",
+     "priority": "must",
+     "spec": "In the nearest cottage window across the lane sits a tiny four-candle Advent wreath, lit 0-4 by Advent Sunday. Before Advent (now), it is a dark ring with four unlit wicks. On 24 Dec from 18:00, the church windows glow amber; at 23:30 they brighten for Midnight Mass; and at 00:00 three tiny lanterns leave the church and walk the lane. On 25 Dec the morning light on the snow turns colder and bluer. Each state changes only these one or two parameters.",
+     "howToBuild": "firstAdvent(y) is the Sunday on or before 3 Dec. candles = min(4, floor((today - firstAdvent)/7 days) + 1) until 25 Dec. Drive two parameters through paintScene()/updateLights(): wreath flames (4 px sprites) and church window gain. The lanterns reuse the lantern-bearer path from the village clock detail. Honour the ?date= override.",
+     "inspiration": "The Advent wreath (one candle per Advent Sunday); Heiligabend and Midnight Mass; Google Santa Tracker's switch on 24 Dec"
+    },
+    {
+     "name": "A village on a real clock",
+     "layer": "ambient",
+     "priority": "should",
+     "spec": "Village windows switch on and off on a deterministic schedule from the viewer's local clock. Kitchens light around 17:00, most go dark between 22:00 and 23:30, one insomniac stays lit, and the bakery lights at 04:30. Each change is a 600 ms incandescent warm-up, and no more than 2 windows change per minute. Chimney smoke thickens briefly after a window lights, as if someone added a log. Once a night, a lantern-bearer walks the lane with the lantern swaying.",
+     "howToBuild": "hash(houseId, dayOfYear) gives on/off intervals evaluated in updateLights(). The warm-up is a colour ramp from 1800 K to 2700 K over 600 ms. Smoke is 3-4 soft sprites rising on noise. The bearer is a 6 px silhouette path with a damped pendulum lantern, triggered once per night from the hash.",
+     "inspiration": "Google Santa Tracker's village; SnowDays (a feeling of company without fake users)"
+    },
+    {
+     "name": "Tonight's moon",
+     "layer": "time-aware",
+     "priority": "nice",
+     "spec": "The moon disc shows tonight's real phase with an elliptical terminator and sits at a plausible height for the hour. The snow's light follows it: near full moon the snow gets faint blue highlights; near new moon only the windows light it. The moon stays a small honest disc, and its halo is never more than twice its diameter.",
+     "howToBuild": "age = ((JD - 2451550.1) mod 29.530588853) days; illuminated fraction k = (1 - cos(2π·age/29.53))/2. Draw the terminator ellipse in paintScene() and set the snow highlight gain to 0.4 + 0.6·k.",
+     "inspiration": "Real lunar phase; architectural sun and moon studies"
+    },
+    {
+     "name": "A sleigh across the moon",
+     "layer": "easter-egg",
+     "priority": "nice",
+     "spec": "On 24 Dec 22:00-02:00 local, or once per session after about 70% of the glass has been wiped, a 14 px silhouette of a sleigh and eight reindeer crosses the moon in about 2 s. It is never announced and never fires in the same session as the existing meteor. Under reduced motion it holds still before the moon for 3 s.",
+     "howToBuild": "One reindeer path is repeated 8× with leg-phase offsets, drawn in a pass like drawMeteor(). Gate it with a sessionStorage flag in try/catch and coordinate with meteorDone.",
+     "inspiration": "The E.T. moon-crossing silhouette; Google Santa Tracker"
+    },
+    {
+     "name": "A heart warms the flame",
+     "layer": "easter-egg",
+     "priority": "nice",
+     "spec": "Drawing a closed heart in the fog makes the candle flare once: the flame grows 20% taller and its warm halo 10% stronger for 1.2 s, and a hairline of clear glass melts around the heart. There is no message.",
+     "howToBuild": "On stroke end in writeSeg(), test closure (start-end distance under 12% of the bbox), one cusp at the top and a bbox aspect of 0.8-1.3. Fire a flame impulse in drawFlame() and a 2 px stampWipe() along the stroke.",
+     "inspiration": "Childhood window drawings; Windows 93-style hidden responses"
+    },
+    {
+     "name": "Snow that settles on the glazing bars",
+     "layer": "ambient",
+     "priority": "should",
+     "spec": "Outside, snow falls in three depth layers, and a shared gust front sweeps across every 20-40 s as a visible wave of tilted flakes. Flakes landing on the outer sill and the outer edges of the glazing bars build a lumpy drift of 6 px or less that sublimates slowly. Tapping the frame, or a heavy drift, slumps a small clump off with a soft whumpf (sound on), at most once a minute. With sound on, a faint wind bed breathes with the same gust value.",
+     "howToBuild": "Extend updateSnow(): gust = value noise plus a travelling x-front. Each ledge gets a Float32Array of height bins with a 3-tap blur, drawn as a quadratic path. A slump spawns 20 particles; the whumpf is a 60 ms lowpassed noise burst. Wind is looped brown noise through a lowpass whose 400-900 Hz cutoff follows the gust.",
+     "inspiration": "'It Came Upon' (Joshua Koo, Chrome Experiments 2012); observed snowfall; A Soft Murmur's noise beds"
+    },
+    {
+     "name": "Hints written in the frost",
+     "layer": "onboarding-hint",
+     "priority": "must",
+     "spec": "The existing hint chain (wipe, then breathe, then write) appears as faint letters traced into the frost itself as clear lines in the ice, at most 4 words ('wipe me'), off-centre in the lower-left pane. A hint shows only after 4 s without progress. Wiping melts it like any frost. Each hint retires after the action succeeds twice, gives up after three showings and never returns. Keyboard users find 'hold B' instead.",
+     "howToBuild": "Stamp the hint text into the frost mask with destination-out at 0.5 alpha, using the existing placeText() layout. Keep the #hint-live aria region carrying the same text. Persist counts under 'pane-hints' through try/catch.",
+     "inspiration": "Bruno Simon's folio (instructions painted on the ground, part of the world)"
+    },
+    {
+     "name": "A fingertip, then a breath",
+     "layer": "micro-interaction",
+     "priority": "should",
+     "spec": "Over the glass, the cursor is a soft 1 px sage ring the exact size of the wipe brush. It grows slightly with speed, and pen pressure scales it. While holding, it becomes a wider, softer breath ellipse that swells on a roughly 4 s breathing rhythm. In writing mode it shrinks to a fingertip dot. The native cursor returns over controls and text, and the ring never lags the pointer or leaves a trail.",
+     "howToBuild": "Set cursor:none on the glass canvas only. Draw the ring in compose() at the latest pointer position with no lerp; radius = base + 0.6·speed (clamped) × (PointerEvent.pressure || 1).",
+     "inspiration": "CAD and Figma tool cursors; Bartosz Ciechanowski's grab cursors"
+    },
+    {
+     "name": "A date beneath the vertical line",
+     "layer": "copy",
+     "priority": "should",
+     "spec": "Under 平安夜 · 雪落无声, a hairline second column in 9-10 px at 55% opacity gives tonight's date and the moon's phase in Chinese, for example '十一月二日 · 下弦'. On 24 Dec it reads '今夜', and from 25 Dec to 6 Jan '圣诞第三日' and so on. While the tab is hidden its title becomes '窗上的霜还在长'.",
+     "howToBuild": "Render it in the existing #vert column with a small 1-31 to 汉字 converter and the phase name from the moon calculation. Refresh at the minute boundary, and swap document.title on visibilitychange.",
+     "inspiration": "Printed colophons; Robin Sloan's sign-offs; classical Chinese lunar-phase names"
+    }
+   ]
+  },
+  {
+   "slug": "glasshouse",
+   "details": [
+    {
+     "name": "Looks cool, still hot",
+     "layer": "material",
+     "priority": "must",
+     "spec": "In Gather, the glow follows the blackbody curve (yellow-white, orange, cherry, dull red), and the thin rim darkens before the core. Below the Draper point the glow is gone, but a heat shimmer of 1.5 px or less keeps warping the velvet above the gather for 4-6 s. The temperature readout keeps counting down in grey ('612 °C · still hot'). Dragging the pipe back to the furnace mouth (the glory hole) at the stage's left edge restores the glow. There are no sparks or embers, because glass does not spark.",
+     "howToBuild": "In updateHeat(), set emissive from a Kelvin-to-sRGB LUT (Tanner Helland) with intensity ∝ (T/T_PEAK)^4, and in patchShader multiply totalEmissiveRadiance by pow(dot(N,V), 1.5) so the rim reads cooler. Let heat keep decaying below T_DRAPER down to T_ROOM instead of stopping at 560. Shimmer is a small camera-facing plane above the gather with a ShaderMaterial sampling a quarter-res render target: uv += 0.004·noise(uv·8 + vec2(0, 1.5)·time)·heat.",
+     "inspiration": "Hot-shop glassblowing (gather at about 1100 °C, glory hole reheats), Corning Museum of Glass demonstrations; the Draper point"
+    },
+    {
+     "name": "The furnace is the loader",
+     "layer": "ambient",
+     "priority": "should",
+     "spec": "While three.js compiles, the stage shows one molten gather on a punty rod, drawn in Canvas2D glow at the exact screen position the 3D gather will take, while the readout rolls down from '1 120 °C' as loading progresses. When ready, that glow crossfades in 250 ms into the first live Gather at matching colour and position. If loading takes under 400 ms it is skipped. A furnace-door crack of light at the left edge breathes at about 0.1 Hz.",
+     "howToBuild": "Use a radial-gradient canvas positioned by the same layout() maths before importing or compiling. Progress steps are geometry, bakeEnvironment() PMREM and renderer.compile(scene, camera), mapped to temperature and to hue through the same blackbody LUT as above.",
+     "inspiration": "Bruno Simon's folio (the loader becomes the start prompt in-world); Lusion's WebGL studio site"
+    },
+    {
+     "name": "Silver that blooms from a swirling pool",
+     "layer": "material",
+     "priority": "must",
+     "spec": "Choosing Mirror pours a small visible pool of solution into the clear ball. The pool sloshes as the pointer tilts the bauble, and the mirror nucleates as a mottled grey fog wherever the liquid touches, climbing upward over about 2.5 s as you swirl (automatically if you don't). The finished mirror keeps honest flaws: a few pinholes and a faint tide line near the neck. Satin and Frosted get their own short truths; Frosted is an etch haze spreading from the neck. It plays once per bauble.",
+     "howToBuild": "In patchShader/makeBodyMaterial(), add uniform uSilver (0 to 1) and mask m = smoothstep(uSilver - 0.08, uSilver, h + 0.15·noise3(pos·6)), where h is normalised height from the liquid side. Mix metalness, roughness (0.05 to 0.12) and transmission by m. Pinholes: m *= step(0.015, hash(floor(pos·80))). The pool is a small transparent sphere-cap mesh tilted by a spring from the pointer. Swirl sound is lowpassed noise whose amplitude follows swirl speed.",
+     "inspiration": "Lauscha's Liebig silvering since 1867 (Krebs Glas Lauscha; Manufactum notes); Corning Museum of Glass on silver-nitrate solutions"
+    },
+    {
+     "name": "A brush with bristles; a ring that never quite closes",
+     "layer": "micro-interaction",
+     "priority": "must",
+     "spec": "The brush is about 12 bristles with their own offsets and wetness. Strokes carry fine parallel striations, the paint load runs out along a stroke into dry-brush, and it recharges when you lift. In Spin, holding the brush still paints a ring that never quite closes: a small overlap blob where it began, and a slight wobble because the bauble sits a hair off-centre on its cap. Over the bauble the cursor is a ring showing brush size and colour, with a fill arc showing remaining paint.",
+     "howToBuild": "In dab()/paintSegment(), loop over bristles with perpendicular offsets, alpha = load·wet_i, and load *= 0.997 per px. For Spin, add v += 0.004·sin(2πu + φ) and an extra dab when u wraps past its start. Draw the cursor ring via updateCursor() as a DOM SVG with a stroke-dashoffset fill arc.",
+     "inspiration": "Lauscha hand-painting (Manufactum product notes); lathe-turned rings on real baubles"
+    },
+    {
+     "name": "Hang: hook, twist, dip, sympathy",
+     "layer": "micro-interaction",
+     "priority": "must",
+     "spec": "When a bauble flies to the fir, its spring-wire loop catches the hook. It swings as a damped pendulum (8° or less) and also twists slowly about the thread, two or three lazy turns as the torsion unwinds, settling within about 3 s. The branch tip dips under the weight and springs back, a few needles quiver, 2-5 needles or a puff of no more than 20 snow particles fall, and neighbouring baubles nod in sympathy with phase delays.",
+     "howToBuild": "Extend updateHung()/stepPhysics() with torsion φ'' = -kφ - c₂φ', with φ' seeded from flight velocity in updateFlights(). Model the branch as a two-segment spring chain and feed about 15% of tip velocity into neighbours' θ'. Needle quiver is per-instance rotation on the needle InstancedMesh, excited by tip velocity.",
+     "inspiration": "Disney's follow-through and overlapping action; Lauscha cap anatomy (crimped cap and spring-wire hanger); real fir-branch springiness"
+    },
+    {
+     "name": "A chime that beats",
+     "layer": "sound",
+     "priority": "must",
+     "spec": "Each bauble's pitch comes from its diameter (smaller is higher), quantised to D major pentatonic. Hanging or contact gives a glass chime with partials at 1 : 2.756 : 5.404 decaying over 1.2, 0.4 and 0.15 s, plus a twin of the fundamental detuned ×1.0015 so it beats at 2-4 Hz like real imperfect glass. Impact speed sets loudness and brightness. Sweeping the pointer along the branch sets off one small cascade of tinks across the hung baubles, ordered by distance, never more than once per 150 ms per pair.",
+     "howToBuild": "Replace the strike() voice with three sines plus the twin, through a lowpass at 2000 + 6000·v Hz. Map size to scale degree in freqFor(). Raycast the branch on pointermove and stagger strikes 90 ms apart. Keep at most 6 voices.",
+     "inspiration": "Free-free bar acoustics and beating near-degenerate modes (as in bells); Google Santa Tracker's Elf Jamband (you cannot play a wrong note)"
+    },
+    {
+     "name": "Furnace breath and lathe hum",
+     "layer": "sound",
+     "priority": "should",
+     "spec": "With sound on, a barely audible furnace breath sits under Gather and fades with heat, joined by faint contraction ticks at a falling rate as the glass cools. In Spin, a soft lathe hum follows spin speed, snapped to the page's scale. Nothing plays on hover.",
+     "howToBuild": "Pass the existing noiseBuf() through a lowpass at about 200 Hz with a 0.1 Hz LFO, gain ∝ heat from updateHeat(). Ticks are 1-3 ms bandpassed noise, Poisson-scheduled with rate ∝ -dT/dt. The hum is a triangle at the scale degree nearest to rpm, at gain 0.01.",
+     "inspiration": "Andy Farnell, 'Designing Sound'; hot-shop room tone"
+    },
+    {
+     "name": "Cap, punched number and seed bubbles",
+     "layer": "material",
+     "priority": "should",
+     "spec": "Every bauble gets a crimped cap with fine teeth and a bent spring-wire loop. The cap carries a punched lot number and today's date ('No. 0007 · 2·XI·26'), legible only when the camera eases close on hover or in the tag. The glass wall holds 3-6 tiny seed bubbles unique to that bauble, refracting differently from the rest.",
+     "howToBuild": "Build the cap as LatheGeometry with radius r0·(1 + 0.04·sin(24θ)) for the crimp, and the wire as a TubeGeometry along a CatmullRomCurve3 in makeOrnament(). The hallmark is a small CanvasTexture decal. Bubbles are tiny spheres with transmission 1 and ior 1.0 inside the wall thickness, seeded by the lot number.",
+     "inspiration": "Lauscha blown-glass ornaments (traditionally credited to Hans Greiner, c. 1847); hallmarking"
+    },
+    {
+     "name": "Caustic pools, and a glint that travels",
+     "layer": "ambient",
+     "priority": "should",
+     "spec": "Under each hung bauble, a soft caustic pool tinted the bauble's colour, with a bright crescent, lies on the velvet; its opacity is 0.25 or less and fades with height. After 20 s idle, the hung baubles turn very slowly, and a single highlight from the arched window glides across them one after another. Everything stops the moment input arrives.",
+     "howToBuild": "Each hung bauble gets a decal plane with a CanvasTexture (tinted radial gradient plus crescent), opacity ∝ 1/height. The idle glint rotates scene.environment's bake orientation slightly (env rotation via a rotated cube sampling uniform in patchShader) by 0.15 rad·idle.",
+     "inspiration": "Window reflections in Dutch still-life glass (Pieter Claesz; van Eyck's convex mirror); Codrops 'Playing with Light and Refraction in Three.js'"
+    },
+    {
+     "name": "The glassblower's vocabulary",
+     "layer": "copy",
+     "priority": "should",
+     "spec": "Tooltips use the real terms, one line each: 'marver', 'jacks', 'glory hole', 'punty'. After Hang, the tag reads 'Annealing. Please don't touch (480 °C).' for 3 s, then settles to 'No. 0007 · hung 2 Nov'. Headings stay elegant Bodoni Moda; wit lives only in the small Jost tag, with at most one joke per view.",
+     "howToBuild": "Use a string table in say()/updateTag(), with variants picked by the bauble seed so repeats are rare.",
+     "inspiration": "Teenage Engineering's dry manuals; Corning Museum of Glass hot-shop narration"
+    },
+    {
+     "name": "Keep the pipe turning",
+     "layer": "onboarding-hint",
+     "priority": "should",
+     "spec": "During Gather, if the user stops turning for 4 s, the hot glass begins to sag visibly (a droop of up to 4% of its radius) and a chalk-style hint appears beside the pipe: 'keep the pipe turning'. Turning recovers the shape. In Paint, 'drag to paint' appears once the same way. Each hint retires after two successes.",
+     "howToBuild": "Add a vertex offset along -y ∝ (1 - spin)·heat in writeLathe(). Use setHint() with counts persisted through try/catch, mirrored to #live.",
+     "inspiration": "Glassblowing (gravity is the first tool); Rauno Freiberg on hints that teach once"
+    },
+    {
+     "name": "Your tree remembers; the season tends it",
+     "layer": "time-aware",
+     "priority": "must",
+     "spec": "Baubles hung on earlier visits still hang, each tag dated ('hung 14 Nov'). Pre-Advent and Advent: the atelier is fully open and the tree is bare except for your work. From 24 Dec 18:00 to 6 Jan, a Lauscha glass finial ('Spitze') joins the shape row, and only then can you make the tree-topper. From 26 Dec to 6 Jan the lot stamp carries a Roman numeral I-XII. After Twelfth Night, the hung baubles rest in a tissue-lined box under the branch; tapping the box hangs them again.",
+     "howToBuild": "Store up to 12 hung-bauble parameter sets (shape, finish, colour, pattern seed, slot, date) in try/catch localStorage and feed them to seedHung(). season(now) with the ?date= override drives two parameters: finial availability and box state. Add the finial profile to makeProfile().",
+     "inspiration": "The Twelfth Night custom of taking decorations down; Lauscha tree-topper spires; SnowDays' persistent flakes"
+    },
+    {
+     "name": "The Christmas pickle",
+     "layer": "easter-egg",
+     "priority": "nice",
+     "spec": "After 6 baubles have been hung, one blank on the tray is a small bumpy green pickle-shaped gather. It only fits the deepest slot near the trunk. Once hung, its tag reads 'Weihnachtsgurke · whoever finds it opens a present first'. There is no announcement.",
+     "howToBuild": "Use a lathe profile elongated with a slight bend via vertex displacement and noise bumps, in pine glass with a satin finish. Restrict freeSlot() to the innermost slot for it.",
+     "inspiration": "The Weihnachtsgurke custom (largely American, attributed to Germany); Google Santa Tracker's 'Santa Search'"
+    },
+    {
+     "name": "Fumed lustre",
+     "layer": "easter-egg",
+     "priority": "nice",
+     "spec": "During Silver, dragging a cooled bauble back into the glory hole and holding it there for 3 s gives it a carnival-glass lustre: an iridescent film that shifts violet to gold with view angle. That finish appears as a fourth swatch for the rest of the session. There is no hint.",
+     "howToBuild": "MeshPhysicalMaterial iridescence 1, iridescenceIOR 1.3, iridescenceThicknessRange [200, 800] (supported in r149), set in applyLook() and gated by a dwell timer near the furnace-mouth hit zone.",
+     "inspiration": "Iridescent metal-oxide fuming on carnival and art glass"
+    }
+   ]
+  },
+  {
+   "slug": "overprint",
+   "details": [
+    {
+     "name": "The machine cycle",
+     "layer": "micro-interaction",
+     "priority": "must",
+     "spec": "PRINT becomes a performance of 2.5 s or less. First, a 'MASTER MAKING…' status shows while a hot hairline in the drum's ink colour scans down the card preview like the thermal head (1.2 s), with a faint hiss. Then the drum spins up with a low thrum and the sheet feeds with a soft 'shhff'. Finally the mechanical counter ratchets 0006 to 0007 with a slight overshoot. The first print after a drum change comes out about 20% pale and the second about 8% pale while the ink comes up, unless the user first taps the tiny IDLING key, which spins the drum for 1 s. The masters gauge loses a notch per master.",
+     "howToBuild": "Chain the stages in runPrint() with async/await over small promises. The thermal head is a 2 px absolutely positioned bar with a 300 ms fading trail in mix-blend 'screen'. The counter is per-digit overflow-hidden 1em columns using translateY with cubic-bezier(.2,.9,.3,1.2). Paleness multiplies layer opacity by [0.8, 0.92, 1][printsSinceDrumChange]. Sound: the thrum is brown noise through a 180 Hz lowpass with a 2 Hz LFO, the feed is 160 ms of bandpassed noise sweeping 2500 to 900 Hz, and sThunk() plays on the tray.",
+     "inspiration": "The Riso duplicator workflow (thermal stencil master, PROOF, idling to re-circulate ink), as in RISD Typeshop guides"
+    },
+    {
+     "name": "Wet ink on the line",
+     "layer": "material",
+     "priority": "must",
+     "spec": "Fresh prints on the drying line carry a faint wet sheen on inked areas only: a narrow band that slides as the card swings and fades over about 40 s while the colours deepen about 5%. If two prints overlapped while wet, the back of the front one carries a faint mirrored set-off, seen when it turns in the draught or is flipped in the viewer. While the tab is hidden the title reads 'ink drying · 3 on the line'.",
+     "howToBuild": "Each hung card gets an SVG linearGradient rect 15% of the card wide, alpha 0.08·exp(-t/40 s), masked by the card's ink group and blended with 'screen'; its x position comes from the swing angle in positionHung(). Deepening is a CSS filter: saturate(1→1.05) transition over 40 s. Set-off is a mirrored <use> of the ink at 3% opacity on the back face.",
+     "inspiration": "Soy-based riso ink drying by absorption (the standard 'let it hang overnight' warning); print-room drying lines"
+    },
+    {
+     "name": "The linen tester",
+     "layer": "material",
+     "priority": "must",
+     "spec": "A small folding linen tester sits in the corner of the mat. Drag it, hold Z, or long-press a print to look through a 150 px circular lens at 6×. Inside you see halftone rosettes at the real screen angles, paper fibres, fibre-edged dots and ink-starved trailing edges, over a millimetre reticle that reads that print's actual misregistration ('Δ 0.4 mm ↘'). The micro detail exists only inside the lens, and the 1× view is unchanged. The rim is a 1 px warm metal edge.",
+     "howToBuild": "Add a second <svg> clipped to a circle that <use href>s the card or print group with a viewBox 1/6 the size, centred on the pointer. Elements with class .micro (fibre hairs, dot jitter) are display:none in the main view. Reticle ticks are at 1 mm in sheet units (A6 is 148×105 mm), and the Δ value comes from driftVec(seed). Re-render only on pointermove.",
+     "inspiration": "The printer's folding linen tester; banknote microprinting"
+    },
+    {
+     "name": "Dots that soak into newsprint",
+     "layer": "material",
+     "priority": "must",
+     "spec": "Halftone is not a clean pattern. Drum A screens at 15° and drum B at 75°, so rosettes form where inks overlap. Dot edges are roughened against the paper fibre so they look wicked in, and dot gain darkens mid-tones about 12%. The LPI slider settles softly on the classic 65, 85, 100 and 133. One hidden setting (pull LPI all the way down while holding Alt) sets both screens to 45°, and a deliberate moiré blooms. It is computed once per print and never animated.",
+     "howToBuild": "In plateFX(), give each drum an SVG <pattern> with patternTransform rotate(15) or rotate(75). Apply a filter to the halftone group: feTurbulence (baseFrequency 0.9, numOctaves 2) into feDisplacementMap at scale 0.8, then feMorphology dilate 0.2 for gain. Enrich paperURL() with about 400 fibre hairs at alpha 0.03, generated once.",
+     "inspiration": "Riso screen angles and grain modes (Spectrolite and riso-lab guides); shadcn.io 'CMYK Halftone'; Effect.app 'Risograph'"
+    },
+    {
+     "name": "Stamps that print like rubber",
+     "layer": "micro-interaction",
+     "priority": "must",
+     "spec": "Stamps show they were hand-carved: 1-2 nicks on the edge, and faint gouge-chatter ridges in cleared areas that catch ink on about 40% of impressions. Each impression responds to the press. A quick tap leaves a speckled kiss print; a long or firm press (400 ms or more, or pen pressure) fills fully with a darker rim of ink squeeze and a slightly fatter outline. Stamping almost exactly over an earlier impression leaves a double-strike ghost. On hover, a stamp lifts 2 px with 1-2° of tilt and a deepening shadow, and press scales it to 0.97.",
+     "howToBuild": "In placeStamp()/stampAt(), store pressure = e.pressure || clamp((tUp - tDown)/400, 0.3, 1). The coverage mask is an SVG filter: feTurbulence into feComponentTransfer (discrete feFuncA), with the threshold shifted by pressure. Squeeze is a 1.2 px stroke at 0.25 with multiply and a 0.4 px blur. Chatter is 3-6 seeded short arcs. Hover uses a CSS --lift variable on the tile, skipped on (hover: none).",
+     "inspiration": "Linocut and rubber-stamp carving; letterpress ink squeeze; tvOS focus lift"
+    },
+    {
+     "name": "Every pull is an edition",
+     "layer": "copy",
+     "priority": "should",
+     "spec": "Each print carries a pencil-grey slug in its margin: 'No. 0012 · 7F3A · Noël 2026'. In the viewer, double-click or F flips it to show a narrow job ticket in Martian Mono: inks ('A Fluorescent Pink / B Teal'), drift in mm, LPI, type width, time pulled and the Advent day. Typing a seed into the ticket re-pulls the identical sheet. The back also carries the imprint 'Pulled on a two-drum machine · edition of one'.",
+     "howToBuild": "Reuse rngFor(seed) and slugText(). The back face is CSS rotateY with backface-visibility inside renderViewer(). The ticket is SVG, and the seed <input> calls runPrint with a forced seed. Keydown handling ignores this input.",
+     "inspiration": "Robin Sloan's Penumbra Print Shop stationery; generative-art seed conventions; the receipt at the end of neal.fun 'Spend Bill Gates' Money'"
+    },
+    {
+     "name": "The Advent drawer",
+     "layer": "time-aware",
+     "priority": "must",
+     "spec": "From 1 Dec, one new hand-cut stamp appears in the stamp drawer each day (holly, a candle, the star of Bethlehem, a robin, a tiny sledge, and so on), wrapped in tissue with a pencilled date. The first touch unfolds the tissue with a paper crinkle, and the stamp stays plain afterwards. Before 1 Dec (now), the drawer's last row shows three hairline outlines at 8% with the pencilled note 'stocking the drawer'. From 25 Dec to 6 Jan all 24 are present. Never a grid of doors, never a NEW! badge.",
+     "howToBuild": "Use a data array of 24 {day, path} entries. n = month===11 ? min(date, 24) : (January and date ≤ 6 ? 24 : 0), honouring ?date=. lastSeenDay is kept in try/catch localStorage for the tissue state. Tissue is a translucent SVG rect with crease lines that folds away over 300 ms on first pointerdown. The crinkle is 5-20 ms noise grains through a 2-6 kHz bandpass.",
+     "inspiration": "Google Santa Tracker's village (one house unlocks per day); Christmas Experiments advent calendar (David Ronai)"
+    },
+    {
+     "name": "Window light that keeps the hour",
+     "layer": "time-aware",
+     "priority": "should",
+     "spec": "A very soft patch of light from an unseen window lies across the print table. It comes from the left in the morning, is overhead and neutral at midday, and is low and warm in late afternoon; after local dusk it becomes a warm desk-lamp pool from the upper right. Stamp and card shadows follow the same direction. It updates once a minute, so the change is imperceptible.",
+     "howToBuild": "Set --light-x and --light-angle custom properties on #studio from the local clock. Add a radial-gradient overlay at 8% or less with mix-blend 'soft-light', and derive the tiles' drop-shadow offsets from --light-angle.",
+     "inspiration": "Architectural sun studies; Apple dynamic wallpapers"
+    },
+    {
+     "name": "Detents you can feel",
+     "layer": "micro-interaction",
+     "priority": "should",
+     "spec": "The registration-drift slider has a centre detent at 0.0 mm with its own soft click, and its readout shows 'in register' there. Type width (Anybody wdth 50-150) detents at 75, 100 and 125, and the slider's own label stretches with the axis as you drag. Detents are felt and never drawn; a hairline value marker shows only while dragging. Clicks are discrete plastic ticks, rate-limited.",
+     "howToBuild": "In updateDrift()/updateLPI() and the type-width handler, use value = raw + (snap - raw)·0.6·exp(-(d/w)²). Give #typeWOut font-variation-settings 'wdth' var(--w). Reuse sClick() with ±4% playbackRate jitter and at most 25 clicks per second.",
+     "inspiration": "Teenage Engineering OP-1 encoders; press registration knobs"
+    },
+    {
+     "name": "A carol spelled across prints",
+     "layer": "sound",
+     "priority": "nice",
+     "spec": "With sound on, each print ends with one soft woody note as the sheet lands on the tray. Print N plays note N of 'O Tannenbaum', so a long run slowly spells the tune. Notes are quantised to the 1/8 grid at 60 BPM so the delay feels intentional. It is never explained.",
+     "howToBuild": "Keep a MIDI melody array, indexed by counter mod length. The voice is sine f plus sine 4f at 0.1 with a 0.4 s decay and a 2 ms click. Schedule at t0 + ceil((now - t0)/step)·step.",
+     "inspiration": "Google Santa Tracker's Elf Jamband; Blob Opera's holiday mode"
+    },
+    {
+     "name": "The impatient misfeed",
+     "layer": "easter-egg",
+     "priority": "nice",
+     "spec": "Pressing PRINT again while the drum is still turning (only after 3 or more prints, once per session) causes a feed misfire. A sheet comes out skewed 1.5° with drum B 4 mm off, heavy starvation and a ghost of the last print, plus a crooked red REJECT chop in the corner. It hangs like any print, and its ticket reads 'kept for the wall'.",
+     "howToBuild": "Add a guard in runPrint(): if a cycle is active and count ≥ 3 and no session flag (try/catch sessionStorage), queue an override print. The chop is an SVG group with a rough filter.",
+     "inspiration": "Real riso double-feeds and skew; misregistration culture among riso printers"
+    },
+    {
+     "name": "Copy with a straight face",
+     "layer": "copy",
+     "priority": "should",
+     "spec": "The empty drying line shows bare pegs and a pencilled 'nothing drying yet'. With the masters gauge at zero, the status LCD reads 'Drum B is sulking. Wipe the squeegee.'. Drum labels carry the ink name and sheets since the change ('TEAL · 14 since change'). At most one joke per view, and never in the masthead.",
+     "howToBuild": "Use a string table keyed by state, updated in syncChip() and the drum-meta element.",
+     "inspiration": "Teenage Engineering's dry manuals; neal.fun's microcopy"
+    },
+    {
+     "name": "The line in a draught",
+     "layer": "ambient",
+     "priority": "should",
+     "spec": "Pegging a new card bounces the rope, the peg spring wobbles, and neighbouring cards swing in sympathy, settling within 2 s. After 20 s idle the line sways in a slow draught (4 px or less), and one card's corner curls slightly as it dries. Past five cards, the oldest is unpegged onto a growing stack at the end of the line, with its set-off showing on top. It stops the moment input arrives.",
+     "howToBuild": "Upgrade sagY()/positionHung() with a 16-point Verlet rope (6 iterations, pinned ends). Each card is a pendulum: θ'' = -(g/L)sinθ - 3.2θ' + 0.002·ropeVelX. The draught is a low-frequency noise force × idle. The curl is a small skew on a clipped corner triangle of the card.",
+     "inspiration": "Disney follow-through; Verlet rope demos; print-room drying lines"
+    },
+    {
+     "name": "Pencil marginalia hints",
+     "layer": "onboarding-hint",
+     "priority": "should",
+     "spec": "Hints appear as pencilled notes on the newsprint mat, each with a small hand-drawn arrow 16 px from its target. They chain: 'drag a stamp on', then 'change an ink', then 'pull a print'. Only one shows at a time, after 4 s without progress, and the pencil line draws itself in 600 ms. Each retires after two successes and gives up after three showings.",
+     "howToBuild": "Draw the SVG path in drawMat() with a stroke-dashoffset animation. Persist counts through try/catch, and mirror the text to announce().",
+     "inspiration": "Bruno Simon's in-world hints; Linear's quiet shortcut hints"
+    }
+   ]
+  },
+  {
+   "slug": "gingerbread",
+   "details": [
+    {
+     "name": "OSNAP crosshair and a command line",
+     "layer": "micro-interaction",
+     "priority": "must",
+     "spec": "Over the sheet, the cursor becomes a full-width crosshair at 15% opacity with a 6 px pickbox. Near geometry the correct AutoSnap glyph appears (square for endpoint, triangle for midpoint, circle for centre, X for intersection, diamond for quadrant) with a 9 px Azeret Mono tooltip, and about 1 in 12 snaps on candy gets a joke name ('GUMDROP CENTER'). The status bar reads live sheet millimetres, 'X 128.50 Y 64.25 · SNAP ON · ORTHO OFF'. A one-line command echo records actions: 'Command: _EXPLODE  1:5 → 1:2.5', 'Command: _LAYER  CANDY ON'. The native cursor returns over chrome and text, and the crosshair is off on touch.",
+     "howToBuild": "After build(), precompute snap points from the part polylines into grid buckets. On pointermove, map through getScreenCTM().inverse() and take the nearest point within 8 px. Glyphs live in an overlay <g> with vector-effect non-scaling-stroke, and the glyph is the sheet's only accent colour. The command echo is aria-live=polite in the existing #readout area.",
+     "inspiration": "AutoCAD AutoSnap markers, the status bar and the command line"
+    },
+    {
+     "name": "Plotted, pen by pen",
+     "layer": "material",
+     "priority": "must",
+     "spec": "On first load, and on Replot (R), the sheet plots in pen order at constant pen speed: P1 0.7 for section cuts, P2 0.5 for visible outlines, P3 0.35 for hidden lines dashed 3/1.5, P4 0.25 for long-dash-dot centre lines, and P5 0.18 for dimensions, hatching and leaders. Each stroke starts with a tiny pen-down blob, pen-up travel shows briefly as a faint dotted path that fades in 200 ms, and corners slow slightly. With sound on, a stepper whine follows pen speed with a soft tock at each pen-down. It takes 6 s or less, a click finishes it instantly, and the sheet is static afterwards. After 30 s idle, the pen quietly re-plots one dimension line. Reduced motion draws it at once.",
+     "howToBuild": "Assign stroke widths from a pen table; the viewBox is in mm, so widths are literal. Give each path pathLength=1 and stroke-dasharray '1 1', and animate stroke-dashoffset 1→0 with el.animate(), duration ∝ getTotalLength()/speed, chaining pen groups with await anim.finished. The stepper is two square oscillators detuned 3 Hz into a 1.2 kHz lowpass at gain 0.01, with frequency 200 + 6·speed.",
+     "inspiration": "HP 7475A-era pen plotters and the AxiDraw; ISO 128 line widths (a √2 series); hatchsvg's visible pen paths"
+    },
+    {
+     "name": "Cyanotype that exposes and washes",
+     "layer": "material",
+     "priority": "must",
+     "spec": "Switching Film to Cyanotype is a short process, not a crossfade. A UV exposure sweep crosses the sheet left to right; the paper flashes pale yellow-green sensitizer, then bronze, then washes to Prussian blue with white linework that keeps deepening for about a second. The margins keep brushy, uneven coating edges and a few dust specks printed white. Switching back slides a matte drafting-film sheet over the drawing with a faint grid and a graphite sheen. It totals 2.5 s or less, clicking again skips it, and reduced motion switches instantly.",
+     "howToBuild": "In setTheme(), add .no-tx (transition: none) to root and animate one overlay div from clip-path inset(0 100% 0 0) to inset(0), with a gradient of #dfe6a8, #8f8a6a and #1f4fa0. Swap the data-theme tokens at 50% and remove .no-tx after two rAFs. The coating edge reuses the existing feTurbulence-displaced border.",
+     "inspiration": "John Herschel's cyanotype (1842) and Anna Atkins' 'Photographs of British Algae' (1843); next-themes' disableTransitionOnChange"
+    },
+    {
+     "name": "The architect's scale clicks into real ratios",
+     "layer": "micro-interaction",
+     "priority": "must",
+     "spec": "Dragging the triangular scale explodes the assembly. It detents softly at real architect's-scale ratios (3/32, 3/16, 1/8, 1/4, 3/8, 1/2, 3/4, 1, 1½, 3 inches to the foot), each with a dry pencil tick, and the face label rolls to the current ratio ('3/16″ = 1′-0″'). A thrown scale keeps its velocity, slows under friction and glides into the nearest detent with a 3-5% overshoot. Past fully assembled or fully exploded it rubber-bands, each extra pixel moving it less, then springs back with one low 'thock'. Detents are felt, never drawn. Arrow keys step one detent.",
+     "howToBuild": "In buildRuler()/placeRuler()/tweenTo(), keep a ring buffer of the last 5 samples for release velocity (zero if still for more than 80 ms). Decay with v *= exp(-dt/0.32), then settle with a spring k = 180, c = 1.6·√k to the nearest detent. Rubber band: shown = limit + (1 - 1/(over·0.55/d + 1))·d. The tick is noise through a 6 kHz highpass for 2 ms. Reduced motion snaps straight to the detent.",
+     "inspiration": "Rauno Freiberg, 'Invisible Details of Interaction Design' (momentum and rubber-banding); real triangular architect's scales"
+    },
+    {
+     "name": "Hold to approve; the stamp lands",
+     "layer": "micro-interaction",
+     "priority": "must",
+     "spec": "APPROVED requires press-and-hold: a thin ring fills around the stamp handle over 450 ms, and letting go early unwinds it with a soft settle. On completion there is a 40 ms hit-stop, the sheet jolts 1.5 px and settles within 120 ms, and a soft thunk plays. The stamp lands rotated 2-4° with rim-heavy, uneven ink, a gap where it rocked off, and a slightly misaligned date band carrying today's date. Then the BOM rows tick off one by one (7 steps or fewer, 1.6 s or less). Double-clicking the stamp later adds a faint double strike. Reduced motion darkens the shadow briefly instead of jolting.",
+     "howToBuild": "In checkApproval(), drive an SVG circle's stroke-dashoffset by elapsed/450. Jolt: y = 1.5·sin(2π·22t)·exp(-t/0.09) on the sheet transform. The ink mask is feTurbulence into feComponentTransfer (discrete feFuncA), multiplied by a rim-heavy radial gradient. The thunk is a sine falling 90→60 Hz over 60 ms plus lowpassed noise at 0.03.",
+     "inspiration": "Martin Jonasson and Petri Purho, 'Juice it or lose it' (hit-stop); office date stamps; Wordle's staggered reveal"
+    },
+    {
+     "name": "A BOM whose numbers roll",
+     "layer": "micro-interaction",
+     "priority": "should",
+     "spec": "Bill of materials quantities and the total roll like an odometer when they change. Turning on CANDY rolls GUMDROPS 0 to 32, with only the changed digits moving, rightmost first, staggered 30 ms, over 420 ms. The total '≈ 2 400 kcal' rolls too. With every layer off, the BOM reads '0 parts — still dough'. At most 3 readouts roll per view; values stream instantly during a drag and roll only when it settles.",
+     "howToBuild": "Each digit is a span (overflow:hidden, 1em tall) holding a 0-9 column moved with translateY(calc(var(--n)·-1em)) and cubic-bezier(.2,.9,.1,1), with tabular-nums. Use a 0-9-0 column for wrap-around and reset it on transitionend. Hook it into applyLayers().",
+     "inspiration": "neal.fun 'Spend Bill Gates' Money' (the live ticking banner); split-flap boards"
+    },
+    {
+     "name": "Section A-A",
+     "layer": "material",
+     "priority": "should",
+     "spec": "A cutting-plane line (thick chain with arrowheads, labelled A) is parked in the margin. Drag it across the house and a small SECTION A-A viewport beside the title block updates live. Cut faces are hatched by material: gingerbread in ANSI31 45° lines at 1.5 mm, royal icing as stippled beads in the joints, candy-glass windows as short triple diagonals, gumdrops as cross-hatch. Wall-thickness dimensions read '6 MM BAKED'. Hatches are 0.18 mm at 60% and appear only on cut faces.",
+     "howToBuild": "Use SVG <pattern> elements with patternUnits userSpaceOnUse (patternTransform rotate(45); a stipple tile of 30 seeded dots). Intersect the plane x = c with each part's profile using the existing clipConvex() and outline the result at 0.7 mm. The plane is a <path> with a long-short dasharray and <marker> arrowheads.",
+     "inspiration": "AutoCAD/ANSI hatch patterns (ANSI31, AR-SAND); architectural section conventions"
+    },
+    {
+     "name": "Hand-drafting ghosts",
+     "layer": "material",
+     "priority": "should",
+     "spec": "A CONSTR layer, on by default at 20-25%, shows the drawing's scaffolding. Non-photo-blue construction lines run through key points and past the parts, corners overshoot by 2-3 px, and paired lettering guidelines sit under every hand-lettered note. When a part moves, a faint erased ghost of its old outline lingers and fades over a minute. There is one graphite smudge where a hand would rest by the title block. In Cyanotype these become faint white.",
+     "howToBuild": "Generate after build(): <line> elements extended 6 units past their endpoints, stroke #8fc1e3 at 0.13 mm; overshoot is a seeded 1-2 unit extension per segment. Ghosts are clones in a group animated to opacity 0 over 60 s. Add the layer as a new row in the existing layer manager.",
+     "inspiration": "Hand architectural drafting (non-photo-blue construction lines, guidelines ruled before lettering)"
+    },
+    {
+     "name": "A sun study for Christmas Eve",
+     "layer": "time-aware",
+     "priority": "should",
+     "spec": "A small viewport labelled 'SUN STUDY · 24 DEC · 14:00 · NÜRNBERG 49.45°N' shows the house's isometric shadow cast from the real solar azimuth and altitude at the viewer's current local clock time, mapped onto 24 Dec. The shadow is drawn as a 15% drafting hatch. After sunset the viewport reads 'SUN BELOW HORIZON · STUDY SUSPENDED' and shows only the outline. It updates every minute.",
+     "howToBuild": "Use declination δ ≈ -23.4° for 24 Dec and hour angle H = 15°·(t - 12) to get altitude and azimuth. Each vertical edge of height h casts a shadow of length h/tan(alt) toward az + 180°, projected with the existing basis(). Take the hull() of the shadow points and fill it with the hatch pattern.",
+     "inspiration": "Architectural winter-solstice sun and shadow studies; the NOAA solar-position method; Nürnberger Lebkuchen"
+    },
+    {
+     "name": "A title block that knows the date",
+     "layer": "time-aware",
+     "priority": "should",
+     "spec": "The title block fills itself in: DATE is today in ISO format, and the PHASE field follows the season. It reads 'PRE-ADVENT · DOUGH RESTING' now, 'ADVENT II' during Advent, 'ISSUED FOR CONSTRUCTION · HEILIGABEND' on 24 Dec, 'AS BUILT · DAY IV OF XII' during the Twelve Days, and 'DEMOLITION PERMITTED' after 6 Jan. Revision rows created this session take today's date.",
+     "howToBuild": "A season(now) helper with the ?date= override writes into the title-block text nodes at load and at the minute boundary.",
+     "inspiration": "Architectural title blocks and drawing-issue status conventions; the Advent calendar"
+    },
+    {
+     "name": "Spec notes with a straight face",
+     "layer": "copy",
+     "priority": "should",
+     "spec": "Callouts and numbered general notes speak in terse drafting voice, with at most one joke per view: 'GUMDROP, LOAD-BEARING — DO NOT SUBSTITUTE'; 'FLUE: SANTA-RATED · MIN. CLEAR OPENING FOR ONE (1) SANTA'; '3. ROYAL ICING TO STIFF PEAK. CURE 2 H BEFORE ROOF.'. Parts give both CUT and BAKED sizes with ±0.5 tolerance and the note 'TRIM TO TEMPLATE WHILE WARM'. Beside the scale bar sits 'DO NOT SCALE DRAWING'.",
+     "howToBuild": "Use string tables in placeCallout() and the notes block, with variants picked by seed.",
+     "inspiration": "Teenage Engineering's dry manuals; ISO 129 and ASME Y14.5 drafting conventions"
+    },
+    {
+     "name": "Reindeer, roof-mounted: not supplied",
+     "layer": "easter-egg",
+     "priority": "nice",
+     "spec": "When the SNOW and LIGHTS layers are both on, the BOM gains a row that rolls in: '17 · REINDEER, ROOF-MOUNTED · QTY 0 · NOT SUPPLIED'. A faint hidden-line (P3 dashed) reindeer silhouette marked 'BY OTHERS' appears on the roof ridge. It is never announced.",
+     "howToBuild": "Add the condition in applyLayers(). The reindeer path uses the hidden-line dash '6 3', and the row uses the odometer component.",
+     "inspiration": "The drafting convention 'by others'; Google Santa Tracker's 'Santa Search' cameos"
+    },
+    {
+     "name": "Lights that behave like real ones",
+     "layer": "ambient",
+     "priority": "should",
+     "spec": "On the LIGHTS layer (off by default), the eave string hangs in true catenaries between hooks, with each bulb set perpendicular to the wire. Switching on, each bulb warms over 120-250 ms from red-orange to warm white, staggered along the string; switching off, bulbs fade faster and leave a brief ember. One loose bulb flickers now and then; clicking it re-seats it with a tiny click, and it stays steady for the session. A tiny controller-box callout cycles the eight real modes on click, defaulting to Steady On, and nothing runs faster than 2 Hz.",
+     "howToBuild": "Extend eaveLights()/bulbAt(): y = a·cosh((x - x0)/a) + c sampled with tangents. Each bulb's temperature T(t) uses a Kelvin LUT (1000 K #ff3800, 1800 K #ff7e00, 2700 K #ffa757), and glow uses the existing glowg blur group with opacity bound to brightness. Each mode is f(i, t) returning brightness.",
+     "inspiration": "Real 8-function mini-light controllers (Combination, In Waves, Sequential, Slo-Glo, Chasing, Slow Fade, Twinkle, Steady On); Chrome Experiments 'Streetlights'"
+    },
+    {
+     "name": "A template you can bake from",
+     "layer": "material",
+     "priority": "should",
+     "spec": "The cutting-template sheet nests every part on 'DOUGH SHEET · t = 6 mm · ROLL ↔', with crop marks, scissors glyphs on dashed cut lines and numbered balloons matching the BOM. It carries a computed 'YIELD 78% · SCRAP → GINGERBREAD PEOPLE' and a 50 mm test square captioned 'PRINT AT 100% — THIS SQUARE MUST MEASURE 50 MM'. Ctrl+P gives a true-scale A4. The perforated tear-off resists at first and then releases, each hole ticking as it pops.",
+     "howToBuild": "In buildTemplate(), shelf-pack the bounding rectangles sorted by height; yield = Σ part area / sheet area. Print styles: @media print { @page { size: A4; margin: 0 } }. Tear progress is the pointer's projection onto the perforation path, with effective delta × (0.4 + 0.6·progress).",
+     "inspiration": "The test square printed on sewing patterns; CNC and laser nesting yield; real gingerbread-house templates"
+    },
+    {
+     "name": "Command-line hints",
+     "layer": "onboarding-hint",
+     "priority": "should",
+     "spec": "Hints appear only in the command line, as a prompt with a 1 Hz caret: 'Command: DRAG SCALE TO EXPLODE', then 'Command: TOGGLE A LAYER (L)', then 'Command: APPROVE (HOLD)'. One shows after 4 s without progress, retires after two successes, and gives up after three showings.",
+     "howToBuild": "Use the same hints-array pattern, writing into the command-echo element, persisted through try/catch.",
+     "inspiration": "The AutoCAD command prompt; Linear's shortcut hints"
+    },
+    {
+     "name": "Layer toggles in rhythm",
+     "layer": "sound",
+     "priority": "nice",
+     "spec": "With sound on, layer toggles tick on a 1/8-note grid at 60 BPM, pitched by layer order from DIMS (low) to SNOW (high) on D major pentatonic, so toggling several in a row plays a small figure. A soft plotter whirr accompanies the dimension relayout during an explode. There is no sound on hover.",
+     "howToBuild": "Use a global musical clock t0 and schedule at t0 + ceil((now - t0)/step)·step, with a pencil-tick transient plus a 30 ms pitched sine.",
+     "inspiration": "Google Santa Tracker's Elf Jamband; Chrome Music Lab's constrained scales"
+    }
+   ]
+  }
+ ]
+}
